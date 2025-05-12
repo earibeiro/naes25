@@ -1,17 +1,8 @@
-{% load static %}
+{% extends "pages/base.html" %}
 
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página Inicial</title>
+{% block title %}Página Inicial - Athena{% endblock %}
 
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}".css">
-</head>
-<body>
-    <h3>Bem-vindo à Página Inicial</h3>
-
-    <img src="{% static 'img' %}" alt="">
-</body>
-</html>
+{% block content %}
+<h2>Bem-vindo à Página Inicial</h2>
+<p>Este é o conteúdo específico da página inicial.</p>
+{% endblock %}
