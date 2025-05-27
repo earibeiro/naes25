@@ -3,17 +3,18 @@
 {% block title %}Sobre - Athena{% endblock %}
 
 {% block hero_content %}
-<h1 class="mx-auto my-0 text-uppercase">Athena</h1>
-<h2 class="text-white-50 mx-auto mt-2 mb-5">Conheça mais sobre nosso projeto</h2>
-<a class="btn btn-primary" href="{% url 'index' %}">Voltar ao Início</a>
+<!-- Área personalizada para about -->
+<div class="container px-4 px-lg-5 text-center" style="padding: 100px 0;">
+    <h1 class="text-white">Athena</h1>
+    <p class="text-white-50">Seus contratos em um único lugar.</p>
+</div>
 {% endblock %}
 
 {% block about_content %}
-<h2 class="text-white mb-4">Nossa Missão</h2>
-<p class="text-white-50">
-    Desenvolver soluções tecnológicas inovadoras para o ambiente empresarial,
-    realizando a gestão dos seus contratos relativos à Lei Geral de Proteção de Dados.
-</p>
 {% endblock %}
 
-<!-- Sobrescreva apenas as seções que você quer modificar -->
+{% block about_image %}
+{% endblock %}
+
+{% block projects_content %}{% endblock %}
+{% block contact_content %}{% endblock %}
