@@ -2,7 +2,18 @@
 
 {% block title %}Sobre - Athena{% endblock %}
 
-{% block content %}
-<h2>Sobre o Projeto</h2>
-<p>Este é o conteúdo específico da página sobre.</p>
+{% block hero_content %}
+<h1 class="mx-auto my-0 text-uppercase">Athena</h1>
+<h2 class="text-white-50 mx-auto mt-2 mb-5">Conheça mais sobre nosso projeto</h2>
+<a class="btn btn-primary" href="{% url 'index' %}">Voltar ao Início</a>
 {% endblock %}
+
+{% block about_content %}
+<h2 class="text-white mb-4">Nossa Missão</h2>
+<p class="text-white-50">
+    Desenvolver soluções tecnológicas inovadoras para o ambiente empresarial,
+    realizando a gestão dos seus contratos relativos à Lei Geral de Proteção de Dados.
+</p>
+{% endblock %}
+
+<!-- Sobrescreva apenas as seções que você quer modificar -->

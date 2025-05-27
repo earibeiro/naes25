@@ -119,7 +119,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR.parent, 'naes25/static'),
+    os.path.join(BASE_DIR.parent, 'static'),
 ]
 
 # Default primary key field type

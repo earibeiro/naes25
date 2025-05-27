@@ -2,7 +2,42 @@
 
 {% block title %}Página Inicial - Athena{% endblock %}
 
-{% block content %}
-<h2>Bem-vindo à Página Inicial</h2>
-<p>Este é o conteúdo específico da página inicial.</p>
+{% block brand_name %}Athena{% endblock %}
+
+{% block hero_title %}Athena{% endblock %}
+{% block hero_subtitle %}Sistema de Gerenciamento Acadêmico - Uma plataforma completa para sua instituição.{% endblock %}
+{% block hero_button %}Começar Agora{% endblock %}
+
+{% block about_content %}
+<h2 class="text-white mb-4">Sobre o Projeto Athena</h2>
+<p class="text-white-50">
+    O Athena é um sistema completo de gerenciamento acadêmico desenvolvido com Django. 
+    Oferece funcionalidades para alunos, professores e administradores, proporcionando 
+    uma experiência integrada e eficiente para o ambiente educacional.
+</p>
 {% endblock %}
+
+{% block project_featured_title %}Dashboard Interativo{% endblock %}
+{% block project_featured_description %}Interface moderna e intuitiva que permite acesso rápido a todas as funcionalidades do sistema, com gráficos e relatórios em tempo real.{% endblock %}
+
+{% block project_one_title %}Gestão de Contratos{% endblock %}
+{% block project_one_description %}Sistema completo para criação, desenvolvimento e gestão de contratos, incluindo histórico de pedidos.{% endblock %}
+
+{% block project_two_title %}Portal do Controlador de Dados{% endblock %}
+{% block project_two_description %}Ferramentas dedicadas para os controladores de dados gerenciarem seus contratos, criação de contratos e sua gestão, uma ferramenta completa.{% endblock %}
+
+{% block project_three_title %}Portal do Titular de Dados{% endblock %}
+{% block project_tthree_description %}Ferramentas dedicadas para que o titular de dados saiba o que é feito com seus dados, podendo exercer também seu direito em conformidade com a lei.{% endblock %}
+
+{% block contact_content %}
+<i class="far fa-envelope fa-2x mb-2 text-white"></i>
+<h2 class="text-white mb-5">Entre em contato conosco!</h2>
+<form class="form-signup" id="contactForm">
+    <div class="row input-group-newsletter">
+        <div class="col"><input class="form-control" id="emailAddress" type="email" placeholder="Digite seu email..." aria-label="Digite seu email..." /></div>
+        <div class="col-auto"><button class="btn btn-primary" id="submitButton" type="submit">Enviar</button></div>
+    </div>
+</form>
+{% endblock %}
+
+{% block copyright %}Projeto Athena 2025{% endblock %}
