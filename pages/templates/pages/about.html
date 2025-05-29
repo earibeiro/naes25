@@ -1,4 +1,5 @@
 {% extends "pages/base.html" %}
+{% load static %}
 
 {% block title %}Sobre - Athena{% endblock %}
 
@@ -11,6 +12,49 @@
 {% endblock %}
 
 {% block about_content %}
+<!-- Seção com as imagens e descrições -->
+<div class="container px-4 px-lg-5 py-5">
+    <div class="row gx-4 gx-lg-5 mb-5">
+        <div class="col-lg-12 text-center mb-5">
+            <h2 class="text-white mb-4">Documentação do Sistema</h2>
+        </div>
+    </div>
+    
+    <!-- Primeira imagem - Diagrama de Caso de Uso -->
+    <div class="row gx-4 gx-lg-5 mb-5 align-items-center">
+        <div class="col-lg-6">
+            <img class="img-fluid rounded shadow" src="{% static 'img/caso_uso_solicitacao.png' %}" alt="Diagrama de Caso de Uso - Solicitação de Dados" />
+        </div>
+        <div class="col-lg-6">
+            <div class="text-center text-lg-left">
+                <h3 class="text-white mb-3">Diagrama de Caso de Uso</h3>
+                <p class="text-white-50">
+                    Este diagrama ilustra o processo de um usuário solicitando dados no sistema Athena. 
+                    Mostra as interações entre o usuário e o sistema durante o fluxo de solicitação, 
+                    incluindo os diferentes atores envolvidos e suas respectivas responsabilidades.
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Segunda imagem - Diagrama de Classes -->
+    <div class="row gx-4 gx-lg-5 mb-5 align-items-center">
+        <div class="col-lg-6 order-lg-2">
+            <img class="img-fluid rounded shadow" src="{% static 'img/diagrama_NAES5.png' %}" alt="Diagrama de Classes NAES5" />
+        </div>
+        <div class="col-lg-6 order-lg-1">
+            <div class="text-center text-lg-right">
+                <h3 class="text-white mb-3">Diagrama de Classes do Sistema</h3>
+                <p class="text-white-50">
+                    O Diagrama de Classes NAES5 apresenta a estrutura arquitetural do sistema Athena, 
+                    mostrando como as diferentes classes se relacionam e interagem entre si. 
+                    Este diagrama é fundamental para compreender o funcionamento interno do sistema 
+                    e suas dependências.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block about_image %}
