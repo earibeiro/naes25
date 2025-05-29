@@ -2,6 +2,7 @@ from django.views.generic import TemplateView
 from .models import State, City, Person, Company
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from .forms import PersonForm, CompanyForm, StateForm, CityForm  # ← ADICIONE ESTA LINHA
 
 class MainPage(TemplateView):
     template_name = 'pages/index.html'
@@ -17,50 +18,50 @@ class ContactView(TemplateView):
 
 class StateCreateView(CreateView):
     model = State
-    fields = ['name', 'abbreviation']
-    template_name = 'pages/state_form.html'
+    form_class = StateForm 
+    template_name = 'pages/signups/forms.html'
     success_url = reverse_lazy('index')
 
 class CityCreateView(CreateView):
     model = City
-    fields = ['name', 'state']
-    template_name = 'pages/city_form.html'
+    form_class = CityForm
+    template_name = 'pages/signups/forms.html'
     success_url = reverse_lazy('index')
 
 class PersonCreateView(CreateView):
     model = Person
-    fields = ['name', 'cpf', 'email', 'phone', 'city']
-    template_name = 'pages/person_form.html'
+    form_class = PersonForm
+    template_name = 'pages/signups/forms.html'
     success_url = reverse_lazy('index')
 
 class CompanyCreateView(CreateView):
     model = Company
-    fields = ['name', 'cnpj', 'email', 'phone', 'city']
-    template_name = 'pages/company_form.html'
+    form_class = CompanyForm
+    template_name = 'pages/signups/forms.html'
     success_url = reverse_lazy('index')
 
 class StateUpdateView(UpdateView):
     model = State
-    fields = ['name', 'abbreviation']
-    template_name = 'pages/state_form.html'
+    form_class = StateForm
+    template_name = 'pages/signups/forms.html'
     success_url = reverse_lazy('index')
 
 class CityUpdateView(UpdateView):
     model = City
-    fields = ['name', 'state']
-    template_name = 'pages/city_form.html'
+    form_class = CityForm
+    template_name = 'pages/signups/forms.html'
     success_url = reverse_lazy('index')
 
 class PersonUpdateView(UpdateView):
     model = Person
-    fields = ['name', 'cpf', 'email', 'phone', 'city']
-    template_name = 'pages/person_form.html'
+    form_class = PersonForm
+    template_name = 'pages/signups/forms.html'
     success_url = reverse_lazy('index')
 
 class CompanyUpdateView(UpdateView):
     model = Company
-    fields = ['name', 'cnpj', 'email', 'phone', 'city']
-    template_name = 'pages/company_form.html'
+    form_class = CompanyForm
+    template_name = 'pages/signups/forms.html'
     success_url = reverse_lazy('index')
 
 class StateDeleteView(DeleteView):
