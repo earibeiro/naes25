@@ -11,8 +11,6 @@ class BaseFormMixin:
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.form_class = 'form-dark'
-        self.helper.label_class = 'text-white'
-        self.helper.field_class = 'mb-3'
         
         # Personalizar campos
         for field_name, field in self.fields.items():
@@ -33,8 +31,8 @@ class StateForm(BaseFormMixin, forms.ModelForm):
         
         self.helper.layout = Layout(
             HTML('<div class="text-center mb-4">'),
-            HTML('<h3 class="text-white mb-3"><i class="fas fa-map me-2"></i>Cadastro de Estado</h3>'),
-            HTML('<p class="text-white-50">Preencha os dados do estado</p>'),
+            HTML('<h3 class="text-white mb-3"><i class="fas fa-map mr-2"></i>Cadastro de Estado</h3>'),
+            HTML('<p class="text-muted">Preencha os dados do estado</p>'),
             HTML('</div>'),
             
             Row(
@@ -44,7 +42,7 @@ class StateForm(BaseFormMixin, forms.ModelForm):
             
             Div(
                 Submit('submit', 'Cadastrar Estado', 
-                       css_class='btn btn-primary btn-lg px-5'),
+                       css_class='btn btn-primary btn-lg'),
                 css_class='text-center mt-4'
             )
         )
@@ -59,8 +57,8 @@ class CityForm(BaseFormMixin, forms.ModelForm):
         
         self.helper.layout = Layout(
             HTML('<div class="text-center mb-4">'),
-            HTML('<h3 class="text-white mb-3"><i class="fas fa-city me-2"></i>Cadastro de Cidade</h3>'),
-            HTML('<p class="text-white-50">Preencha os dados da cidade</p>'),
+            HTML('<h3 class="text-white mb-3"><i class="fas fa-city mr-2"></i>Cadastro de Cidade</h3>'),
+            HTML('<p class="text-muted">Preencha os dados da cidade</p>'),
             HTML('</div>'),
             
             Row(
@@ -70,7 +68,7 @@ class CityForm(BaseFormMixin, forms.ModelForm):
             
             Div(
                 Submit('submit', 'Cadastrar Cidade', 
-                       css_class='btn btn-primary btn-lg px-5'),
+                       css_class='btn btn-primary btn-lg'),
                 css_class='text-center mt-4'
             )
         )
@@ -85,8 +83,8 @@ class PersonForm(BaseFormMixin, forms.ModelForm):
         
         self.helper.layout = Layout(
             HTML('<div class="text-center mb-4">'),
-            HTML('<h3 class="text-white mb-3"><i class="fas fa-user me-2"></i>Cadastro de Pessoa Física</h3>'),
-            HTML('<p class="text-white-50">Preencha os dados da pessoa física</p>'),
+            HTML('<h3 class="text-white mb-3"><i class="fas fa-user mr-2"></i>Cadastro de Pessoa Física</h3>'),
+            HTML('<p class="text-muted">Preencha os dados da pessoa física</p>'),
             HTML('</div>'),
             
             Row(
@@ -103,7 +101,7 @@ class PersonForm(BaseFormMixin, forms.ModelForm):
             
             Div(
                 Submit('submit', 'Cadastrar Pessoa Física', 
-                       css_class='btn btn-primary btn-lg px-5'),
+                       css_class='btn btn-primary btn-lg'),
                 css_class='text-center mt-4'
             )
         )
@@ -118,8 +116,8 @@ class CompanyForm(BaseFormMixin, forms.ModelForm):
         
         self.helper.layout = Layout(
             HTML('<div class="text-center mb-4">'),
-            HTML('<h3 class="text-white mb-3"><i class="fas fa-building me-2"></i>Cadastro de Pessoa Jurídica</h3>'),
-            HTML('<p class="text-white-50">Preencha os dados da pessoa jurídica</p>'),
+            HTML('<h3 class="text-white mb-3"><i class="fas fa-building mr-2"></i>Cadastro de Pessoa Jurídica</h3>'),
+            HTML('<p class="text-muted">Preencha os dados da pessoa jurídica</p>'),
             HTML('</div>'),
             
             Row(
@@ -136,7 +134,7 @@ class CompanyForm(BaseFormMixin, forms.ModelForm):
             
             Div(
                 Submit('submit', 'Cadastrar Pessoa Jurídica', 
-                       css_class='btn btn-primary btn-lg px-5'),
+                       css_class='btn btn-primary btn-lg'),
                 css_class='text-center mt-4'
             )
         )
