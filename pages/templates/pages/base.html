@@ -18,22 +18,130 @@
     </head>
     <body id="page-top">
         <!-- Navigation-->
+        <!-- Navbar -->
         <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
-    <div class="container px-4 px-lg-5">
-        <a class="navbar-brand" href="{% url 'index' %}">{% block brand_name %}Athena{% endblock %}</a>
-        <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-            Menu
-            <i class="fas fa-bars"></i>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarResponsive">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">About</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'projects' %}">Projects</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
-            </ul>
-        </div>
-    </div>
-</nav>
+            <div class="container px-4 px-lg-5">
+                <a class="navbar-brand" href="{% url 'index' %}">
+                    <i class="fas fa-shield-alt mr-2"></i>Athena
+                </a>
+                <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                    Menu
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarResponsive">
+                    <ul class="navbar-nav ms-auto">
+                        <!-- Links públicos -->
+                        <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">Início</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">Sobre</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'projects' %}">Projetos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contato</a></li>
+                        
+                        <!-- Menu baseado em grupos -->
+                        {% if user.is_authenticated %}
+                            
+                            <!-- Menu Admin (apenas administradores) -->
+                            {% if user.groups.all and 'Administrador' in user.groups.values_list 'name' flat=True %}
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle text-warning" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-cog mr-1"></i>Admin
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li><h6 class="dropdown-header">Configurações</h6></li>
+                                        <li><a class="dropdown-item" href="{% url 'state-list' %}">
+                                            <i class="fas fa-map mr-2"></i>Estados
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="{% url 'city-list' %}">
+                                            <i class="fas fa-city mr-2"></i>Cidades
+                                        </a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item" href="/admin/">
+                                            <i class="fas fa-tools mr-2"></i>Django Admin
+                                        </a></li>
+                                    </ul>
+                                </li>
+                            {% endif %}
+                            
+                            <!-- Menu LGPD (usuários e administradores) -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="lgpdDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-database mr-1"></i>LGPD
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><h6 class="dropdown-header">Gestão de Dados</h6></li>
+                                    <li><a class="dropdown-item" href="{% url 'person-list' %}">
+                                        <i class="fas fa-user mr-2"></i>Pessoas Físicas
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{% url 'company-list' %}">
+                                        <i class="fas fa-building mr-2"></i>Empresas
+                                    </a></li>
+                                </ul>
+                            </li>
+                        {% endif %}
+                        
+                        <!-- Menu do usuário -->
+                        {% if user.is_authenticated %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-user-circle mr-1"></i>
+                                    {% if user.first_name %}
+                                        {{ user.first_name }}
+                                    {% else %}
+                                        {{ user.username }}
+                                    {% endif %}
+                                    
+                                    <!-- Badge do grupo -->
+                                    {% if user.groups.all %}
+                                        {% for group in user.groups.all %}
+                                            {% if group.name == 'Administrador' %}
+                                                <span class="badge badge-warning ml-1">Admin</span>
+                                            {% elif group.name == 'Usuarios' %}
+                                                <span class="badge badge-info ml-1">User</span>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><h6 class="dropdown-header">
+                                        <i class="fas fa-info-circle mr-2"></i>Logado como:
+                                    </h6></li>
+                                    <li><small class="dropdown-item-text">
+                                        <strong>{{ user.username }}</strong><br>
+                                        {% if user.email %}{{ user.email }}{% endif %}<br>
+                                        {% if user.groups.all %}
+                                            <span class="text-muted">
+                                                Grupos: 
+                                                {% for group in user.groups.all %}
+                                                    {{ group.name }}{% if not forloop.last %}, {% endif %}
+                                                {% endfor %}
+                                            </span>
+                                        {% endif %}
+                                    </small></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="#">
+                                        <i class="fas fa-user-cog mr-2"></i>Meu Perfil
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{% url 'alterar-senha' %}">
+                                        <i class="fas fa-key mr-2"></i>Alterar Senha
+                                    </a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">
+                                        <i class="fas fa-sign-out-alt mr-2"></i>Sair do Sistema
+                                    </a></li>
+                                </ul>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link btn btn-outline-primary" href="{% url 'login' %}" style="border-radius: 25px;">
+                                    <i class="fas fa-sign-in-alt mr-1"></i>Entrar
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        {% block content %}
 
         <!-- Masthead-->
         <header class="masthead">

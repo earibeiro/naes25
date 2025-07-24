@@ -1,140 +1,65 @@
 from django import forms
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Submit, Row, Column, Div, HTML
-from .models import State, City, Person, Company
+from .models import Person, Company, State, City
 
-class BaseFormMixin:
-    """Mixin para configurações básicas dos formulários"""
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_method = 'post'
-        self.helper.form_class = 'form-dark'
-        
-        # Personalizar campos
-        for field_name, field in self.fields.items():
-            field.widget.attrs.update({
-                'class': 'form-control bg-dark text-white border-secondary',
-                'style': 'border-radius: 0.5rem;'
-            })
-            if hasattr(field.widget, 'attrs'):
-                field.widget.attrs['placeholder'] = field.label
-
-class StateForm(BaseFormMixin, forms.ModelForm):
+class StateForm(forms.ModelForm):
     class Meta:
         model = State
         fields = ['name', 'abbreviation']
         
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        
-        self.helper.layout = Layout(
-            HTML('<div class="text-center mb-4">'),
-            HTML('<h3 class="text-white mb-3"><i class="fas fa-map mr-2"></i>Cadastro de Estado</h3>'),
-            HTML('<p class="text-muted">Preencha os dados do estado</p>'),
-            HTML('</div>'),
-            
-            Row(
-                Column('name', css_class='form-group col-md-8 mb-3'),
-                Column('abbreviation', css_class='form-group col-md-4 mb-3'),
-            ),
-            
-            Div(
-                Submit('submit', 'Cadastrar Estado', 
-                       css_class='btn btn-primary btn-lg'),
-                css_class='text-center mt-4'
-            )
-        )
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'abbreviation': forms.TextInput(attrs={'class': 'form-control', 'maxlength': '2'}),
+        }
 
-class CityForm(BaseFormMixin, forms.ModelForm):
+class CityForm(forms.ModelForm):
     class Meta:
         model = City
         fields = ['name', 'state']
         
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        
-        self.helper.layout = Layout(
-            HTML('<div class="text-center mb-4">'),
-            HTML('<h3 class="text-white mb-3"><i class="fas fa-city mr-2"></i>Cadastro de Cidade</h3>'),
-            HTML('<p class="text-muted">Preencha os dados da cidade</p>'),
-            HTML('</div>'),
-            
-            Row(
-                Column('name', css_class='form-group col-md-8 mb-3'),
-                Column('state', css_class='form-group col-md-4 mb-3'),
-            ),
-            
-            Div(
-                Submit('submit', 'Cadastrar Cidade', 
-                       css_class='btn btn-primary btn-lg'),
-                css_class='text-center mt-4'
-            )
-        )
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'state': forms.Select(attrs={'class': 'form-control'}),
+        }
 
-class PersonForm(BaseFormMixin, forms.ModelForm):
+class PersonForm(forms.ModelForm):
     class Meta:
         model = Person
-        fields = ['name', 'cpf', 'email', 'phone', 'city']
+        fields = [
+            'full_name', 'cpf', 'email', 'phone', 'birth_date', 
+            'address', 'city', 'data_processing_purpose'
+        ]
+        # REMOVIDO 'usuario' - será preenchido automaticamente
         
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        
-        self.helper.layout = Layout(
-            HTML('<div class="text-center mb-4">'),
-            HTML('<h3 class="text-white mb-3"><i class="fas fa-user mr-2"></i>Cadastro de Pessoa Física</h3>'),
-            HTML('<p class="text-muted">Preencha os dados da pessoa física</p>'),
-            HTML('</div>'),
-            
-            Row(
-                Column('name', css_class='form-group col-md-8 mb-3'),
-                Column('cpf', css_class='form-group col-md-4 mb-3'),
-            ),
-            Row(
-                Column('email', css_class='form-group col-md-8 mb-3'),
-                Column('phone', css_class='form-group col-md-4 mb-3'),
-            ),
-            Row(
-                Column('city', css_class='form-group col-md-12 mb-3'),
-            ),
-            
-            Div(
-                Submit('submit', 'Cadastrar Pessoa Física', 
-                       css_class='btn btn-primary btn-lg'),
-                css_class='text-center mt-4'
-            )
-        )
+        widgets = {
+            'full_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'cpf': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '000.000.000-00'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '(00) 00000-0000'}),
+            'birth_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'address': forms.TextInput(attrs={'class': 'form-control'}),
+            'city': forms.Select(attrs={'class': 'form-control'}),
+            'data_processing_purpose': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+        }
 
-class CompanyForm(BaseFormMixin, forms.ModelForm):
+class CompanyForm(forms.ModelForm):
     class Meta:
         model = Company
-        fields = ['name', 'cnpj', 'email', 'phone', 'city']
+        fields = [
+            'corporate_name', 'trade_name', 'cnpj', 'email', 'phone',
+            'address', 'city', 'data_controller_name', 'data_controller_email',
+            'data_processing_purpose'
+        ]
+        # REMOVIDO 'usuario' - será preenchido automaticamente
         
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        
-        self.helper.layout = Layout(
-            HTML('<div class="text-center mb-4">'),
-            HTML('<h3 class="text-white mb-3"><i class="fas fa-building mr-2"></i>Cadastro de Pessoa Jurídica</h3>'),
-            HTML('<p class="text-muted">Preencha os dados da pessoa jurídica</p>'),
-            HTML('</div>'),
-            
-            Row(
-                Column('name', css_class='form-group col-md-8 mb-3'),
-                Column('cnpj', css_class='form-group col-md-4 mb-3'),
-            ),
-            Row(
-                Column('email', css_class='form-group col-md-8 mb-3'),
-                Column('phone', css_class='form-group col-md-4 mb-3'),
-            ),
-            Row(
-                Column('city', css_class='form-group col-md-12 mb-3'),
-            ),
-            
-            Div(
-                Submit('submit', 'Cadastrar Pessoa Jurídica', 
-                       css_class='btn btn-primary btn-lg'),
-                css_class='text-center mt-4'
-            )
-        )
+        widgets = {
+            'corporate_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'trade_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'cnpj': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '00.000.000/0000-00'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '(00) 00000-0000'}),
+            'address': forms.TextInput(attrs={'class': 'form-control'}),
+            'city': forms.Select(attrs={'class': 'form-control'}),
+            'data_controller_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'data_controller_email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'data_processing_purpose': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+        }

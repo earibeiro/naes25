@@ -1,0 +1,115 @@
+{% extends "pages/listas/base_list.html" %}
+
+{% block title %}Pessoas Físicas{% endblock %}
+
+{% block hero_content %}
+<div class="container px-4 px-lg-5 text-center" style="padding: 80px 0;">
+    <h1 class="text-white">Pessoas Físicas</h1>
+    <p class="text-white-50">Gerenciamento de Pessoas Físicas - LGPD</p>
+</div>
+{% endblock %}
+
+{% block table_content %}
+<table class="table table-dark table-hover">
+    <thead>
+        <tr>
+            <th><i class="fas fa-hashtag"></i> ID</th>
+            <th><i class="fas fa-user"></i> Nome</th>
+            <th><i class="fas fa-id-card"></i> CPF</th>
+            <th><i class="fas fa-envelope"></i> Email</th>
+            <th><i class="fas fa-phone"></i> Telefone</th>
+            <th><i class="fas fa-map-marker-alt"></i> Cidade</th>
+            <th class="text-center"><i class="fas fa-cogs"></i> Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for person in persons %}
+        <tr>
+            <td>{{ person.id }}</td>
+            <td>
+                <a href="{% url 'person-detail' person.pk %}" class="text-white text-decoration-none">
+                    <strong>{{ person.name }}</strong>
+                </a>
+            </td>
+            <td>
+                <code class="text-info">{{ person.cpf }}</code>
+            </td>
+            <td>
+                <a href="mailto:{{ person.email }}" class="text-info text-decoration-none">
+                    {{ person.email }}
+                </a>
+            </td>
+            <td>
+                <a href="tel:{{ person.phone }}" class="text-success text-decoration-none">
+                    {{ person.phone }}
+                </a>
+            </td>
+            <td>
+                <small>{{ person.city.name }}, {{ person.city.state.abbreviation }}</small>
+            </td>
+            <td class="text-center">
+                <div class="btn-group" role="group">
+                    <a href="{% url 'person-detail' person.pk %}" class="btn btn-info btn-sm" title="Visualizar">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                    <a href="{% url 'update-person' person.pk %}" class="btn btn-warning btn-sm" title="Editar">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="{% url 'delete-person' person.pk %}" class="btn btn-danger btn-sm" title="Excluir">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Informações extras -->
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="card bg-secondary">
+            <div class="card-body text-center">
+                <h5 class="card-title text-white">
+                    <i class="fas fa-users mr-2"></i>Total de Pessoas
+                </h5>
+                <h2 class="text-primary">{{ persons|length }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info">
+            <div class="card-body text-center">
+                <h5 class="card-title text-white">
+                    <i class="fas fa-shield-alt mr-2"></i>LGPD
+                </h5>
+                <small class="text-white">Dados protegidos</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-secondary">
+            <div class="card-body text-center">
+                <h5 class="card-title text-white">
+                    <i class="fas fa-building mr-2"></i>Empresas
+                </h5>
+                <a href="{% url 'company-list' %}" class="btn btn-outline-light btn-sm">
+                    Ver Empresas
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-secondary">
+            <div class="card-body text-center">
+                <h5 class="card-title text-white">
+                    <i class="fas fa-plus mr-2"></i>Ação Rápida
+                </h5>
+                <a href="{% url 'person-create' %}" class="btn btn-primary">
+                    Nova Pessoa
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

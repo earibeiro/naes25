@@ -1,0 +1,103 @@
+{% extends "pages/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} - Athena{% endblock %}
+
+{% block hero_content %}
+<div class="container px-4 px-lg-5 text-center" style="padding: 80px 0;">
+    <h1 class="text-white">{{ title }}</h1>
+    <p class="text-white-50">{{ subtitle }}</p>
+</div>
+{% endblock %}
+
+{% block about_content %}
+<div class="container px-4 px-lg-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-12">
+            
+            <!-- Mensagens -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-4" role="alert">
+                        <i class="fas fa-check-circle mr-2"></i>{{ message }}
+                        <button type="button" class="close" data-dismiss="alert">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <!-- Botão de adicionar -->
+            <div class="text-right mb-4">
+                <a href="{{ create_url }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus mr-2"></i>Adicionar {{ item_name }}
+                </a>
+            </div>
+            
+            <!-- Card com tabela -->
+            <div class="card bg-dark border-light shadow-lg" style="border-radius: 1rem;">
+                <div class="card-body p-4">
+                    {% if object_list %}
+                        <div class="table-responsive">
+                            {% block table_content %}
+                            <!-- Conteúdo específico da tabela será definido nos templates filhos -->
+                            {% endblock %}
+                        </div>
+                        
+                        <!-- Paginação -->
+                        {% if is_paginated %}
+                        <nav aria-label="Navegação de páginas" class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link bg-dark text-white border-secondary" href="?page={{ page_obj.previous_page_number }}">
+                                            <i class="fas fa-chevron-left"></i> Anterior
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                
+                                <li class="page-item active">
+                                    <span class="page-link bg-primary border-primary">
+                                        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                                    </span>
+                                </li>
+                                
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link bg-dark text-white border-secondary" href="?page={{ page_obj.next_page_number }}">
+                                            Próxima <i class="fas fa-chevron-right"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-inbox fa-4x text-muted mb-3"></i>
+                            <h4 class="text-white">Nenhum {{ item_name }} encontrado</h4>
+                            <p class="text-white-50">Comece adicionando o primeiro {{ item_name }}.</p>
+                            <a href="{{ create_url }}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-plus mr-2"></i>Adicionar {{ item_name }}
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Botão voltar -->
+            <div class="text-center mt-4">
+                <a href="{% url 'index' %}" class="btn btn-outline-light btn-lg">
+                    <i class="fas fa-arrow-left mr-2"></i>Voltar ao Início
+                </a>
+            </div>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block about_image %}{% endblock %}
+{% block projects_content %}{% endblock %}
+{% block contact_content %}{% endblock %}
+{% block copyright %}Projeto Athena 2025{% endblock %}

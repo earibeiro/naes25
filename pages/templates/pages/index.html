@@ -5,39 +5,152 @@
 {% block brand_name %}Athena{% endblock %}
 
 {% block hero_title %}Athena{% endblock %}
-{% block hero_subtitle %}Sistema de Gerenciamento Acadêmico - Uma plataforma completa para sua instituição.{% endblock %}
-{% block hero_button %}Começar Agora{% endblock %}
+{% block hero_subtitle %}
+    Sistema de Gerenciamento LGPD - Proteção de dados pessoais em conformidade com a lei.
+    {% if user.is_authenticated %}
+        Bem-vindo(a), <strong>{{ user.first_name|default:user.username }}</strong>!
+    {% endif %}
+{% endblock %}
+
+{% block hero_button %}
+    {% if user.is_authenticated %}
+        Acessar Sistema
+    {% else %}
+        Fazer Login
+    {% endif %}
+{% endblock %}
 
 {% block about_content %}
 <h2 class="text-white mb-4">Sobre o Projeto Athena</h2>
 <p class="text-white-50">
-    O Athena é um sistema completo de gerenciamento acadêmico desenvolvido com Django. 
-    Oferece funcionalidades para alunos, professores e administradores, proporcionando 
-    uma experiência integrada e eficiente para o ambiente educacional.
+    O Athena é um sistema completo de gerenciamento de dados pessoais desenvolvido com Django 
+    em conformidade com a LGPD (Lei Geral de Proteção de Dados). 
+    Oferece funcionalidades para empresas e pessoas físicas, proporcionando 
+    uma experiência segura e eficiente para o controle de dados pessoais.
 </p>
+
+{% if user.is_authenticated %}
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card bg-dark border-primary">
+                <div class="card-body text-center">
+                    <i class="fas fa-users fa-3x text-primary mb-3"></i>
+                    <h5 class="text-white">Pessoas Físicas</h5>
+                    <p class="text-white-50">Gerencie dados de pessoas físicas</p>
+                    <a href="{% url 'person-list' %}" class="btn btn-primary">
+                        <i class="fas fa-user mr-1"></i>Acessar
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card bg-dark border-warning">
+                <div class="card-body text-center">
+                    <i class="fas fa-building fa-3x text-warning mb-3"></i>
+                    <h5 class="text-white">Empresas</h5>
+                    <p class="text-white-50">Gerencie dados de empresas</p>
+                    <a href="{% url 'company-list' %}" class="btn btn-warning">
+                        <i class="fas fa-building mr-1"></i>Acessar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div class="text-center mt-4">
+        <a href="{% url 'login' %}" class="btn btn-primary btn-lg">
+            <i class="fas fa-sign-in-alt mr-2"></i>Acessar Sistema LGPD
+        </a>
+    </div>
+{% endif %}
 {% endblock %}
 
-{% block project_featured_title %}Dashboard Interativo{% endblock %}
-{% block project_featured_description %}Interface moderna e intuitiva que permite acesso rápido a todas as funcionalidades do sistema, com gráficos e relatórios em tempo real.{% endblock %}
+{% block project_featured_title %}Sistema LGPD Completo{% endblock %}
+{% block project_featured_description %}
+    Interface moderna e segura que permite gestão completa de dados pessoais em conformidade 
+    com a LGPD, incluindo contratos, consentimentos e relatórios de compliance.
+    {% if user.is_authenticated %}
+        <div class="mt-3">
+            <a href="{% url 'person-list' %}" class="btn btn-primary mr-2">
+                <i class="fas fa-users mr-1"></i>Pessoas
+            </a>
+            <a href="{% url 'company-list' %}" class="btn btn-secondary mr-2">
+                <i class="fas fa-building mr-1"></i>Empresas
+            </a>
+            <a href="{% url 'state-list' %}" class="btn btn-info">
+                <i class="fas fa-map mr-1"></i>Localização
+            </a>
+        </div>
+    {% endif %}
+{% endblock %}
 
-{% block project_one_title %}Gestão de Contratos{% endblock %}
-{% block project_one_description %}Sistema completo para criação, desenvolvimento e gestão de contratos, incluindo histórico de pedidos.{% endblock %}
+{% block project_one_title %}Gestão de Contratos LGPD{% endblock %}
+{% block project_one_description %}
+    Sistema completo para criação, desenvolvimento e gestão de contratos de uso de dados pessoais, 
+    incluindo histórico de consentimentos e termos de acordo.
+{% endblock %}
 
 {% block project_two_title %}Portal do Controlador de Dados{% endblock %}
-{% block project_two_description %}Ferramentas dedicadas para os controladores de dados gerenciarem seus contratos, criação de contratos e sua gestão, uma ferramenta completa.{% endblock %}
+{% block project_two_description %}
+    Ferramentas dedicadas para os controladores de dados gerenciarem contratos, 
+    uploads de documentos LGPD e gestão completa de consentimentos.
+{% endblock %}
 
 {% block project_three_title %}Portal do Titular de Dados{% endblock %}
-{% block project_tthree_description %}Ferramentas dedicadas para que o titular de dados saiba o que é feito com seus dados, podendo exercer também seu direito em conformidade com a lei.{% endblock %}
+{% block project_tthree_description %}
+    Ferramentas dedicadas para que o titular de dados visualize quais informações 
+    são coletadas, podendo exercer seus direitos de acordo com a LGPD.
+{% endblock %}
 
 {% block contact_content %}
 <i class="far fa-envelope fa-2x mb-2 text-white"></i>
 <h2 class="text-white mb-5">Entre em contato conosco!</h2>
-<form class="form-signup" id="contactForm">
-    <div class="row input-group-newsletter">
-        <div class="col"><input class="form-control" id="emailAddress" type="email" placeholder="Digite seu email..." aria-label="Digite seu email..." /></div>
-        <div class="col-auto"><button class="btn btn-primary" id="submitButton" type="submit">Enviar</button></div>
+
+{% if user.is_authenticated %}
+    <div class="alert alert-success">
+        <i class="fas fa-check-circle mr-2"></i>
+        <strong>Você está logado como:</strong> {{ user.username }}
+        {% if user.email %} - {{ user.email }}{% endif %}
     </div>
-</form>
+    <div class="row">
+        <div class="col-md-4">
+            <a href="{% url 'person-list' %}" class="btn btn-primary btn-block">
+                <i class="fas fa-user mr-2"></i>Pessoas Físicas
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="{% url 'company-list' %}" class="btn btn-warning btn-block">
+                <i class="fas fa-building mr-2"></i>Empresas
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="{% url 'alterar-senha' %}" class="btn btn-info btn-block">
+                <i class="fas fa-key mr-2"></i>Alterar Senha
+            </a>
+        </div>
+    </div>
+{% else %}
+    <form class="form-signup" id="contactForm">
+        <div class="row input-group-newsletter">
+            <div class="col">
+                <input class="form-control" id="emailAddress" type="email" 
+                       placeholder="Digite seu email para mais informações..." 
+                       aria-label="Digite seu email..." />
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-primary" id="submitButton" type="submit">
+                    Enviar
+                </button>
+            </div>
+        </div>
+        <div class="text-center mt-3">
+            <small class="text-white-50">
+                Ou <a href="{% url 'login' %}" class="text-primary">faça login</a> 
+                para acessar o sistema LGPD
+            </small>
+        </div>
+    </form>
+{% endif %}
 {% endblock %}
 
-{% block copyright %}Projeto Athena 2025{% endblock %}
+{% block copyright %}Projeto Athena LGPD 2025{% endblock %}
