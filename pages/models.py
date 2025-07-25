@@ -82,3 +82,4 @@ class Company(models.Model):
         verbose_name = "Empresa"
         verbose_name_plural = "Empresas"
         ordering = ['corporate_name']
+
