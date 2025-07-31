@@ -29,7 +29,6 @@ class Person(models.Model):
     # Dados pessoais LGPD
     full_name = models.CharField(max_length=150, verbose_name="Nome Completo")
     cpf = models.CharField(max_length=14, verbose_name="CPF", unique=True)
-    email = models.EmailField(verbose_name="E-mail")
     phone = models.CharField(max_length=15, verbose_name="Telefone")
     birth_date = models.DateField(verbose_name="Data de Nascimento")
     
@@ -40,10 +39,10 @@ class Person(models.Model):
     # Controle LGPD
     consent_date = models.DateTimeField(auto_now_add=True, verbose_name="Data do Consentimento")
     data_processing_purpose = models.TextField(verbose_name="Finalidade do Tratamento")
-    
+
     # RELACIONAMENTO COM USUÁRIO - Quem cadastrou/gerencia estes dados
-    usuario = models.ForeignKey(User, on_delete=models.PROTECT, verbose_name="Controlador de Dados")
-    
+    usuario = models.OneToOneField(User, on_delete=models.PROTECT, related_name= 'person')
+
     def __str__(self):
         return f"{self.full_name} - {self.cpf}"
     
@@ -57,7 +56,6 @@ class Company(models.Model):
     corporate_name = models.CharField(max_length=200, verbose_name="Razão Social")
     trade_name = models.CharField(max_length=200, verbose_name="Nome Fantasia", blank=True)
     cnpj = models.CharField(max_length=18, verbose_name="CNPJ", unique=True)
-    email = models.EmailField(verbose_name="E-mail Corporativo")
     phone = models.CharField(max_length=15, verbose_name="Telefone")
     
     # Endereço
@@ -73,7 +71,7 @@ class Company(models.Model):
     data_processing_purpose = models.TextField(verbose_name="Finalidade do Tratamento")
     
     # RELACIONAMENTO COM USUÁRIO - Quem cadastrou/gerencia estes dados
-    usuario = models.ForeignKey(User, on_delete=models.PROTECT, verbose_name="Controlador de Dados")
+    usuario = models.OneToOneField(User, on_delete=models.PROTECT, related_name= 'company')
     
     def __str__(self):
         return f"{self.corporate_name} - {self.cnpj}"
