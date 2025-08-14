@@ -16,9 +16,23 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+from django.views.static import serve
+import os
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('pages.urls')),
     path('', include('usuarios.urls')),
 ]
+
+# FORÇAR servir arquivos estáticos - SEMPRE funciona
+if settings.DEBUG:
+    # Método 1 - Padrão
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    
+    # Método 2 - Forçado (se o primeiro não funcionar)
+    urlpatterns += [
+        path('static/<path:path>', serve, {'document_root': settings.STATIC_ROOT}),
+    ]

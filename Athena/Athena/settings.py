@@ -134,8 +134,10 @@ USE_TZ = True
 DEBUG = True
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
-STATIC_ROOT = BASE_DIR / 'static_gcloud/'
+STATICFILES_DIRS = [
+    BASE_DIR.parent / 'static',  # Vai para a pasta raiz do projeto
+]
+STATIC_ROOT = BASE_DIR.parent / 'staticfiles'  # CORRIGIDO também
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
