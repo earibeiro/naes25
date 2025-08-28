@@ -10,6 +10,62 @@ from django.core.exceptions import PermissionDenied
 from datetime import timedelta
 from .models import Person, Company, Contract, State, City
 
+# IMPORTAR MIXINS DO PRÓPRIO APP (LOCAL)
+from .mixins import (
+    OwnerQuerysetMixin, 
+    OwnerObjectPermissionMixin, 
+    OwnerCreateMixin,
+    AdminOnlyMixin,
+    GroupRequiredMixin
+)
+
+# Tentar importar mixins existentes
+try:
+    from .mixins import GroupRequiredMixin
+    MIXINS_AVAILABLE = True
+except ImportError:
+    MIXINS_AVAILABLE = False
+    
+    # Criar mixins básicos inline
+    class GroupRequiredMixin:
+        group_required = None
+        
+        def dispatch(self, request, *args, **kwargs):
+            if self.group_required and not request.user.groups.filter(name=self.group_required).exists():
+                raise PermissionDenied("Você não tem permissão para acessar esta página.")
+            return super().dispatch(request, *args, **kwargs)
+    
+    class OwnerQuerysetMixin(LoginRequiredMixin):
+        owner_field_name = "usuario"
+        
+        def get_queryset(self):
+            qs = super().get_queryset()
+            return qs.filter(**{self.owner_field_name: self.request.user})
+    
+    class OwnerObjectPermissionMixin(UserPassesTestMixin):
+        owner_field_name = "usuario"
+        
+        def test_func(self):
+            try:
+                obj = self.get_object()
+                owner = getattr(obj, self.owner_field_name, None)
+                return owner == self.request.user
+            except:
+                return False
+    
+    class OwnerCreateMixin(LoginRequiredMixin):
+        owner_field_name = "usuario"
+        
+        def form_valid(self, form):
+            if hasattr(form.instance, self.owner_field_name):
+                setattr(form.instance, self.owner_field_name, self.request.user)
+            return super().form_valid(form)
+    
+    class AdminOnlyMixin(UserPassesTestMixin):
+        def test_func(self):
+            u = self.request.user
+            return u.is_superuser or u.groups.filter(name="empresa_admin").exists()
+
 # IMPORTAR FORMS COM TRATAMENTO DE ERRO
 try:
     from .forms import PersonForm, CompanyForm, ContractForm, StateForm, CityForm
@@ -35,191 +91,136 @@ except ImportError:
             fields = '__all__'
             exclude = ['usuario']
 
-# Importar mixins
-try:
-    from .mixins import GroupRequiredMixin
-except ImportError:
-    class GroupRequiredMixin:
-        group_required = None
-        
-        def dispatch(self, request, *args, **kwargs):
-            if self.group_required and not request.user.groups.filter(name=self.group_required).exists():
-                raise PermissionDenied("Você não tem permissão para acessar esta página.")
-            return super().dispatch(request, *args, **kwargs)
-
 # ===========================================
-# VIEWS PARA PERSON (PESSOA FÍSICA)
+# VIEWS PARA PERSON (PESSOA)
 # ===========================================
 
-class PersonListView(GroupRequiredMixin, LoginRequiredMixin, ListView):
-    group_required = ["empresa_admin", "funcionario"]
-    login_url = reverse_lazy('login')
+class PersonListView(OwnerQuerysetMixin, ListView):
+    """ListView para pessoas com escopo por owner"""
     model = Person
     template_name = 'pages/lists/person_list.html'
     context_object_name = 'persons'
     paginate_by = 10
-    
-    def get_queryset(self):
-        return Person.objects.filter(usuario=self.request.user)
 
-class PersonDetailView(GroupRequiredMixin, LoginRequiredMixin, DetailView):
-    group_required = ["empresa_admin", "funcionario"]
-    login_url = reverse_lazy('login')
+class PersonCreateView(OwnerCreateMixin, GroupRequiredMixin, CreateView):
+    """CreateView para pessoas"""
+    model = Person
+    fields = ['nome', 'cpf', 'email', 'telefone', 'cidade', 'data_processing_purpose']
+    template_name = 'pages/forms/person_form.html'
+    success_url = reverse_lazy('person-list')
+    group_required = 'funcionario'
+    
+    def form_valid(self, form):
+        messages.success(self.request, f'✅ Pessoa "{form.instance.nome}" criada com sucesso!')
+        return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        messages.error(self.request, '❌ Erro ao criar pessoa. Verifique os dados.')
+        return super().form_invalid(form)
+
+class PersonDetailView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, DetailView):
+    """DetailView para pessoas (apenas dono pode ver)"""
     model = Person
     template_name = 'pages/detail/person_detail.html'
     context_object_name = 'person'
-    
-    def get_queryset(self):
-        return Person.objects.filter(usuario=self.request.user)
 
-class PersonCreateView(GroupRequiredMixin, LoginRequiredMixin, CreateView):
-    group_required = ["empresa_admin", "funcionario"]
-    login_url = reverse_lazy('login')
+class PersonUpdateView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, UpdateView):
+    """UpdateView para pessoas (apenas dono pode editar)"""
     model = Person
-    form_class = PersonForm
+    fields = ['nome', 'cpf', 'email', 'telefone', 'cidade', 'data_processing_purpose']
     template_name = 'pages/forms/person_form.html'
-    success_url = reverse_lazy('person-list')
     
     def form_valid(self, form):
-        form.instance.usuario = self.request.user
-        messages.success(self.request, '✅ Pessoa cadastrada com sucesso!')
+        messages.success(self.request, f'✅ Pessoa "{form.instance.nome}" atualizada com sucesso!')
         return super().form_valid(form)
     
-    def form_invalid(self, form):
-        messages.error(self.request, '❌ Erro ao cadastrar pessoa. Verifique os dados.')
-        return super().form_invalid(form)
+    def get_success_url(self):
+        return reverse_lazy('person-detail', kwargs={'pk': self.object.pk})
 
-class PersonUpdateView(GroupRequiredMixin, LoginRequiredMixin, UpdateView):
-    group_required = ["empresa_admin", "funcionario"]
-    login_url = reverse_lazy('login')
+class PersonDeleteView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, DeleteView):
+    """DeleteView para pessoas (apenas dono pode deletar)"""
     model = Person
-    form_class = PersonForm
-    template_name = 'pages/forms/person_form.html'
+    template_name = 'pages/delete/person_confirm_delete.html'
     success_url = reverse_lazy('person-list')
-    
-    def get_queryset(self):
-        return Person.objects.filter(usuario=self.request.user)
-    
-    def form_valid(self, form):
-        messages.success(self.request, '✅ Pessoa atualizada com sucesso!')
-        return super().form_valid(form)
-    
-    def form_invalid(self, form):
-        messages.error(self.request, '❌ Erro ao atualizar pessoa. Verifique os dados.')
-        return super().form_invalid(form)
-
-class PersonDeleteView(GroupRequiredMixin, LoginRequiredMixin, DeleteView):
-    group_required = ["empresa_admin", "funcionario"]
-    login_url = reverse_lazy('login')
-    model = Person
-    template_name = 'pages/confirm/person_confirm_delete.html'
-    success_url = reverse_lazy('person-list')
-    
-    def get_queryset(self):
-        return Person.objects.filter(usuario=self.request.user)
     
     def delete(self, request, *args, **kwargs):
-        messages.success(request, '✅ Pessoa excluída com sucesso!')
+        person_name = self.get_object().nome
+        messages.success(request, f'✅ Pessoa "{person_name}" excluída com sucesso!')
         return super().delete(request, *args, **kwargs)
 
 # ===========================================
 # VIEWS PARA COMPANY (EMPRESA)
 # ===========================================
 
-class CompanyListView(GroupRequiredMixin, LoginRequiredMixin, ListView):
-    group_required = ["empresa_admin", "funcionario"]
-    login_url = reverse_lazy('login')
+class CompanyListView(OwnerQuerysetMixin, ListView):
+    """ListView para empresas com escopo por owner"""
     model = Company
     template_name = 'pages/lists/company_list.html'
     context_object_name = 'companies'
     paginate_by = 10
-    
-    def get_queryset(self):
-        return Company.objects.filter(usuario=self.request.user)
 
-class CompanyDetailView(GroupRequiredMixin, LoginRequiredMixin, DetailView):
-    group_required = ["empresa_admin", "funcionario"]
-    login_url = reverse_lazy('login')
+class CompanyCreateView(OwnerCreateMixin, GroupRequiredMixin, CreateView):
+    """CreateView para empresas"""
+    model = Company
+    fields = ['nome', 'cnpj', 'email', 'telefone', 'cidade', 'data_processing_purpose']
+    template_name = 'pages/forms/company_form.html'
+    success_url = reverse_lazy('company-list')
+    group_required = 'funcionario'
+    
+    def form_valid(self, form):
+        messages.success(self.request, f'✅ Empresa "{form.instance.nome}" criada com sucesso!')
+        return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        messages.error(self.request, '❌ Erro ao criar empresa. Verifique os dados.')
+        return super().form_invalid(form)
+
+class CompanyDetailView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, DetailView):
+    """DetailView para empresas (apenas dono pode ver)"""
     model = Company
     template_name = 'pages/detail/company_detail.html'
     context_object_name = 'company'
-    
-    def get_queryset(self):
-        return Company.objects.filter(usuario=self.request.user)
 
-class CompanyCreateView(GroupRequiredMixin, LoginRequiredMixin, CreateView):
-    group_required = ["empresa_admin", "funcionario"]
-    login_url = reverse_lazy('login')
+class CompanyUpdateView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, UpdateView):
+    """UpdateView para empresas (apenas dono pode editar)"""
     model = Company
-    form_class = CompanyForm
+    fields = ['nome', 'cnpj', 'email', 'telefone', 'cidade', 'data_processing_purpose']
     template_name = 'pages/forms/company_form.html'
-    success_url = reverse_lazy('company-list')
     
     def form_valid(self, form):
-        form.instance.usuario = self.request.user
-        messages.success(self.request, '✅ Empresa cadastrada com sucesso!')
+        messages.success(self.request, f'✅ Empresa "{form.instance.nome}" atualizada com sucesso!')
         return super().form_valid(form)
     
-    def form_invalid(self, form):
-        messages.error(self.request, '❌ Erro ao cadastrar empresa. Verifique os dados.')
-        return super().form_invalid(form)
+    def get_success_url(self):
+        return reverse_lazy('company-detail', kwargs={'pk': self.object.pk})
 
-class CompanyUpdateView(GroupRequiredMixin, LoginRequiredMixin, UpdateView):
-    group_required = ["empresa_admin", "funcionario"]
-    login_url = reverse_lazy('login')
+class CompanyDeleteView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, DeleteView):
+    """DeleteView para empresas (apenas dono pode deletar)"""
     model = Company
-    form_class = CompanyForm
-    template_name = 'pages/forms/company_form.html'
+    template_name = 'pages/delete/company_confirm_delete.html'
     success_url = reverse_lazy('company-list')
-    
-    def get_queryset(self):
-        return Company.objects.filter(usuario=self.request.user)
-    
-    def form_valid(self, form):
-        messages.success(self.request, '✅ Empresa atualizada com sucesso!')
-        return super().form_valid(form)
-    
-    def form_invalid(self, form):
-        messages.error(self.request, '❌ Erro ao atualizar empresa. Verifique os dados.')
-        return super().form_invalid(form)
-
-class CompanyDeleteView(GroupRequiredMixin, LoginRequiredMixin, DeleteView):
-    group_required = ["empresa_admin", "funcionario"]
-    login_url = reverse_lazy('login')
-    model = Company
-    template_name = 'pages/confirm/company_confirm_delete.html'
-    success_url = reverse_lazy('company-list')
-    
-    def get_queryset(self):
-        return Company.objects.filter(usuario=self.request.user)
     
     def delete(self, request, *args, **kwargs):
-        messages.success(request, '✅ Empresa excluída com sucesso!')
+        company_name = self.get_object().nome
+        messages.success(request, f'✅ Empresa "{company_name}" excluída com sucesso!')
         return super().delete(request, *args, **kwargs)
 
 # ===========================================
 # VIEWS PARA CONTRACT (CONTRATO)
 # ===========================================
 
-class ContractListView(LoginRequiredMixin, ListView):
+class ContractListView(OwnerQuerysetMixin, ListView):
     """ListView para contratos com escopo por owner"""
     model = Contract
     template_name = 'pages/lists/contract_list.html'
     context_object_name = 'contracts'
     paginate_by = 10
-    login_url = reverse_lazy('login')
-    
-    def get_queryset(self):
-        return Contract.objects.filter(
-            usuario=self.request.user
-        ).order_by('-created_at')
 
-class ContractCreateView(LoginRequiredMixin, CreateView):
+class ContractCreateView(OwnerCreateMixin, CreateView):
     """CreateView para contratos"""
     model = Contract
     form_class = ContractForm
     template_name = 'pages/forms/contract_form.html'
-    login_url = reverse_lazy('login')
     
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -227,7 +228,6 @@ class ContractCreateView(LoginRequiredMixin, CreateView):
         return kwargs
     
     def form_valid(self, form):
-        form.instance.usuario = self.request.user
         # Se não tiver data de início, usar hoje
         if not form.instance.start_date:
             form.instance.start_date = timezone.now().date()
@@ -241,15 +241,17 @@ class ContractCreateView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         return reverse_lazy('contract-detail', kwargs={'pk': self.object.pk})
 
-class ContractUpdateView(LoginRequiredMixin, UpdateView):
+class ContractDetailView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, DetailView):
+    """DetailView para contratos (apenas dono pode ver)"""
+    model = Contract
+    template_name = 'pages/detail/contract_detail.html'
+    context_object_name = 'contract'
+
+class ContractUpdateView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, UpdateView):
     """UpdateView para contratos (apenas dono pode editar)"""
     model = Contract
     form_class = ContractForm
     template_name = 'pages/forms/contract_form.html'
-    login_url = reverse_lazy('login')
-    
-    def get_queryset(self):
-        return Contract.objects.filter(usuario=self.request.user)
     
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -267,33 +269,11 @@ class ContractUpdateView(LoginRequiredMixin, UpdateView):
     def get_success_url(self):
         return reverse_lazy('contract-detail', kwargs={'pk': self.object.pk})
 
-class ContractDetailView(LoginRequiredMixin, DetailView):
-    """DetailView para contratos (apenas dono pode ver)"""
-    model = Contract
-    template_name = 'pages/detail/contract_detail.html'
-    context_object_name = 'contract'
-    login_url = reverse_lazy('login')
-    
-    def get_queryset(self):
-        return Contract.objects.filter(usuario=self.request.user)
-
-class ContractDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+class ContractDeleteView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, DeleteView):
     """DeleteView para contratos (apenas dono pode deletar)"""
     model = Contract
     template_name = 'pages/delete/contract_confirm_delete.html'
     success_url = reverse_lazy('contract-list')
-    login_url = reverse_lazy('login')
-    
-    def test_func(self):
-        """Verifica se o usuário é o dono do contrato"""
-        try:
-            obj = self.get_object()
-            return obj.usuario == self.request.user
-        except:
-            return False
-    
-    def get_queryset(self):
-        return Contract.objects.filter(usuario=self.request.user)
     
     def delete(self, request, *args, **kwargs):
         contract_title = self.get_object().title
@@ -301,113 +281,69 @@ class ContractDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return super().delete(request, *args, **kwargs)
 
 # ===========================================
-# VIEWS PARA STATE (ESTADO) - ADMIN ONLY
+# VIEWS ADMINISTRATIVAS (ESTADOS E CIDADES)
 # ===========================================
 
-class StateListView(GroupRequiredMixin, LoginRequiredMixin, ListView):
-    group_required = "empresa_admin"
-    login_url = reverse_lazy('login')
+class StateListView(AdminOnlyMixin, ListView):
+    """ListView para estados (apenas admin)"""
     model = State
     template_name = 'pages/lists/state_list.html'
     context_object_name = 'states'
-    paginate_by = 10
-    
-    def get_queryset(self):
-        return State.objects.all().order_by('name')
+    paginate_by = 50
 
-class StateCreateView(GroupRequiredMixin, LoginRequiredMixin, CreateView):
-    group_required = "empresa_admin"
-    login_url = reverse_lazy('login')
+class StateCreateView(AdminOnlyMixin, CreateView):
+    """CreateView para estados (apenas admin)"""
     model = State
-    form_class = StateForm
+    fields = '__all__'
     template_name = 'pages/forms/state_form.html'
     success_url = reverse_lazy('state-list')
-    
-    def form_valid(self, form):
-        messages.success(self.request, '✅ Estado cadastrado com sucesso!')
-        return super().form_valid(form)
 
-class StateUpdateView(GroupRequiredMixin, LoginRequiredMixin, UpdateView):
-    group_required = "empresa_admin"
-    login_url = reverse_lazy('login')
+class StateUpdateView(AdminOnlyMixin, UpdateView):
+    """UpdateView para estados (apenas admin)"""
     model = State
-    form_class = StateForm
+    fields = '__all__'
     template_name = 'pages/forms/state_form.html'
     success_url = reverse_lazy('state-list')
-    
-    def form_valid(self, form):
-        messages.success(self.request, '✅ Estado atualizado com sucesso!')
-        return super().form_valid(form)
 
-class StateDeleteView(GroupRequiredMixin, LoginRequiredMixin, DeleteView):
-    group_required = "empresa_admin"
-    login_url = reverse_lazy('login')
+class StateDeleteView(AdminOnlyMixin, DeleteView):
+    """DeleteView para estados (apenas admin)"""
     model = State
-    template_name = 'pages/confirm/state_confirm_delete.html'
+    template_name = 'pages/delete/state_confirm_delete.html'
     success_url = reverse_lazy('state-list')
-    
-    def delete(self, request, *args, **kwargs):
-        messages.success(request, '✅ Estado excluído com sucesso!')
-        return super().delete(request, *args, **kwargs)
 
-# ===========================================
-# VIEWS PARA CITY (CIDADE) - ADMIN ONLY
-# ===========================================
-
-class CityListView(GroupRequiredMixin, LoginRequiredMixin, ListView):
-    group_required = "empresa_admin"
-    login_url = reverse_lazy('login')
+class CityListView(AdminOnlyMixin, ListView):
+    """ListView para cidades (apenas admin)"""
     model = City
     template_name = 'pages/lists/city_list.html'
     context_object_name = 'cities'
-    paginate_by = 10
-    
-    def get_queryset(self):
-        return City.objects.all().order_by('name')
+    paginate_by = 50
 
-class CityCreateView(GroupRequiredMixin, LoginRequiredMixin, CreateView):
-    group_required = "empresa_admin"
-    login_url = reverse_lazy('login')
+class CityCreateView(AdminOnlyMixin, CreateView):
+    """CreateView para cidades (apenas admin)"""
     model = City
-    form_class = CityForm
+    fields = '__all__'
     template_name = 'pages/forms/city_form.html'
     success_url = reverse_lazy('city-list')
-    
-    def form_valid(self, form):
-        messages.success(self.request, '✅ Cidade cadastrada com sucesso!')
-        return super().form_valid(form)
 
-class CityUpdateView(GroupRequiredMixin, LoginRequiredMixin, UpdateView):
-    group_required = "empresa_admin"
-    login_url = reverse_lazy('login')
+class CityUpdateView(AdminOnlyMixin, UpdateView):
+    """UpdateView para cidades (apenas admin)"""
     model = City
-    form_class = CityForm
+    fields = '__all__'
     template_name = 'pages/forms/city_form.html'
     success_url = reverse_lazy('city-list')
-    
-    def form_valid(self, form):
-        messages.success(self.request, '✅ Cidade atualizada com sucesso!')
-        return super().form_valid(form)
 
-class CityDeleteView(GroupRequiredMixin, LoginRequiredMixin, DeleteView):
-    group_required = "empresa_admin"
-    login_url = reverse_lazy('login')
+class CityDeleteView(AdminOnlyMixin, DeleteView):
+    """DeleteView para cidades (apenas admin)"""
     model = City
-    template_name = 'pages/confirm/city_confirm_delete.html'
+    template_name = 'pages/delete/city_confirm_delete.html'
     success_url = reverse_lazy('city-list')
-    
-    def delete(self, request, *args, **kwargs):
-        messages.success(request, '✅ Cidade excluída com sucesso!')
-        return super().delete(request, *args, **kwargs)
 
 # ===========================================
-# VIEW PARA HOME
+# VIEWS DE FLUXO DE RASCUNHO E HOME
 # ===========================================
 
 class HomeView(LoginRequiredMixin, TemplateView):
-    """
-    Dashboard principal com KPIs e registros recentes
-    """
+    """Dashboard principal com KPIs e registros recentes"""
     login_url = reverse_lazy('login')
     template_name = 'pages/home.html'
     
@@ -494,91 +430,21 @@ class HomeView(LoginRequiredMixin, TemplateView):
         
         return context
 
-# ===========================================
-# VIEW PARA PÁGINA INICIAL (INDEX)
-# ===========================================
-
-class IndexView(ListView):
-    """View para página inicial (index)"""
-    model = Person
+class IndexView(TemplateView):
+    """Página inicial pública"""
     template_name = 'pages/index.html'
-    context_object_name = 'recent_persons'
-    
-    def get_queryset(self):
-        if self.request.user.is_authenticated:
-            return Person.objects.filter(usuario=self.request.user)[:3]
-        return Person.objects.none()
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        if self.request.user.is_authenticated:
-            user = self.request.user
-            context.update({
-                'recent_companies': Company.objects.filter(usuario=user)[:3],
-                'recent_contracts': Contract.objects.filter(usuario=user)[:3],
-            })
-        return context
 
-class AboutView(ListView):
-    """View para página sobre"""
-    model = Person
+class AboutView(TemplateView):
+    """Página sobre o sistema"""
     template_name = 'pages/about.html'
-    context_object_name = 'persons'
-    
-    def get_queryset(self):
-        return Person.objects.none()
 
-class StateDetailView(GroupRequiredMixin, DetailView):
-    """View para detalhar Estado (apenas empresa_admin)"""
-    model = State
-    template_name = 'pages/detail/state_detail.html'
-    context_object_name = 'state'
-    group_required = ['empresa_admin']
-
-class CityDetailView(GroupRequiredMixin, DetailView):
-    """View para detalhar Cidade (apenas empresa_admin)"""
-    model = City
-    template_name = 'pages/detail/city_detail.html'
-    context_object_name = 'city'
-    group_required = ['empresa_admin']
-
-class ContractDetailView(LoginRequiredMixin, DetailView):
-    """View para detalhar Contrato"""
-    model = Contract
-    template_name = 'pages/detail/contract_detail.html'
-    context_object_name = 'contract'
-    login_url = reverse_lazy('login')
-    
-    def get_queryset(self):
-        return Contract.objects.filter(usuario=self.request.user)
-
-class CompanyDetailView(LoginRequiredMixin, DetailView):
-    """View para detalhar Empresa"""
-    model = Company
-    template_name = 'pages/detail/company_detail.html'
-    context_object_name = 'company'
-    login_url = reverse_lazy('login')
-    
-    def get_queryset(self):
-        return Company.objects.filter(usuario=self.request.user)
-
-class PersonDetailView(LoginRequiredMixin, DetailView):
-    """View para detalhar Pessoa"""
-    model = Person
-    template_name = 'pages/detail/person_detail.html'
-    context_object_name = 'person'
-    login_url = reverse_lazy('login')
-    
-    def get_queryset(self):
-        return Person.objects.filter(usuario=self.request.user)
-
-from django.shortcuts import redirect
-from django.contrib import messages
+# ===========================================
+# VIEWS DE FLUXO DE RASCUNHO ANÔNIMO
+# ===========================================
 
 class ContratoDraftStartView(FormView):
     """View para iniciar rascunho de contrato anônimo"""
     template_name = 'pages/contratos/contrato_draft_form.html'
-    form_class = None  # Vamos criar um form simples
     success_url = reverse_lazy('contrato-draft-review')
     
     def get_form_class(self):
