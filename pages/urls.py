@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import (
-    MainPage, AboutView, ProjectsView, ContactView,
+    HomeView,  # IMPORTAR HomeView
+    AboutView, ProjectsView, ContactView,
     StateCreateView, CityCreateView, PersonCreateView, CompanyCreateView,
     StateUpdateView, CityUpdateView, PersonUpdateView, CompanyUpdateView,
     StateDeleteView, CityDeleteView, PersonDeleteView, CompanyDeleteView,
@@ -9,8 +10,10 @@ from .views import (
 )
 
 urlpatterns = [
-    # Páginas principais
-    path('', MainPage.as_view(), name='index'),
+    # USAR HomeView na URL principal
+    path('', HomeView.as_view(), name='home'),
+    path('index/', HomeView.as_view(), name='index'),  # Compatibilidade
+    
     path('about/', AboutView.as_view(), name='about'),
     path('projects/', ProjectsView.as_view(), name='projects'),
     path('contact/', ContactView.as_view(), name='contact'),
@@ -32,14 +35,14 @@ urlpatterns = [
     # CRUD Persons
     path('persons/', PersonListView.as_view(), name='person-list'),
     path('persons/<int:pk>/', PersonDetailView.as_view(), name='person-detail'),
-    path('create/person/', PersonCreateView.as_view(), name='person-create'),
+    path('create/person/', PersonCreateView.as_view(), name='create-person'),
     path('update/person/<int:pk>/', PersonUpdateView.as_view(), name='update-person'),
     path('delete/person/<int:pk>/', PersonDeleteView.as_view(), name='delete-person'),
     
     # CRUD Companies
     path('companies/', CompanyListView.as_view(), name='company-list'),
     path('companies/<int:pk>/', CompanyDetailView.as_view(), name='company-detail'),
-    path('create/company/', CompanyCreateView.as_view(), name='company-create'),
+    path('create/company/', CompanyCreateView.as_view(), name='create-company'),
     path('update/company/<int:pk>/', CompanyUpdateView.as_view(), name='update-company'),
     path('delete/company/<int:pk>/', CompanyDeleteView.as_view(), name='delete-company'),
 ]

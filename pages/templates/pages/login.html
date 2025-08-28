@@ -1,0 +1,108 @@
+{% extends "pages/base.html" %}
+{% load static %}
+
+{% block title %}Login - Athena{% endblock %}
+
+{% block hero_content %}
+<div class="container px-4 px-lg-5 text-center" style="padding: 80px 0;">
+    <h1 class="text-white">Autenticação</h1>
+    <p class="text-white-50">Acesse sua conta no sistema Athena</p>
+</div>
+{% endblock %}
+
+{% block about_content %}
+<div class="container px-4 px-lg-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            
+            {% if user.is_authenticated %}
+                <!-- Usuário já logado -->
+                <div class="alert alert-warning text-center">
+                    <h4><i class="fas fa-user-check mr-2"></i>Você já está logado!</h4>
+                    <p>Usuário: <strong>{{ user.username }}</strong></p>
+                    <a href="{% url 'index' %}" class="btn btn-primary">
+                        <i class="fas fa-home mr-2"></i>Ir para Início
+                    </a>
+                </div>
+            
+            {% else %}
+                <!-- Mensagens -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- Formulário de login -->
+                <div class="card bg-dark border-light shadow-lg">
+                    <div class="card-header bg-primary text-white text-center">
+                        <h3 class="mb-0">
+                            <i class="fas fa-sign-in-alt mr-2"></i>Login
+                        </h3>
+                    </div>
+                    <div class="card-body p-4">
+                        
+                        {% if form.errors %}
+                            <div class="alert alert-danger">
+                                <strong>Erro de autenticação!</strong>
+                                {{ form.errors }}
+                            </div>
+                        {% endif %}
+
+                        <form method="post">
+                            {% csrf_token %}
+                            
+                            <!-- Campo usuário -->
+                            <div class="form-group mb-3">
+                                <label for="{{ form.username.id_for_label }}" class="text-white">
+                                    <i class="fas fa-user mr-2"></i>Usuário
+                                </label>
+                                {{ form.username }}
+                            </div>
+                            
+                            <!-- Campo senha -->
+                            <div class="form-group mb-3">
+                                <label for="{{ form.password.id_for_label }}" class="text-white">
+                                    <i class="fas fa-lock mr-2"></i>Senha
+                                </label>
+                                {{ form.password }}
+                            </div>
+                            
+                            <!-- Botão entrar -->
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-sign-in-alt mr-2"></i>Entrar
+                                </button>
+                            </div>
+                        </form>
+                        
+                        <!-- Link para cadastro -->
+                        <div class="text-center mt-3">
+                            <small class="text-white-50">
+                                Não tem conta? 
+                                <a href="#" class="text-primary">Cadastre-se aqui</a>
+                            </small>
+                        </div>
+                        
+                    </div>
+                </div>
+            {% endif %}
+            
+            <!-- Botão voltar -->
+            <div class="text-center mt-4">
+                <a href="{% url 'index' %}" class="btn btn-outline-light">
+                    <i class="fas fa-home mr-2"></i>Voltar ao Início
+                </a>
+            </div>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block about_image %}{% endblock %}
+{% block projects_content %}{% endblock %}
+{% block contact_content %}{% endblock %}

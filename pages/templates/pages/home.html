@@ -1,0 +1,326 @@
+{% extends "pages/base.html" %}
+{% load static %}
+
+{% block title %}Athena - Sistema LGPD{% endblock %}
+
+{% block hero_content %}
+<div class="container px-4 px-lg-5 text-center" style="padding: 80px 0;">
+    <h1 class="text-white">Sistema Athena</h1>
+    <p class="text-white-50">Gestão de Dados Pessoais e Empresariais com Conformidade LGPD</p>
+    
+    {% if not user.is_authenticated %}
+        <!-- Call-to-Action para usuários não autenticados -->
+        <div class="mt-4">
+            <a href="{% url 'login' %}" class="btn btn-primary btn-lg mr-3">
+                <i class="fas fa-sign-in-alt mr-2"></i>Entrar no Sistema
+            </a>
+            <a href="{% url 'cadastro' %}" class="btn btn-outline-light btn-lg">
+                <i class="fas fa-user-plus mr-2"></i>Criar Conta
+            </a>
+        </div>
+    {% else %}
+        <!-- Atalhos para usuários autenticados -->
+        <div class="mt-4">
+            <a href="{% url 'person-create' %}" class="btn btn-primary btn-lg mr-2">
+                <i class="fas fa-user-plus mr-2"></i>Nova Pessoa
+            </a>
+            <a href="{% url 'company-create' %}" class="btn btn-warning btn-lg mr-2">
+                <i class="fas fa-building mr-2"></i>Nova Empresa
+            </a>
+            <a href="{% url 'person-list' %}" class="btn btn-info btn-lg">
+                <i class="fas fa-list mr-2"></i>Ver Registros
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block about_content %}
+<div class="container px-4 px-lg-5">
+    
+    {% if user.is_authenticated %}
+        <!-- Dashboard para usuários autenticados -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <h2 class="text-white text-center mb-4">
+                    <i class="fas fa-tachometer-alt mr-2"></i>Dashboard - {{ user.username }}
+                </h2>
+            </div>
+        </div>
+        
+        <!-- Cards de estatísticas pessoais -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="card bg-primary text-white h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-users fa-2x mb-2"></i>
+                        <h4 class="card-title">{{ minhas_pessoas }}</h4>
+                        <p class="card-text">Minhas Pessoas</p>
+                        <small class="text-white-50">
+                            +{{ pessoas_ultima_semana }} esta semana
+                        </small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-3">
+                <div class="card bg-warning text-dark h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-building fa-2x mb-2"></i>
+                        <h4 class="card-title">{{ minhas_empresas }}</h4>
+                        <p class="card-text">Minhas Empresas</p>
+                        <small class="text-dark-50">
+                            +{{ empresas_ultima_semana }} esta semana
+                        </small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-3">
+                <div class="card bg-success text-white h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-shield-alt fa-2x mb-2"></i>
+                        <h4 class="card-title">100%</h4>
+                        <p class="card-text">LGPD Conforme</p>
+                        <small class="text-white-50">Dados protegidos</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-3">
+                <div class="card bg-info text-white h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-user fa-2x mb-2"></i>
+                        <h4 class="card-title">{{ user.username }}</h4>
+                        <p class="card-text">Usuário Ativo</p>
+                        <small class="text-white-50">Sessão ativa</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Seção de registros recentes -->
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card bg-dark border-light">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-clock mr-2"></i>Últimas Pessoas Cadastradas
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if ultimas_pessoas %}
+                            <div class="list-group list-group-flush">
+                                {% for pessoa in ultimas_pessoas %}
+                                    <div class="list-group-item bg-dark text-white border-light">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-1">{{ pessoa.full_name }}</h6>
+                                                <small class="text-white-50">
+                                                    CPF: {{ pessoa.cpf }} • {{ pessoa.consent_date|date:"d/m/Y H:i" }}
+                                                </small>
+                                            </div>
+                                            <a href="{% url 'person-detail' pessoa.pk %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-3">
+                                <i class="fas fa-users fa-2x text-muted mb-2"></i>
+                                <p class="text-white-50">Nenhuma pessoa cadastrada ainda.</p>
+                                <a href="{% url 'person-create' %}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-plus mr-1"></i>Cadastrar
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 mb-4">
+                <div class="card bg-dark border-light">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0">
+                            <i class="fas fa-clock mr-2"></i>Últimas Empresas Cadastradas
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if ultimas_empresas %}
+                            <div class="list-group list-group-flush">
+                                {% for empresa in ultimas_empresas %}
+                                    <div class="list-group-item bg-dark text-white border-light">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-1">{{ empresa.trade_name }}</h6>
+                                                <small class="text-white-50">
+                                                    CNPJ: {{ empresa.cnpj }} • {{ empresa.consent_date|date:"d/m/Y H:i" }}
+                                                </small>
+                                            </div>
+                                            <a href="{% url 'company-detail' empresa.pk %}" class="btn btn-sm btn-outline-warning">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-3">
+                                <i class="fas fa-building fa-2x text-muted mb-2"></i>
+                                <p class="text-white-50">Nenhuma empresa cadastrada ainda.</p>
+                                <a href="{% url 'company-create' %}" class="btn btn-warning btn-sm">
+                                    <i class="fas fa-plus mr-1"></i>Cadastrar
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    {% else %}
+        <!-- Conteúdo para usuários não autenticados -->
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <h2 class="text-white mb-4">Por que escolher o Athena?</h2>
+            </div>
+        </div>
+        
+        <!-- Cards de estatísticas gerais -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="card bg-primary text-white h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-users fa-2x mb-2"></i>
+                        <h4 class="card-title">{{ total_pessoas }}</h4>
+                        <p class="card-text">Pessoas Cadastradas</p>
+                        <small class="text-white-50">No sistema</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-3">
+                <div class="card bg-warning text-dark h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-building fa-2x mb-2"></i>
+                        <h4 class="card-title">{{ total_empresas }}</h4>
+                        <p class="card-text">Empresas Cadastradas</p>
+                        <small class="text-dark-50">No sistema</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-3">
+                <div class="card bg-success text-white h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-map-marker-alt fa-2x mb-2"></i>
+                        <h4 class="card-title">{{ total_estados }}</h4>
+                        <p class="card-text">Estados</p>
+                        <small class="text-white-50">Cobertos</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-3">
+                <div class="card bg-info text-white h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-city fa-2x mb-2"></i>
+                        <h4 class="card-title">{{ total_cidades }}</h4>
+                        <p class="card-text">Cidades</p>
+                        <small class="text-white-50">Disponíveis</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Seção de registros recentes globais -->
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card bg-dark border-light">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-globe mr-2"></i>Últimas Pessoas (Geral)
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if pessoas_recentes_geral %}
+                            <div class="list-group list-group-flush">
+                                {% for pessoa in pessoas_recentes_geral %}
+                                    <div class="list-group-item bg-dark text-white border-light">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-1">{{ pessoa.full_name }}</h6>
+                                                <small class="text-white-50">
+                                                    {{ pessoa.consent_date|date:"d/m/Y H:i" }}
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 mb-4">
+                <div class="card bg-dark border-light">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0">
+                            <i class="fas fa-globe mr-2"></i>Últimas Empresas (Geral)
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if empresas_recentes_geral %}
+                            <div class="list-group list-group-flush">
+                                {% for empresa in empresas_recentes_geral %}
+                                    <div class="list-group-item bg-dark text-white border-light">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-1">{{ empresa.trade_name }}</h6>
+                                                <small class="text-white-50">
+                                                    {{ empresa.consent_date|date:"d/m/Y H:i" }}
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Call-to-Action final -->
+        <div class="row">
+            <div class="col-12 text-center">
+                <div class="card bg-dark border-light">
+                    <div class="card-body py-5">
+                        <h3 class="text-white mb-3">Pronto para começar?</h3>
+                        <p class="text-white-50 mb-4">
+                            Junte-se ao Athena e gerencie seus dados com total conformidade LGPD.
+                        </p>
+                        <div>
+                            <a href="{% url 'cadastro' %}" class="btn btn-primary btn-lg mr-3">
+                                <i class="fas fa-user-plus mr-2"></i>Criar Conta Gratuita
+                            </a>
+                            <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg">
+                                <i class="fas fa-sign-in-alt mr-2"></i>Entrar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    {% endif %}
+    
+</div>
+{% endblock %}
+
+{% block about_image %}{% endblock %}
+{% block projects_content %}{% endblock %}
+{% block contact_content %}{% endblock %}
