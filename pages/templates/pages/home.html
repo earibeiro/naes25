@@ -11,14 +11,14 @@
         
         <!-- Atalhos rápidos para usuários autenticados -->
         <div class="mt-4">
+            <a href="{% url 'contrato-draft-start' %}" class="btn btn-success btn-lg me-2">
+                <i class="fas fa-file-contract me-2"></i>Começar um Contrato
+            </a>
             <a href="{% url 'person-create' %}" class="btn btn-primary btn-lg me-2">
                 <i class="fas fa-user-plus me-2"></i>Nova Pessoa
             </a>
             <a href="{% url 'company-create' %}" class="btn btn-warning btn-lg me-2">
                 <i class="fas fa-building me-2"></i>Nova Empresa
-            </a>
-            <a href="{% url 'contract-create' %}" class="btn btn-success btn-lg">
-                <i class="fas fa-file-contract me-2"></i>Novo Contrato
             </a>
         </div>
     {% else %}
@@ -27,6 +27,9 @@
         
         <!-- Call-to-Action para usuários não autenticados -->
         <div class="mt-4">
+            <a href="{% url 'contrato-draft-start' %}" class="btn btn-success btn-lg me-3">
+                <i class="fas fa-file-contract me-2"></i>Começar um Contrato
+            </a>
             <a href="{% url 'login' %}" class="btn btn-primary btn-lg me-3">
                 <i class="fas fa-sign-in-alt me-2"></i>Entrar no Sistema
             </a>

@@ -21,13 +21,18 @@ urlpatterns = [
     path('empresas/<int:pk>/editar/', views.CompanyUpdateView.as_view(), name='company-update'),
     path('empresas/<int:pk>/excluir/', views.CompanyDeleteView.as_view(), name='company-delete'),
     
-    # Contract URLs
+    # Contract URLs - APENAS AS QUE EXISTEM
     path('contratos/', views.ContractListView.as_view(), name='contract-list'),
-    path('contratos/novo/', views.ContractCreateView.as_view(), name='contract-create'),
+    # path('contratos/novo/', views.ContractCreateView.as_view(), name='contract-create'),  # COMENTAR ATÉ CRIAR A VIEW
     path('contratos/<int:pk>/', views.ContractDetailView.as_view(), name='contract-detail'),
-    path('contratos/<int:pk>/editar/', views.ContractUpdateView.as_view(), name='contract-update'),
+    # path('contratos/<int:pk>/editar/', views.ContractUpdateView.as_view(), name='contract-update'),  # COMENTAR ATÉ CRIAR A VIEW
     path('contratos/<int:pk>/excluir/', views.ContractDeleteView.as_view(), name='contract-delete'),
     
+    # FLUXO DE RASCUNHO ANÔNIMO
+    path('contratos/draft/', views.ContratoDraftStartView.as_view(), name='contrato-draft-start'),
+    path('contratos/draft/review/', views.ContratoDraftReviewView.as_view(), name='contrato-draft-review'),
+    path('contratos/draft/finalize/', views.ContratoDraftFinalizeView.as_view(), name='contrato-draft-finalize'),
+
     # State URLs - APENAS CRUD BÁSICO
     path('estados/', views.StateListView.as_view(), name='state-list'),
     path('estados/novo/', views.StateCreateView.as_view(), name='state-create'),

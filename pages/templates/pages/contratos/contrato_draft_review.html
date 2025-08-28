@@ -1,0 +1,96 @@
+{% extends "pages/base.html" %}
+{% load static %}
+
+{% block title %}Revisar Contrato - Athena{% endblock %}
+
+{% block hero_content %}
+<div class="container px-4 px-lg-5 text-center" style="padding: 60px 0;">
+    <h1 class="text-white">
+        <i class="fas fa-eye me-2"></i>Revisar Contrato
+    </h1>
+    <p class="text-white-50">Confirme as informações antes de finalizar</p>
+</div>
+{% endblock %}
+
+{% block about_content %}
+<div class="container px-4 px-lg-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            
+            {% if draft %}
+                <div class="card bg-dark border-info shadow-lg">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-file-contract me-2"></i>Resumo do Contrato
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="text-white mb-3">
+                                    <i class="fas fa-heading me-2"></i>Título
+                                </h6>
+                                <p class="text-white-50">{{ draft.titulo }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-white mb-3">
+                                    <i class="fas fa-building me-2"></i>Empresa
+                                </h6>
+                                <p class="text-white-50">
+                                    {% if draft.empresa_nome %}
+                                        {{ draft.empresa_nome }}
+                                    {% else %}
+                                        <em class="text-muted">Não informada</em>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h6 class="text-white mb-3">
+                                <i class="fas fa-align-left me-2"></i>Descrição
+                            </h6>
+                            <div class="bg-secondary p-3 rounded">
+                                <p class="text-white mb-0">{{ draft.descricao }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info mt-4">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Nota:</strong> Ao finalizar, você será solicitado a fazer login para salvar o contrato em sua conta.
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'contrato-draft-start' %}" class="btn btn-warning">
+                                <i class="fas fa-edit me-1"></i>Editar
+                            </a>
+                            <a href="{% url 'contrato-draft-finalize' %}" class="btn btn-success">
+                                <i class="fas fa-check me-1"></i>Finalizar Contrato
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="card bg-dark border-danger shadow-lg">
+                    <div class="card-body text-center p-5">
+                        <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
+                        <h4 class="text-white">Nenhum rascunho encontrado</h4>
+                        <p class="text-white-50">Comece criando um novo contrato.</p>
+                        <a href="{% url 'contrato-draft-start' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i>Criar Novo Contrato
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+            
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block about_image %}{% endblock %}
+{% block projects_content %}{% endblock %}
+{% block signup_content %}{% endblock %}
+{% block contact_content %}{% endblock %}
+{% block copyright %}Projeto Athena LGPD 2025{% endblock %}

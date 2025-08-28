@@ -1,0 +1,162 @@
+{% extends "pages/base.html" %}
+{% load static %}
+
+{% block title %}{{ contract.title }} - Athena{% endblock %}
+
+{% block hero_content %}
+<div class="container px-4 px-lg-5 text-center" style="padding: 60px 0;">
+    <h1 class="text-white">
+        <i class="fas fa-file-contract me-2"></i>{{ contract.title }}
+    </h1>
+    <p class="text-white-50">Detalhes do contrato</p>
+</div>
+{% endblock %}
+
+{% block about_content %}
+<div class="container px-4 px-lg-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card bg-dark text-white shadow-lg">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-contract me-2"></i>Informações do Contrato
+                    </h5>
+                    <div class="btn-group" role="group">
+                        <a href="{% url 'contract-update' contract.pk %}" class="btn btn-outline-warning btn-sm">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="{% url 'contract-delete' contract.pk %}" class="btn btn-outline-danger btn-sm">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-white mb-2">
+                                <i class="fas fa-heading me-2"></i>Título
+                            </h6>
+                            <p class="text-white-50">{{ contract.title }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-white mb-2">
+                                <i class="fas fa-building me-2"></i>Empresa
+                            </h6>
+                            <p class="text-white-50">
+                                {% if contract.company %}
+                                    {{ contract.company.nome }}
+                                {% else %}
+                                    <em class="text-muted">Não informada</em>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h6 class="text-white mb-2">
+                            <i class="fas fa-align-left me-2"></i>Descrição
+                        </h6>
+                        <div class="bg-secondary p-3 rounded">
+                            <p class="text-white mb-0">{{ contract.description }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-4">
+                            <h6 class="text-white mb-2">
+                                <i class="fas fa-calendar me-2"></i>Data de Início
+                            </h6>
+                            <p class="text-white-50">
+                                {% if contract.start_date %}
+                                    {{ contract.start_date|date:"d/m/Y" }}
+                                {% else %}
+                                    <em class="text-muted">Não definida</em>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="text-white mb-2">
+                                <i class="fas fa-calendar-times me-2"></i>Data de Fim
+                            </h6>
+                            <p class="text-white-50">
+                                {% if contract.end_date %}
+                                    {{ contract.end_date|date:"d/m/Y" }}
+                                {% else %}
+                                    <em class="text-muted">Indeterminado</em>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="text-white mb-2">
+                                <i class="fas fa-info-circle me-2"></i>Status
+                            </h6>
+                            {% if contract.is_active %}
+                                <span class="badge bg-success">Ativo</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Inativo</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h6 class="text-white mb-2">
+                            <i class="fas fa-shield-alt me-2"></i>Finalidade LGPD
+                        </h6>
+                        <div class="bg-secondary p-3 rounded">
+                            <p class="text-white mb-0">{{ contract.data_processing_purpose }}</p>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Informações adicionais -->
+            <div class="card bg-dark text-white shadow-lg">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Informações
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <small class="text-white-50">Criado em:</small>
+                        <p class="text-white mb-2">{{ contract.created_at|date:"d/m/Y H:i" }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-white-50">Última atualização:</small>
+                        <p class="text-white mb-0">{{ contract.updated_at|date:"d/m/Y H:i" }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Ações rápidas -->
+            <div class="card bg-dark text-white shadow-lg mt-3">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-rocket me-2"></i>Ações
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'contract-list' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-list me-1"></i>Ver Todos
+                        </a>
+                        <a href="{% url 'contrato-draft-start' %}" class="btn btn-outline-success">
+                            <i class="fas fa-plus me-1"></i>Novo Contrato
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block about_image %}{% endblock %}
+{% block projects_content %}{% endblock %}
+{% block signup_content %}{% endblock %}
+{% block contact_content %}{% endblock %}
+{% block copyright %}Projeto Athena LGPD 2025{% endblock %}
