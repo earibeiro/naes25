@@ -148,9 +148,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
 CRISPY_TEMPLATE_PACK = "bootstrap4"
 
-LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'index'
-LOGOUT_REDIRECT_URL = 'index'
+# URLs de redirecionamento após login/logout
+LOGIN_URL = '/usuarios/login/'
+LOGIN_REDIRECT_URL = '/dashboard/'  # Redireciona para dashboard após login
+LOGOUT_REDIRECT_URL = '/'  # Redireciona para index após logout
 
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Sao_Paulo'

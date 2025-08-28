@@ -1,79 +1,126 @@
-{% extends "pages/listas/base_list.html" %}
+{% extends "pages/base.html" %}
+{% load static %}
 
-{% block title %}Estados{% endblock %}
+{% block title %}Estados - Athena{% endblock %}
 
-{% block hero_content %}
-<div class="container px-4 px-lg-5 text-center" style="padding: 80px 0;">
-    <h1 class="text-white">Estados</h1>
-    <p class="text-white-50">Gerenciamento de Estados Brasileiros</p>
-</div>
-{% endblock %}
+{% block content %}
+<div class="container-fluid px-4 px-lg-5 mt-5">
+    
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="text-white">
+                <i class="fas fa-map-marked-alt mr-3"></i>Estados
+            </h1>
+            <p class="text-white-50 mb-0">
+                <i class="fas fa-cog mr-2"></i>
+                Gerenciamento de estados do sistema
+            </p>
+        </div>
+        
+        <a href="{% url 'create-state' %}" class="btn btn-info">
+            <i class="fas fa-plus mr-2"></i>Novo Estado
+        </a>
+    </div>
 
-{% block table_content %}
-<table class="table table-dark table-hover">
-    <thead>
-        <tr>
-            <th><i class="fas fa-hashtag"></i> ID</th>
-            <th><i class="fas fa-map"></i> Nome</th>
-            <th><i class="fas fa-tag"></i> Abreviação</th>
-            <th><i class="fas fa-city"></i> Cidades</th>
-            <th class="text-center"><i class="fas fa-cogs"></i> Ações</th>
-        </tr>
-    </thead>
-    <tbody>
+    {% if states %}
+    <!-- Lista de estados -->
+    <div class="row">
         {% for state in states %}
-        <tr>
-            <td>{{ state.id }}</td>
-            <td>
-                <a href="{% url 'state-detail' state.pk %}" class="text-white text-decoration-none">
-                    <strong>{{ state.name }}</strong>
-                </a>
-            </td>
-            <td><span class="badge badge-primary">{{ state.abbreviation }}</span></td>
-            <td>
-                <small class="text-muted">{{ state.city_set.count }} cidade{{ state.city_set.count|pluralize }}</small>
-            </td>
-            <td class="text-center">
-                <div class="btn-group" role="group">
-                    <a href="{% url 'state-detail' state.pk %}" class="btn btn-info btn-sm" title="Visualizar">
-                        <i class="fas fa-eye"></i>
-                    </a>
-                    <a href="{% url 'update-state' state.pk %}" class="btn btn-warning btn-sm" title="Editar">
-                        <i class="fas fa-edit"></i>
-                    </a>
-                    <a href="{% url 'delete-state' state.pk %}" class="btn btn-danger btn-sm" title="Excluir">
-                        <i class="fas fa-trash"></i>
-                    </a>
+        <div class="col-lg-6 col-xl-4 mb-4">
+            <div class="card bg-dark border-info h-100">
+                <div class="card-header bg-info text-dark">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0 fw-bold">
+                            <i class="fas fa-map-marker-alt mr-2"></i>{{ state.name }}
+                        </h6>
+                        <span class="badge bg-dark text-info">{{ state.abbreviation }}</span>
+                    </div>
                 </div>
-            </td>
-        </tr>
+                
+                <div class="card-body">
+                    <div class="mb-3">
+                        <p class="text-white-50 mb-1">
+                            <i class="fas fa-tag mr-2"></i><strong>Sigla:</strong>
+                        </p>
+                        <p class="text-white mb-0">{{ state.abbreviation }}</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <p class="text-white-50 mb-1">
+                            <i class="fas fa-city mr-2"></i><strong>Cidades:</strong>
+                        </p>
+                        <p class="text-white mb-0">{{ state.cities.count }} cidade(s)</p>
+                    </div>
+                </div>
+                
+                <div class="card-footer bg-transparent border-info">
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'update-state' state.pk %}" class="btn btn-info btn-sm">
+                            <i class="fas fa-edit mr-1"></i>Editar
+                        </a>
+                        <a href="{% url 'delete-state' state.pk %}" class="btn btn-danger btn-sm">
+                            <i class="fas fa-trash mr-1"></i>Excluir
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
         {% endfor %}
-    </tbody>
-</table>
-
-<!-- Informações extras -->
-<div class="row mt-4">
-    <div class="col-md-6">
-        <div class="card bg-secondary">
-            <div class="card-body text-center">
-                <h5 class="card-title text-white">
-                    <i class="fas fa-map mr-2"></i>Total de Estados
-                </h5>
-                <h2 class="text-primary">{{ states|length }}</h2>
-            </div>
+    </div>
+    
+    <!-- Paginação -->
+    {% if is_paginated %}
+    <nav aria-label="Navegação de estados">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link bg-dark border-info text-info" href="?page=1">&laquo; Primeira</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link bg-dark border-info text-info" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+            </li>
+            {% endif %}
+            
+            <li class="page-item active">
+                <span class="page-link bg-info text-dark border-info">
+                    {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                </span>
+            </li>
+            
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link bg-dark border-info text-info" href="?page={{ page_obj.next_page_number }}">Próxima</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link bg-dark border-info text-info" href="?page={{ page_obj.paginator.num_pages }}">Última &raquo;</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+    
+    {% else %}
+    <!-- Estado vazio -->
+    <div class="text-center py-5">
+        <div class="mb-4">
+            <i class="fas fa-map-marked-alt text-info" style="font-size: 4rem; opacity: 0.6;"></i>
+        </div>
+        <h3 class="text-white mb-3">Nenhum estado cadastrado</h3>
+        <p class="text-white-50 mb-4">
+            Ainda não há estados cadastrados no sistema.<br>
+            Cadastre o primeiro estado para começar.
+        </p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{% url 'create-state' %}" class="btn btn-info">
+                <i class="fas fa-plus mr-2"></i>Cadastrar Primeiro Estado
+            </a>
+            <a href="{% url 'home' %}" class="btn btn-outline-light">
+                <i class="fas fa-home mr-2"></i>Voltar ao Início
+            </a>
         </div>
     </div>
-    <div class="col-md-6">
-        <div class="card bg-secondary">
-            <div class="card-body text-center">
-                <h5 class="card-title text-white">
-                    <i class="fas fa-plus mr-2"></i>Ação Rápida
-                </h5>
-                <a href="{% url 'create-state' %}" class="btn btn-primary">
-                    Novo Estado
-                </a>
-            </div>
-        </div>
-    </div>
+    {% endif %}
+    
 </div>
 {% endblock %}

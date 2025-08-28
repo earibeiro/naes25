@@ -4,176 +4,44 @@
 {% block title %}Sobre - Athena{% endblock %}
 
 {% block hero_content %}
-<!-- Área personalizada para about -->
-<div class="container px-4 px-lg-5 text-center" style="padding: 100px 0;">
-    <h1 class="text-white">Athena</h1>
-    <p class="text-white-50">Seus contratos em um único lugar.</p>
-</div>
+<h1 class="mx-auto my-0 text-uppercase">Sobre o Athena</h1>
+<h2 class="text-white-50 mx-auto mt-2 mb-5">Conheça nosso sistema de gestão LGPD</h2>
+<a class="btn btn-primary" href="#about">Saiba Mais</a>
 {% endblock %}
 
 {% block about_content %}
-<!-- Seção com explicação da aplicação -->
 <div class="container px-4 px-lg-5">
     <div class="row gx-4 gx-lg-5 justify-content-center">
-        <div class="col-lg-10">
-            <div class="text-center mb-5">
-                <h2 class="text-white mb-4">O que é o Sistema Athena?</h2>
-                <p class="text-white-50 lead">
-                    O Athena é um sistema completo de gestão de contratos e dados desenvolvido em conformidade 
-                    com a Lei Geral de Proteção de Dados (LGPD). Nossa plataforma oferece uma solução integrada 
-                    para organizações que precisam gerenciar contratos de forma eficiente e transparente.
-                </p>
-            </div>
-            
-            <!-- Cards com funcionalidades principais -->
-            <div class="row gx-4 gx-lg-5 mb-5">
-                <div class="col-md-4 mb-4">
-                    <div class="card h-100 bg-dark border-light">
-                        <div class="card-body text-center text-white">
-                            <i class="fas fa-file-contract fa-3x mb-3 text-primary"></i>
-                            <h5 class="card-title">Gestão de Contratos</h5>
-                            <p class="card-text">Criação, desenvolvimento e gestão completa de contratos com histórico detalhado de pedidos.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <div class="card h-100 bg-dark border-light">
-                        <div class="card-body text-center text-white">
-                            <i class="fas fa-shield-alt fa-3x mb-3 text-primary"></i>
-                            <h5 class="card-title">Conformidade LGPD</h5>
-                            <p class="card-text">Portal dedicado para titulares de dados exercerem seus direitos conforme a legislação.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <div class="card h-100 bg-dark border-light">
-                        <div class="card-body text-center text-white">
-                            <i class="fas fa-chart-line fa-3x mb-3 text-primary"></i>
-                            <h5 class="card-title">Dashboard Inteligente</h5>
-                            <p class="card-text">Interface moderna com gráficos e relatórios em tempo real para controle total.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Seção de documentação -->
-    <div class="row gx-4 gx-lg-5 mb-5">
-        <div class="col-lg-12 text-center mb-5">
-            <h2 class="text-white mb-4">Documentação Técnica</h2>
+        <div class="col-lg-8">
+            <h2 class="text-white mb-4">Sobre o Sistema Athena</h2>
             <p class="text-white-50">
-                Conheça a arquitetura e os processos do sistema através dos diagramas técnicos abaixo.
+                O Athena foi desenvolvido para facilitar a gestão de dados pessoais de acordo com a LGPD (Lei Geral de Proteção de Dados). 
+                Nossa plataforma oferece ferramentas completas para empresas e pessoas físicas controlarem seus dados com segurança e conformidade legal.
             </p>
-        </div>
-    </div>
-    
-    <!-- Primeira imagem - Diagrama de Caso de Uso -->
-    <div class="row gx-4 gx-lg-5 mb-5 align-items-center">
-        <div class="col-lg-6">
-            <img class="img-fluid rounded shadow" 
-                 src="{% static 'img/caso_uso_solicitacao.drawio.png' %}" 
-                 alt="Diagrama de Caso de Uso - Solicitação de Dados"
-                 onclick="openModal('modalCasoUso')"
-                 style="cursor: pointer; transition: transform 0.2s;"
-                 onmouseover="this.style.transform='scale(1.05)'"
-                 onmouseout="this.style.transform='scale(1)'" />
-        </div>
-        <div class="col-lg-6">
-            <div class="text-center text-lg-left">
-                <h3 class="text-white mb-3">Diagrama de Caso de Uso</h3>
-                <p class="text-white-50">
-                    Este diagrama ilustra o processo de um usuário solicitando dados no sistema Athena. 
-                    Mostra as interações entre o usuário e o sistema durante o fluxo de solicitação, 
-                    incluindo os diferentes atores envolvidos e suas respectivas responsabilidades.
-                </p>
-                <small class="text-white-50"><i class="fas fa-search-plus"></i> Clique na imagem para ampliar</small>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Segunda imagem - Diagrama de Classes -->
-    <div class="row gx-4 gx-lg-5 mb-5 align-items-center">
-        <div class="col-lg-6 order-lg-2">
-            <img class="img-fluid rounded shadow" 
-                 src="{% static 'img/Diagrama NAES5.drawio.png' %}" 
-                 alt="Diagrama de Classes NAES5"
-                 onclick="openModal('modalDiagramaClasses')"
-                 style="cursor: pointer; transition: transform 0.2s;"
-                 onmouseover="this.style.transform='scale(1.05)'"
-                 onmouseout="this.style.transform='scale(1)'" />
-        </div>
-        <div class="col-lg-6 order-lg-1">
-            <div class="text-center text-lg-right">
-                <h3 class="text-white mb-3">Diagrama de Classes do Sistema</h3>
-                <p class="text-white-50">
-                    O Diagrama de Classes NAES5 apresenta a estrutura arquitetural do sistema Athena, 
-                    mostrando como as diferentes classes se relacionam e interagem entre si. 
-                    Este diagrama é fundamental para compreender o funcionamento interno do sistema 
-                    e suas dependências.
-                </p>
-                <small class="text-white-50"><i class="fas fa-search-plus"></i> Clique na imagem para ampliar</small>
+            
+            <h3 class="text-white mt-5 mb-3">Principais Funcionalidades:</h3>
+            <ul class="text-white-50">
+                <li><strong>Gestão de Pessoas:</strong> Cadastro e controle de dados de pessoas físicas</li>
+                <li><strong>Gestão de Empresas:</strong> Registro de informações corporativas</li>
+                <li><strong>Contratos:</strong> Gerenciamento de contratos entre empresas e pessoas</li>
+                <li><strong>Conformidade LGPD:</strong> Documentação da finalidade do tratamento de dados</li>
+                <li><strong>Segurança:</strong> Acesso controlado por usuário e grupos</li>
+            </ul>
+            
+            <div class="text-center mt-5">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'home' %}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-arrow-right me-2"></i>Voltar ao Dashboard
+                    </a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-sign-in-alt me-2"></i>Fazer Login
+                    </a>
+                {% endif %}
             </div>
         </div>
     </div>
 </div>
-
-<!-- Modais - FORA do container e sem display:none -->
-<!-- Modal para Diagrama de Caso de Uso -->
-<div class="modal fade" id="modalCasoUso" tabindex="-1" aria-labelledby="modalCasoUsoLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content bg-dark border-secondary">
-            <div class="modal-header border-secondary">
-                <h5 class="modal-title text-white" id="modalCasoUsoLabel">
-                    <i class="fas fa-diagram-project me-2"></i>
-                    Diagrama de Caso de Uso - Solicitação de Dados
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-center p-3">
-                <img src="{% static 'img/caso_uso_solicitacao.drawio.png' %}" 
-                     class="img-fluid rounded" 
-                     alt="Diagrama de Caso de Uso - Solicitação de Dados"
-                     style="max-height: 70vh; width: auto;" />
-            </div>
-            <div class="modal-footer border-secondary">
-                <small class="text-white-50">Use Ctrl+Scroll para fazer zoom na imagem</small>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal para Diagrama de Classes -->
-<div class="modal fade" id="modalDiagramaClasses" tabindex="-1" aria-labelledby="modalDiagramaClassesLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content bg-dark border-secondary">
-            <div class="modal-header border-secondary">
-                <h5 class="modal-title text-white" id="modalDiagramaClassesLabel">
-                    <i class="fas fa-sitemap me-2"></i>
-                    Diagrama de Classes do Sistema NAES5
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-center p-3">
-                <img src="{% static 'img/Diagrama NAES5.drawio.png' %}" 
-                     class="img-fluid rounded" 
-                     alt="Diagrama de Classes NAES5"
-                     style="max-height: 70vh; width: auto;" />
-            </div>
-            <div class="modal-footer border-secondary">
-                <small class="text-white-50">Use Ctrl+Scroll para fazer zoom na imagem</small>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-function openModal(modalId) {
-    // Usar Bootstrap 5 syntax
-    const modal = new bootstrap.Modal(document.getElementById(modalId));
-    modal.show();
-}
-</script>
 {% endblock %}
 
 {% block about_image %}{% endblock %}

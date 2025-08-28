@@ -6,8 +6,8 @@ from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('usuarios/', include('usuarios.urls')),
     path('', include('pages.urls')),  # Esta linha já inclui a home
-    path('', include('usuarios.urls')),
     
     # URLs adicionais para compatibilidade
     path('accounts/login/', auth_views.LoginView.as_view(

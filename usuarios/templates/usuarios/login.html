@@ -1,155 +1,68 @@
 {% extends "pages/base.html" %}
 {% load static %}
-{% load crispy_forms_tags %}
 
-{% block title %}{{ titulo }} - Athena{% endblock %}
+{% block title %}Login - Athena{% endblock %}
 
 {% block hero_content %}
-<div class="container px-4 px-lg-5 text-center" style="padding: 80px 0;">
-    <h1 class="text-white">{{ titulo }}</h1>
-    <p class="text-white-50">Acesse sua conta no sistema Athena</p>
-</div>
+<h1 class="mx-auto my-0 text-uppercase">Login</h1>
+<h2 class="text-white-50 mx-auto mt-2 mb-5">Acesse sua conta no Sistema Athena</h2>
+<a class="btn btn-primary" href="#about">Fazer Login</a>
 {% endblock %}
 
 {% block about_content %}
 <div class="container px-4 px-lg-5">
-    <div class="row justify-content-center">
+    <div class="row gx-4 gx-lg-5 justify-content-center">
         <div class="col-lg-6">
             
-            {% if user.is_authenticated %}
-                <!-- Usuário já está logado -->
-                <div class="card bg-dark border-warning shadow-lg" style="border-radius: 1rem;">
-                    <div class="card-header bg-warning text-dark text-center">
-                        <h3 class="mb-0">
-                            <i class="fas fa-exclamation-triangle mr-2"></i>Já Autenticado
-                        </h3>
-                    </div>
-                    <div class="card-body p-5 text-center">
-                        <i class="fas fa-user-check fa-4x text-warning mb-3"></i>
-                        <h4 class="text-white">Você já está logado!</h4>
-                        <p class="text-white-50">
-                            Logado como: <strong>{{ user.username }}</strong>
-                        </p>
-                        <p class="text-white-50">
-                            Redirecionando para a página inicial em <span id="countdown">5</span> segundos...
-                        </p>
-                        
-                        <div class="mt-4">
-                            <a href="{% url 'index' %}" class="btn btn-warning btn-lg mr-2">
-                                <i class="fas fa-home mr-2"></i>Ir para Início
-                            </a>
-                            <a href="{% url 'logout' %}" class="btn btn-outline-light btn-lg">
-                                <i class="fas fa-sign-out-alt mr-2"></i>Fazer Logout
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Script de redirecionamento -->
-                <script>
-                    let countdown = 5;
-                    const countdownElement = document.getElementById('countdown');
-                    
-                    const timer = setInterval(() => {
-                        countdown--;
-                        countdownElement.textContent = countdown;
-                        
-                        if (countdown <= 0) {
-                            clearInterval(timer);
-                            window.location.href = "{% url 'index' %}";
-                        }
-                    }, 1000);
-                </script>
-                
-            {% else %}
-                <!-- Formulário de login -->
-                
-                <!-- Mensagens de erro -->
-                {% if form.errors %}
-                    <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
-                        <i class="fas fa-exclamation-triangle mr-2"></i>
-                        <strong>Erro de autenticação!</strong>
-                        <ul class="mb-0 mt-2">
-                            {% for field, errors in form.errors.items %}
-                                {% for error in errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            {% endfor %}
-                        </ul>
-                        <button type="button" class="close" data-dismiss="alert">
-                            <span>&times;</span>
-                        </button>
-                    </div>
-                {% endif %}
-                
-                <!-- Card de login -->
-                <div class="card bg-dark border-light shadow-lg" style="border-radius: 1rem;">
-                    <div class="card-header bg-primary text-white text-center">
-                        <h3 class="mb-0">
-                            <i class="fas fa-sign-in-alt mr-2"></i>Login
-                        </h3>
-                    </div>
-                    <div class="card-body p-5">
-                        
-                        <form method="post">
-                            {% csrf_token %}
-                            
-                            <!-- Campo usuário -->
-                            <div class="form-group mb-4">
-                                <label for="{{ form.username.id_for_label }}" class="text-white">
-                                    <i class="fas fa-user mr-2"></i>Usuário
-                                </label>
-                                <input type="text" 
-                                       name="{{ form.username.name }}" 
-                                       id="{{ form.username.id_for_label }}"
-                                       class="form-control form-control-lg bg-dark text-white border-secondary"
-                                       style="border-radius: 0.5rem;"
-                                       placeholder="Digite seu usuário"
-                                       required>
-                            </div>
-                            
-                            <!-- Campo senha -->
-                            <div class="form-group mb-4">
-                                <label for="{{ form.password.id_for_label }}" class="text-white">
-                                    <i class="fas fa-lock mr-2"></i>Senha
-                                </label>
-                                <input type="password" 
-                                       name="{{ form.password.name }}" 
-                                       id="{{ form.password.id_for_label }}"
-                                       class="form-control form-control-lg bg-dark text-white border-secondary"
-                                       style="border-radius: 0.5rem;"
-                                       placeholder="Digite sua senha"
-                                       required>
-                            </div>
-                            
-                            <!-- Botão entrar -->
-                            <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-primary btn-lg">
-                                    <i class="fas fa-sign-in-alt mr-2"></i>Entrar
-                                </button>
-                            </div>
-                            
-                        </form>
-                        
-                        <!-- Links extras -->
-                        <div class="text-center mt-4">
-                            <small class="text-white-50">
-                                Esqueceu sua senha? 
-                                <a href="{% url 'alterar-senha' %}" class="text-primary">Clique aqui</a>
-                            </small>
-                        </div>
-                        
-                    </div>
+            <h2 class="text-white mb-4 text-center">
+                <i class="fas fa-sign-in-alt me-2"></i>
+                Entrar no Sistema
+            </h2>
+            
+            {% if form.errors %}
+                <div class="alert alert-danger mb-4">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Erro no login!</strong> Verifique seus dados.
                 </div>
             {% endif %}
+
+            <form method="post" class="bg-black p-4 rounded">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label for="{{ form.username.id_for_label }}" class="form-label text-white">
+                        <i class="fas fa-user me-2"></i>{{ form.username.label }}
+                    </label>
+                    {{ form.username }}
+                </div>
+
+                <div class="mb-4">
+                    <label for="{{ form.password.id_for_label }}" class="form-label text-white">
+                        <i class="fas fa-lock me-2"></i>{{ form.password.label }}
+                    </label>
+                    {{ form.password }}
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary btn-lg px-5">
+                        <i class="fas fa-sign-in-alt me-2"></i>Entrar
+                    </button>
+                </div>
+                
+                <input type="hidden" name="next" value="{{ next }}" />
+            </form>
             
-            <!-- Botão voltar -->
             <div class="text-center mt-4">
-                <a href="{% url 'index' %}" class="btn btn-outline-light btn-lg">
-                    <i class="fas fa-home mr-2"></i>Voltar ao Início
-                </a>
+                <h5 class="text-white mb-3">Não tem conta?</h5>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'escolha-tipo-cadastro' %}" class="btn btn-success btn-lg">
+                        <i class="fas fa-user-plus me-2"></i>Criar Nova Conta
+                    </a>
+                </div>
+                <small class="text-white-50 mt-3 d-block">
+                    Cadastre-se como Pessoa Física (CPF) ou Pessoa Jurídica (CNPJ)
+                </small>
             </div>
-            
         </div>
     </div>
 </div>
@@ -157,24 +70,5 @@
 
 {% block about_image %}{% endblock %}
 {% block projects_content %}{% endblock %}
+{% block signup_content %}{% endblock %}
 {% block contact_content %}{% endblock %}
-{% block copyright %}Projeto Athena 2025{% endblock %}
-
-<style>
-    .form-control.bg-dark {
-        background-color: #2d3748 !important;
-        border-color: #4a5568 !important;
-        color: #fff !important;
-    }
-    
-    .form-control.bg-dark:focus {
-        background-color: #2d3748 !important;
-        border-color: #667eea !important;
-        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25) !important;
-        color: #fff !important;
-    }
-    
-    .form-control.bg-dark::placeholder {
-        color: #a0aec0 !important;
-    }
-</style>

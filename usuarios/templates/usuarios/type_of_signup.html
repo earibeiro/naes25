@@ -1,0 +1,138 @@
+{% extends "pages/base.html" %}
+{% load static %}
+
+{% block title %}Tipo de Cadastro - Athena{% endblock %}
+
+{% block hero_content %}
+<h1 class="mx-auto my-0 text-uppercase">Cadastro</h1>
+<h2 class="text-white-50 mx-auto mt-2 mb-5">Escolha o tipo de conta para criar</h2>
+<a class="btn btn-primary" href="#about">Escolher Tipo</a>
+{% endblock %}
+
+{% block about_content %}
+<div class="container px-4 px-lg-5">
+    <div class="row gx-4 gx-lg-5 justify-content-center">
+        <div class="col-lg-10">
+            
+            <h2 class="text-white mb-5 text-center">
+                <i class="fas fa-user-plus me-2"></i>
+                Qual tipo de conta você deseja criar?
+            </h2>
+            
+            <div class="row">
+                <!-- Pessoa Física -->
+                <div class="col-md-6 mb-4">
+                    <div class="card bg-dark border-primary h-100 hover-card">
+                        <div class="card-header bg-primary text-white text-center">
+                            <i class="fas fa-user fa-3x mb-3"></i>
+                            <h3 class="mb-0">Pessoa Física</h3>
+                        </div>
+                        <div class="card-body text-center">
+                            <p class="card-text text-white">
+                                Cadastro para pessoas físicas com CPF.
+                                Ideal para:
+                            </p>
+                            <ul class="text-white-50 text-start">
+                                <li>Profissionais autônomos</li>
+                                <li>Consultores independentes</li>
+                                <li>Pessoas físicas em geral</li>
+                                <li>Usuários individuais</li>
+                            </ul>
+                            <div class="mt-4">
+                                <a href="{% url 'cadastro-pf' %}" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-user-plus me-2"></i>
+                                    Cadastrar como PF
+                                </a>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-dark border-primary text-center">
+                            <small class="text-white-50">
+                                <i class="fas fa-id-card me-1"></i>
+                                Identificação por CPF
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pessoa Jurídica -->
+                <div class="col-md-6 mb-4">
+                    <div class="card bg-dark border-warning h-100 hover-card">
+                        <div class="card-header bg-warning text-dark text-center">
+                            <i class="fas fa-building fa-3x mb-3"></i>
+                            <h3 class="mb-0">Pessoa Jurídica</h3>
+                        </div>
+                        <div class="card-body text-center">
+                            <p class="card-text text-white">
+                                Cadastro para empresas com CNPJ.
+                                Ideal para:
+                            </p>
+                            <ul class="text-white-50 text-start">
+                                <li>Empresas de todos os portes</li>
+                                <li>Organizações corporativas</li>
+                                <li>Instituições</li>
+                                <li>Pessoas jurídicas em geral</li>
+                            </ul>
+                            <div class="mt-4">
+                                <a href="{% url 'cadastro-pj' %}" class="btn btn-warning btn-lg text-dark">
+                                    <i class="fas fa-building me-2"></i>
+                                    Cadastrar como PJ
+                                </a>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-dark border-warning text-center">
+                            <small class="text-white-50">
+                                <i class="fas fa-file-alt me-1"></i>
+                                Identificação por CNPJ
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Informações adicionais -->
+            <div class="row mt-5">
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        <h5 class="text-dark">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Informações Importantes
+                        </h5>
+                        <ul class="mb-0 text-dark">
+                            <li><strong>CPF e CNPJ são únicos:</strong> Cada documento pode ser usado apenas uma vez</li>
+                            <li><strong>Dados seguros:</strong> Todas as informações são protegidas conforme LGPD</li>
+                            <li><strong>Verificação:</strong> Os documentos são validados no momento do cadastro</li>
+                            <li><strong>Suporte:</strong> Em caso de dúvidas, entre em contato conosco</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <p class="text-white-50">
+                    Já tem uma conta? 
+                    <a href="{% url 'login' %}" class="text-primary">Faça login aqui</a>
+                </p>
+                <a href="{% url 'index' %}" class="btn btn-outline-light">
+                    <i class="fas fa-arrow-left me-2"></i>Voltar ao Início
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block about_image %}{% endblock %}
+{% block projects_content %}{% endblock %}
+{% block signup_content %}{% endblock %}
+{% block contact_content %}{% endblock %}
+
+<style>
+.hover-card {
+    transition: transform 0.3s ease-in-out;
+}
+
+.hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+</style>

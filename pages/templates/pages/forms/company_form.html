@@ -1,0 +1,205 @@
+{% extends "pages/base.html" %}
+{% load static %}
+
+{% block title %}
+    {% if object %}Editar Empresa{% else %}Nova Empresa{% endif %} - Athena
+{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item">
+    <a href="{% url 'company-list' %}">
+        <i class="fas fa-building me-1"></i>Empresas
+    </a>
+</li>
+<li class="breadcrumb-item active">
+    {% if object %}Editar{% else %}Nova{% endif %}
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 px-lg-5 mt-3">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            
+            <!-- Cabeçalho -->
+            <div class="text-center mb-4">
+                <h1 class="text-white">
+                    <i class="fas fa-building{% if not object %}-plus{% else %}-edit{% endif %} me-3"></i>
+                    {% if object %}Editar Empresa{% else %}Nova Empresa{% endif %}
+                </h1>
+                <p class="text-white-50">
+                    {% if object %}
+                        Atualize as informações de {{ object.corporate_name }}
+                    {% else %}
+                        Cadastre uma nova empresa no sistema
+                    {% endif %}
+                </p>
+            </div>
+
+            <!-- Formulário -->
+            <div class="card bg-dark border-warning shadow-lg">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-form me-2"></i>Dados da Empresa
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    
+                    {% if form.errors %}
+                        <div class="alert alert-danger mb-4">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Erro nos dados!</strong> Verifique os campos abaixo.
+                        </div>
+                    {% endif %}
+
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <!-- Razão Social -->
+                            <div class="col-md-12 mb-3">
+                                <label for="{{ form.corporate_name.id_for_label }}" class="form-label text-white">
+                                    <i class="fas fa-building me-2"></i>{{ form.corporate_name.label }}
+                                    <span class="text-danger">*</span>
+                                </label>
+                                {{ form.corporate_name }}
+                                {% if form.corporate_name.errors %}
+                                    <div class="text-danger mt-1">
+                                        {% for error in form.corporate_name.errors %}
+                                            <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Nome Fantasia -->
+                            <div class="col-md-12 mb-3">
+                                <label for="{{ form.trade_name.id_for_label }}" class="form-label text-white">
+                                    <i class="fas fa-store me-2"></i>{{ form.trade_name.label }}
+                                </label>
+                                {{ form.trade_name }}
+                                {% if form.trade_name.errors %}
+                                    <div class="text-danger mt-1">
+                                        {% for error in form.trade_name.errors %}
+                                            <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- CNPJ -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.cnpj.id_for_label }}" class="form-label text-white">
+                                    <i class="fas fa-hashtag me-2"></i>{{ form.cnpj.label }}
+                                    <span class="text-danger">*</span>
+                                </label>
+                                {{ form.cnpj }}
+                                {% if form.cnpj.errors %}
+                                    <div class="text-danger mt-1">
+                                        {% for error in form.cnpj.errors %}
+                                            <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Telefone -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.phone.id_for_label }}" class="form-label text-white">
+                                    <i class="fas fa-phone me-2"></i>{{ form.phone.label }}
+                                </label>
+                                {{ form.phone }}
+                                {% if form.phone.errors %}
+                                    <div class="text-danger mt-1">
+                                        {% for error in form.phone.errors %}
+                                            <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Email -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.email.id_for_label }}" class="form-label text-white">
+                                    <i class="fas fa-envelope me-2"></i>{{ form.email.label }}
+                                </label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                    <div class="text-danger mt-1">
+                                        {% for error in form.email.errors %}
+                                            <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Cidade -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.city.id_for_label }}" class="form-label text-white">
+                                    <i class="fas fa-map-marker-alt me-2"></i>{{ form.city.label }}
+                                    <span class="text-danger">*</span>
+                                </label>
+                                {{ form.city }}
+                                {% if form.city.errors %}
+                                    <div class="text-danger mt-1">
+                                        {% for error in form.city.errors %}
+                                            <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Endereço -->
+                            <div class="col-md-12 mb-3">
+                                <label for="{{ form.address.id_for_label }}" class="form-label text-white">
+                                    <i class="fas fa-home me-2"></i>{{ form.address.label }}
+                                    <span class="text-danger">*</span>
+                                </label>
+                                {{ form.address }}
+                                {% if form.address.errors %}
+                                    <div class="text-danger mt-1">
+                                        {% for error in form.address.errors %}
+                                            <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Finalidade do Tratamento -->
+                            <div class="col-md-12 mb-4">
+                                <label for="{{ form.data_processing_purpose.id_for_label }}" class="form-label text-white">
+                                    <i class="fas fa-shield-alt me-2"></i>{{ form.data_processing_purpose.label }}
+                                    <span class="text-danger">*</span>
+                                </label>
+                                {{ form.data_processing_purpose }}
+                                <small class="form-text text-white-50">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Descreva a finalidade do tratamento dos dados (LGPD)
+                                </small>
+                                {% if form.data_processing_purpose.errors %}
+                                    <div class="text-danger mt-1">
+                                        {% for error in form.data_processing_purpose.errors %}
+                                            <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Botões -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'company-list' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Voltar
+                            </a>
+                            <button type="submit" class="btn btn-warning text-dark">
+                                <i class="fas fa-save me-2"></i>
+                                {% if object %}Atualizar{% else %}Cadastrar{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

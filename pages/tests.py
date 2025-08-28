@@ -26,6 +26,13 @@ class GroupProtectionTest(TestCase):
         )
         self.regular_user.groups.add(self.user_group)
         
+        # CRIAR USUÁRIO ADICIONAL para teste de criação
+        self.test_user = User.objects.create_user(
+            username='testuser', 
+            password='pass123'
+        )
+        self.test_user.groups.add(self.user_group)
+        
         self.no_group_user = User.objects.create_user(
             username='nogroup', 
             password='pass123'
@@ -44,7 +51,7 @@ class GroupProtectionTest(TestCase):
             address='Rua A, 123',
             city=self.city,
             data_processing_purpose='Teste',
-            usuario=self.admin_user 
+            usuario=self.admin_user
         )
         
         # Criar registros para regular_user
@@ -56,7 +63,7 @@ class GroupProtectionTest(TestCase):
             address='Rua B, 456',
             city=self.city,
             data_processing_purpose='Teste',
-            usuario=self.regular_user  
+            usuario=self.regular_user
         )
         
         self.client = Client()
@@ -67,7 +74,6 @@ class GroupProtectionTest(TestCase):
         """
         self.client.login(username='nogroup', password='pass123')
         response = self.client.get(reverse('person-list'))
-        # GroupRequiredMixin redireciona para login (302) em vez de 403
         self.assertEqual(response.status_code, 302)
     
     def test_user_cannot_see_other_user_records(self):
@@ -77,7 +83,6 @@ class GroupProtectionTest(TestCase):
         self.client.login(username='user', password='pass123')
         response = self.client.get(reverse('person-list'))
         
-        # Deve ver apenas seu próprio registro
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'User Person')
         self.assertNotContains(response, 'Admin Person')
@@ -88,11 +93,9 @@ class GroupProtectionTest(TestCase):
         """
         self.client.login(username='user', password='pass123')
         
-        # Tentar editar registro do admin
         response = self.client.get(
             reverse('update-person', kwargs={'pk': self.admin_person.pk})
         )
-        # Deve retornar 404 (não encontrado) devido ao filtro get_queryset
         self.assertEqual(response.status_code, 404)
     
     def test_admin_can_access_all_views(self):
@@ -101,25 +104,14 @@ class GroupProtectionTest(TestCase):
         """
         self.client.login(username='admin', password='pass123')
         
-        # Testar acesso às listas - USAR URL DIRETA PARA EVITAR ERROS DE TEMPLATE
-        try:
-            response = self.client.get(reverse('person-list'))
-            self.assertEqual(response.status_code, 200)
-        except Exception as e:
-            # Se template não existir, pelo menos verificar que não é erro de permissão
-            self.assertNotEqual(response.status_code, 302)  # Não deve redirecionar
+        response = self.client.get(reverse('person-list'))
+        self.assertEqual(response.status_code, 200)
         
-        try:
-            response = self.client.get(reverse('company-list'))
-            self.assertEqual(response.status_code, 200)
-        except Exception as e:
-            self.assertNotEqual(response.status_code, 302)
+        response = self.client.get(reverse('company-list'))
+        self.assertEqual(response.status_code, 200)
         
-        try:
-            response = self.client.get(reverse('state-list'))
-            self.assertEqual(response.status_code, 200)
-        except Exception as e:
-            self.assertNotEqual(response.status_code, 302)
+        response = self.client.get(reverse('state-list'))
+        self.assertEqual(response.status_code, 200)
     
     def test_regular_user_cannot_access_admin_views(self):
         """
@@ -127,18 +119,16 @@ class GroupProtectionTest(TestCase):
         """
         self.client.login(username='user', password='pass123')
         
-        # Tentar acessar lista de estados (apenas admin)
         response = self.client.get(reverse('state-list'))
-        # GroupRequiredMixin redireciona para login (302) em vez de 403
         self.assertEqual(response.status_code, 302)
     
     def test_owner_scope_in_create(self):
         """
         Testar se o owner é atribuído corretamente na criação
         """
-        self.client.login(username='user', password='pass123')
+        # USAR USUÁRIO SEM PERSON EXISTENTE
+        self.client.login(username='testuser', password='pass123')
         
-        # Criar uma nova pessoa - CORRIGIR URL E DADOS
         data = {
             'full_name': 'New Person',
             'cpf': '111.222.333-44',
@@ -146,18 +136,11 @@ class GroupProtectionTest(TestCase):
             'birth_date': '1990-01-01',
             'address': 'Rua C, 789',
             'city': self.city.id,
-            'data_processing_purpose': 'Teste criação',
-            'usuario': self.regular_user.id  
+            'data_processing_purpose': 'Teste criação'
         }
         
-        # CORRIGIR: Usar URL correta baseada no projeto
-        try:
-            response = self.client.post(reverse('create-person'), data)
-            self.assertEqual(response.status_code, 302)  # Redirect após sucesso
-            
-            # Verificar se o registro foi criado com o owner correto
-            new_person = Person.objects.get(cpf='111.222.333-44')
-            self.assertEqual(new_person.usuario, self.regular_user)
-        except Exception as e:
-            # Se houver erro, verificar se pelo menos não é erro de permissão
-            self.assertNotEqual(response.status_code, 302)  # Não deve redirecionar se logado
+        response = self.client.post(reverse('create-person'), data)
+        self.assertEqual(response.status_code, 302)
+        
+        new_person = Person.objects.get(cpf='111.222.333-44')
+        self.assertEqual(new_person.usuario, self.test_user)

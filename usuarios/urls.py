@@ -1,20 +1,21 @@
-from django.urls import path, reverse_lazy
+from django.urls import path
 from django.contrib.auth import views as auth_views
+from . import views
 
 urlpatterns = [
-    # Login
-    path('login/', auth_views.LoginView.as_view(
-        template_name='usuarios/login.html',
-        extra_context={'titulo': 'Autenticação'}
-    ), name='login'),
-    
-    # Logout
-    path('sair/', auth_views.LogoutView.as_view(), name="logout"),
-    
-    # Alterar senha
-    path('alterar-minha-senha/', auth_views.PasswordChangeView.as_view(
-        template_name='usuarios/alterar_senha.html',
-        extra_context={'titulo': 'Alterar senha atual'},
-        success_url=reverse_lazy('index')
-    ), name="alterar-senha"),
+    # URLs de autenticação básicas
+    path('login/', auth_views.LoginView.as_view(template_name='usuarios/login.html'), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('alterar-senha/', auth_views.PasswordChangeView.as_view(
+        template_name='usuarios/change_password.html',
+        success_url='/usuarios/login/'
+    ), name='alterar-senha'),
+
+    # Cadastro de usuários
+    path('cadastro/', views.EscolhaTipoCadastroView.as_view(), name='escolha-tipo-cadastro'),
+    path('cadastro/pessoa-fisica/', views.CadastroPessoaFisicaView.as_view(), name='cadastro-pf'),
+    path('cadastro/pessoa-juridica/', views.CadastroPessoaJuridicaView.as_view(), name='cadastro-pj'),
+
+    # Perfil
+    path('perfil/', views.perfil_view, name='perfil'),
 ]
