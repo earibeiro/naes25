@@ -12,32 +12,251 @@
 {% block about_content %}
 <div class="container px-4 px-lg-5">
     <div class="row gx-4 gx-lg-5 justify-content-center">
-        <div class="col-lg-8">
+        <div class="col-lg-8 text-center">
             <h2 class="text-white mb-4">Sobre o Sistema Athena</h2>
-            <p class="text-white-50">
+            <p class="text-white-50 mb-5">
                 O Athena foi desenvolvido para facilitar a gestão de dados pessoais de acordo com a LGPD (Lei Geral de Proteção de Dados). 
                 Nossa plataforma oferece ferramentas completas para empresas e pessoas físicas controlarem seus dados com segurança e conformidade legal.
             </p>
-            
-            <h3 class="text-white mt-5 mb-3">Principais Funcionalidades:</h3>
-            <ul class="text-white-50">
-                <li><strong>Gestão de Pessoas:</strong> Cadastro e controle de dados de pessoas físicas</li>
-                <li><strong>Gestão de Empresas:</strong> Registro de informações corporativas</li>
-                <li><strong>Contratos:</strong> Gerenciamento de contratos entre empresas e pessoas</li>
-                <li><strong>Conformidade LGPD:</strong> Documentação da finalidade do tratamento de dados</li>
-                <li><strong>Segurança:</strong> Acesso controlado por usuário e grupos</li>
-            </ul>
-            
-            <div class="text-center mt-5">
-                {% if user.is_authenticated %}
-                    <a href="{% url 'home' %}" class="btn btn-primary btn-lg">
-                        <i class="fas fa-arrow-right me-2"></i>Voltar ao Dashboard
-                    </a>
-                {% else %}
-                    <a href="{% url 'login' %}" class="btn btn-primary btn-lg">
-                        <i class="fas fa-sign-in-alt me-2"></i>Fazer Login
-                    </a>
-                {% endif %}
+        </div>
+    </div>
+    
+    <!-- Grid de Cards Principais -->
+    <div class="row gx-4 gx-lg-5 mb-5">
+        
+        <!-- Card 1: Missão do Athena -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card bg-dark border-primary shadow-lg h-100">
+                <div class="card-header bg-primary text-white text-center">
+                    <i class="fas fa-bullseye fa-2x mb-2"></i>
+                    <h4 class="mb-0">Nossa Missão</h4>
+                </div>
+                <div class="card-body text-center">
+                    <p class="text-white-50">
+                        Tornar a conformidade com a LGPD simples e acessível para todos, 
+                        oferecendo ferramentas intuitivas para gestão segura de dados pessoais.
+                    </p>
+                    <ul class="text-white-50 text-start">
+                        <li>Transparência total</li>
+                        <li>Facilidade de uso</li>
+                        <li>Conformidade garantida</li>
+                        <li>Segurança em primeiro lugar</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 2: LGPD e Contratos -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card bg-dark border-warning shadow-lg h-100">
+                <div class="card-header bg-warning text-dark text-center">
+                    <i class="fas fa-shield-alt fa-2x mb-2"></i>
+                    <h4 class="mb-0">LGPD & Contratos</h4>
+                </div>
+                <div class="card-body text-center">
+                    <p class="text-white-50">
+                        Sistema completo de gestão de contratos e documentação de 
+                        finalidade do tratamento de dados conforme LGPD.
+                    </p>
+                    <ul class="text-white-50 text-start">
+                        <li>Contratos automatizados</li>
+                        <li>Consentimentos rastreáveis</li>
+                        <li>Relatórios de compliance</li>
+                        <li>Auditoria integrada</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 3: Como Funciona -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card bg-dark border-info shadow-lg h-100">
+                <div class="card-header bg-info text-white text-center">
+                    <i class="fas fa-cogs fa-2x mb-2"></i>
+                    <h4 class="mb-0">Como Funciona</h4>
+                </div>
+                <div class="card-body text-center">
+                    <p class="text-white-50">
+                        Processo simples e intuitivo para gestão completa de dados e contratos.
+                    </p>
+                    <div class="text-white-50 text-start">
+                        <div class="mb-2">
+                            <i class="fas fa-user-plus text-info me-2"></i>
+                            <strong>1. Cadastro:</strong> PF ou PJ
+                        </div>
+                        <div class="mb-2">
+                            <i class="fas fa-building text-info me-2"></i>
+                            <strong>2. Empresa:</strong> Registre sua organização
+                        </div>
+                        <div class="mb-2">
+                            <i class="fas fa-file-contract text-info me-2"></i>
+                            <strong>3. Contrato:</strong> Crie relacionamentos
+                        </div>
+                        <div class="mb-2">
+                            <i class="fas fa-check-circle text-info me-2"></i>
+                            <strong>4. Verificação:</strong> Conformidade LGPD
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 4: Segurança e Acesso -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card bg-dark border-success shadow-lg h-100">
+                <div class="card-header bg-success text-white text-center">
+                    <i class="fas fa-lock fa-2x mb-2"></i>
+                    <h4 class="mb-0">Segurança & Acesso</h4>
+                </div>
+                <div class="card-body text-center">
+                    <p class="text-white-50">
+                        Controle de acesso robusto com diferentes níveis de permissão 
+                        e criptografia de dados.
+                    </p>
+                    <ul class="text-white-50 text-start">
+                        <li>Acesso por grupos (Admin/Funcionário)</li>
+                        <li>Dados privados por usuário</li>
+                        <li>Criptografia end-to-end</li>
+                        <li>Logs de auditoria</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 5: Funcionalidades Principais -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card bg-dark border-danger shadow-lg h-100">
+                <div class="card-header bg-danger text-white text-center">
+                    <i class="fas fa-star fa-2x mb-2"></i>
+                    <h4 class="mb-0">Funcionalidades</h4>
+                </div>
+                <div class="card-body text-center">
+                    <p class="text-white-50">
+                        Conjunto completo de ferramentas para gestão empresarial e compliance.
+                    </p>
+                    <ul class="text-white-50 text-start">
+                        <li><strong>Gestão de Pessoas:</strong> Cadastro PF completo</li>
+                        <li><strong>Gestão de Empresas:</strong> Registro PJ detalhado</li>
+                        <li><strong>Contratos:</strong> Relacionamentos e termos</li>
+                        <li><strong>Dashboard:</strong> KPIs e indicadores</li>
+                        <li><strong>Relatórios:</strong> Conformidade LGPD</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 6: Roadmap -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card bg-dark border-light shadow-lg h-100">
+                <div class="card-header bg-secondary text-white text-center">
+                    <i class="fas fa-road fa-2x mb-2"></i>
+                    <h4 class="mb-0">Roadmap</h4>
+                </div>
+                <div class="card-body text-center">
+                    <p class="text-white-50">
+                        Evolução contínua com novas funcionalidades e melhorias baseadas 
+                        no feedback dos usuários.
+                    </p>
+                    <div class="text-white-50 text-start">
+                        <div class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            <span class="text-success">✓</span> Sistema base LGPD
+                        </div>
+                        <div class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            <span class="text-success">✓</span> Cadastro PF/PJ
+                        </div>
+                        <div class="mb-2">
+                            <i class="fas fa-spinner text-warning me-2"></i>
+                            <span class="text-warning">⏳</span> API REST completa
+                        </div>
+                        <div class="mb-2">
+                            <i class="fas fa-clock text-info me-2"></i>
+                            <span class="text-info">🔮</span> App mobile
+                        </div>
+                        <div class="mb-2">
+                            <i class="fas fa-clock text-info me-2"></i>
+                            <span class="text-info">🔮</span> Integração com CRMs
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seção de Estatísticas -->
+    <div class="row gx-4 gx-lg-5 mb-5">
+        <div class="col-12">
+            <div class="card bg-dark border-primary">
+                <div class="card-body py-5">
+                    <h3 class="text-white text-center mb-4">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Sistema em Números
+                    </h3>
+                    <div class="row text-center">
+                        <div class="col-md-3 mb-3">
+                            <div class="text-primary">
+                                <i class="fas fa-shield-alt fa-3x mb-2"></i>
+                                <h4 class="text-white">100%</h4>
+                                <p class="text-white-50">Conformidade LGPD</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="text-warning">
+                                <i class="fas fa-users fa-3x mb-2"></i>
+                                <h4 class="text-white">PF + PJ</h4>
+                                <p class="text-white-50">Tipos de Cadastro</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="text-info">
+                                <i class="fas fa-file-contract fa-3x mb-2"></i>
+                                <h4 class="text-white">∞</h4>
+                                <p class="text-white-50">Contratos Ilimitados</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="text-success">
+                                <i class="fas fa-clock fa-3x mb-2"></i>
+                                <h4 class="text-white">24/7</h4>
+                                <p class="text-white-50">Disponibilidade</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call-to-Action Final -->
+    <div class="row gx-4 gx-lg-5">
+        <div class="col-12 text-center">
+            <div class="card bg-gradient-primary border-0 shadow-lg">
+                <div class="card-body py-5">
+                    <h3 class="text-white mb-3">
+                        <i class="fas fa-rocket me-2"></i>
+                        Comece Agora Mesmo!
+                    </h3>
+                    <p class="text-white mb-4">
+                        Junte-se ao Athena e tenha controle total sobre seus dados com conformidade LGPD garantida.
+                    </p>
+                    
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'home' %}" class="btn btn-light btn-lg me-3">
+                            <i class="fas fa-arrow-right me-2"></i>Voltar ao Dashboard
+                        </a>
+                        <a href="{% url 'person-create' %}" class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-plus me-2"></i>Novo Cadastro
+                        </a>
+                    {% else %}
+                        <a href="{% url 'escolha-tipo-cadastro' %}" class="btn btn-light btn-lg me-3">
+                            <i class="fas fa-user-plus me-2"></i>Criar Conta Gratuita
+                        </a>
+                        <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-sign-in-alt me-2"></i>Fazer Login
+                        </a>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
@@ -46,5 +265,6 @@
 
 {% block about_image %}{% endblock %}
 {% block projects_content %}{% endblock %}
+{% block signup_content %}{% endblock %}
 {% block contact_content %}{% endblock %}
-{% block copyright %}Projeto Athena 2025{% endblock %}
+{% block copyright %}Projeto Athena LGPD 2025{% endblock %}
