@@ -1,162 +1,260 @@
 {% extends "pages/base.html" %}
 {% load static %}
 
-{% block title %}Meus Contratos - Athena{% endblock %}
+{% block title %}Contratos LGPD - Athena{% endblock %}
 
-{% block breadcrumb_items %}
-<li class="breadcrumb-item active">
-    <i class="fas fa-file-contract me-1"></i>Contratos
-</li>
+{% block hero_content %}
+<div class="container px-4 px-lg-5 text-center" style="padding: 60px 0;">
+    <h1 class="text-white">📋 Contratos LGPD</h1>
+    <p class="text-white-50">Gestão completa de contratos e conformidade</p>
+    <a href="{% url 'contract-create' %}" class="btn btn-success btn-lg">
+        <i class="fas fa-file-contract me-2"></i>Novo Contrato
+    </a>
+</div>
 {% endblock %}
 
-{% block content %}
-<div class="container-fluid px-4 px-lg-5 mt-3">
+{% block about_content %}
+<div class="container px-4 px-lg-5">
     
-    <!-- Cabeçalho com indicação de owner -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="text-white">
-                <i class="fas fa-file-contract me-3"></i>Meus Contratos
-            </h1>
-            <p class="text-white-50 mb-0">
-                <i class="fas fa-user me-2"></i>
-                Gerenciando contratos de <strong>{{ user.username }}</strong>
-            </p>
+    <!-- Estatísticas -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-file-contract fa-2x mb-2"></i>
+                    <h3>{{ contracts|length }}</h3>
+                    <p class="mb-0">Total de Contratos</p>
+                </div>
+            </div>
         </div>
-        
-        <a href="{% url 'create-contract' %}" class="btn btn-success">
-            <i class="fas fa-plus me-2"></i>Novo Contrato
-        </a>
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-check-circle fa-2x mb-2"></i>
+                    <h3>{{ contracts|length }}</h3>
+                    <p class="mb-0">Ativos</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-calendar-week fa-2x mb-2"></i>
+                    <h3>0</h3>
+                    <p class="mb-0">Esta Semana</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark">
+                <div class="card-body text-center">
+                    <i class="fas fa-clock fa-2x mb-2"></i>
+                    <h3>0</h3>
+                    <p class="mb-0">Vencendo</p>
+                </div>
+            </div>
+        </div>
     </div>
-
-    {% if contracts %}
-    <!-- Lista de contratos -->
+    
+    <!-- Lista de Contratos -->
     <div class="row">
-        {% for contract in contracts %}
-        <div class="col-lg-6 col-xl-4 mb-4">
-            <div class="card bg-dark border-success h-100">
-                <div class="card-header bg-success text-white">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h6 class="mb-0 fw-bold">
-                            <i class="fas fa-file-contract me-2"></i>{{ contract.title|truncatechars:25 }}
-                        </h6>
-                        <span class="badge bg-dark text-success">{{ contract.contract_type }}</span>
-                    </div>
+        <div class="col-12">
+            <div class="card bg-dark text-white">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list me-2"></i>Lista de Contratos ({{ contracts|length }})
+                    </h5>
+                    <a href="{% url 'contract-create' %}" class="btn btn-success btn-sm">
+                        <i class="fas fa-plus me-1"></i>Novo Contrato
+                    </a>
                 </div>
-                
                 <div class="card-body">
-                    <div class="row mb-3">
-                        <div class="col-sm-6">
-                            <p class="text-white-50 mb-1">
-                                <i class="fas fa-building me-2"></i><strong>Empresa:</strong>
-                            </p>
-                            <p class="text-white mb-0">{{ contract.company.corporate_name|truncatechars:20 }}</p>
+                    {% if contracts %}
+                        <div class="table-responsive">
+                            <table class="table table-dark table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th><i class="fas fa-file-contract me-1"></i>Título</th>
+                                        <th><i class="fas fa-building me-1"></i>Empresa</th>
+                                        <th><i class="fas fa-user me-1"></i>Pessoa</th>
+                                        <th><i class="fas fa-calendar me-1"></i>Período</th>
+                                        <th><i class="fas fa-info-circle me-1"></i>Status</th>
+                                        <th><i class="fas fa-cogs me-1"></i>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for contract in contracts %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ contract.titulo|truncatechars:30 }}</strong>
+                                                <br><small class="text-muted">{{ contract.descricao|truncatechars:40 }}</small>
+                                            </td>
+                                            <td>
+                                                <i class="fas fa-building text-warning me-1"></i>
+                                                {{ contract.company.nome|truncatechars:25 }}
+                                            </td>
+                                            <td>
+                                                <i class="fas fa-user text-primary me-1"></i>
+                                                {{ contract.person.nome|truncatechars:25 }}
+                                            </td>
+                                            <td>
+                                                <small>
+                                                    <strong>Início:</strong> {{ contract.data_inicio|date:"d/m/Y" }}<br>
+                                                    {% if contract.data_fim %}
+                                                        <strong>Fim:</strong> {{ contract.data_fim|date:"d/m/Y" }}
+                                                    {% else %}
+                                                        <span class="text-info">Indeterminado</span>
+                                                    {% endif %}
+                                                </small>
+                                            </td>
+                                            <td>
+                                                {% if contract.is_active %}
+                                                    <span class="badge bg-success">
+                                                        <i class="fas fa-check me-1"></i>Ativo
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">
+                                                        <i class="fas fa-times me-1"></i>Inativo
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                    <a href="{% url 'contract-detail' contract.pk %}" 
+                                                       class="btn btn-outline-info" title="Ver Detalhes">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="{% url 'contract-update' contract.pk %}" 
+                                                       class="btn btn-outline-warning" title="Editar">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a href="{% url 'contract-delete' contract.pk %}" 
+                                                       class="btn btn-outline-danger" title="Excluir">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
-                        <div class="col-sm-6">
-                            <p class="text-white-50 mb-1">
-                                <i class="fas fa-user me-2"></i><strong>Pessoa:</strong>
+                        
+                        <!-- Paginação -->
+                        {% if is_paginated %}
+                            <nav aria-label="Navegação das páginas">
+                                <ul class="pagination justify-content-center mt-4">
+                                    {% if page_obj.has_previous %}
+                                        <li class="page-item">
+                                            <a class="page-link bg-dark border-secondary text-white" 
+                                               href="?page=1">Primeira</a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link bg-dark border-secondary text-white" 
+                                               href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                                        </li>
+                                    {% endif %}
+                                    
+                                    <li class="page-item active">
+                                        <span class="page-link bg-success border-success">
+                                            Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                                        </span>
+                                    </li>
+                                    
+                                    {% if page_obj.has_next %}
+                                        <li class="page-item">
+                                            <a class="page-link bg-dark border-secondary text-white" 
+                                               href="?page={{ page_obj.next_page_number }}">Próxima</a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link bg-dark border-secondary text-white" 
+                                               href="?page={{ page_obj.paginator.num_pages }}">Última</a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                        {% endif %}
+                        
+                    {% else %}
+                        <!-- Estado vazio -->
+                        <div class="text-center py-5">
+                            <i class="fas fa-file-contract fa-4x text-muted mb-3"></i>
+                            <h4 class="text-white">Nenhum contrato cadastrado</h4>
+                            <p class="text-white-50 mb-4">
+                                Comece criando seu primeiro contrato LGPD no sistema.
                             </p>
-                            <p class="text-white mb-0">{{ contract.person.full_name|truncatechars:20 }}</p>
+                            <a href="{% url 'contract-create' %}" class="btn btn-success btn-lg">
+                                <i class="fas fa-file-contract me-2"></i>Criar Primeiro Contrato
+                            </a>
                         </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <p class="text-white-50 mb-1">
-                            <i class="fas fa-calendar me-2"></i><strong>Período:</strong>
-                        </p>
-                        <p class="text-white mb-0">
-                            {{ contract.start_date|date:"d/m/Y" }}
-                            {% if contract.end_date %} - {{ contract.end_date|date:"d/m/Y" }}{% endif %}
-                        </p>
-                    </div>
-                    
-                    {% if contract.value %}
-                    <div class="mb-3">
-                        <p class="text-white-50 mb-1">
-                            <i class="fas fa-dollar-sign me-2"></i><strong>Valor:</strong>
-                        </p>
-                        <p class="text-white mb-0">R$ {{ contract.value|floatformat:2 }}</p>
-                    </div>
                     {% endif %}
-                    
-                    <div class="mb-3">
-                        <p class="text-white-50 mb-1">
-                            <i class="fas fa-align-left me-2"></i><strong>Descrição:</strong>
-                        </p>
-                        <p class="text-white mb-0">{{ contract.description|truncatechars:80 }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Informações LGPD -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="mb-3">
+                        <i class="fas fa-shield-alt me-2"></i>Conformidade LGPD
+                    </h5>
+                    <p class="mb-3">
+                        Os contratos são fundamentais para documentar a finalidade do tratamento 
+                        de dados pessoais e garantir a conformidade com a Lei Geral de Proteção de Dados.
+                    </p>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <span class="badge bg-light text-dark">
+                            <i class="fas fa-check me-1"></i>Documentação Completa
+                        </span>
+                        <span class="badge bg-light text-dark">
+                            <i class="fas fa-users me-1"></i>Gestão de Consentimentos
+                        </span>
+                        <span class="badge bg-light text-dark">
+                            <i class="fas fa-clock me-1"></i>Controle de Vigência
+                        </span>
+                        <span class="badge bg-light text-dark">
+                            <i class="fas fa-file-alt me-1"></i>Relatórios de Compliance
+                        </span>
                     </div>
                 </div>
-                
-                <div class="card-footer bg-transparent border-success">
-                    <div class="d-flex justify-content-between">
-                        <a href="{% url 'detail-contract' contract.pk %}" class="btn btn-info btn-sm">
-                            <i class="fas fa-eye me-1"></i>Ver
+            </div>
+        </div>
+    </div>
+    
+    <!-- Ações Rápidas -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card bg-gradient-success border-0">
+                <div class="card-body text-center py-4">
+                    <h5 class="text-white mb-3">
+                        <i class="fas fa-rocket me-2"></i>Ações Rápidas
+                    </h5>
+                    <div class="d-flex justify-content-center gap-2 flex-wrap">
+                        <a href="{% url 'contract-create' %}" class="btn btn-light">
+                            <i class="fas fa-file-contract me-1"></i>Novo Contrato
                         </a>
-                        <a href="{% url 'update-contract' contract.pk %}" class="btn btn-success btn-sm">
-                            <i class="fas fa-edit me-1"></i>Editar
+                        <a href="{% url 'person-list' %}" class="btn btn-outline-light">
+                            <i class="fas fa-users me-1"></i>Pessoas
                         </a>
-                        <a href="{% url 'delete-contract' contract.pk %}" class="btn btn-danger btn-sm">
-                            <i class="fas fa-trash me-1"></i>Excluir
+                        <a href="{% url 'company-list' %}" class="btn btn-outline-light">
+                            <i class="fas fa-building me-1"></i>Empresas
+                        </a>
+                        <a href="{% url 'home' %}" class="btn btn-outline-light">
+                            <i class="fas fa-home me-1"></i>Dashboard
                         </a>
                     </div>
                 </div>
             </div>
         </div>
-        {% endfor %}
     </div>
-    
-    <!-- Paginação -->
-    {% if is_paginated %}
-    <nav aria-label="Navegação de contratos">
-        <ul class="pagination justify-content-center">
-            {% if page_obj.has_previous %}
-            <li class="page-item">
-                <a class="page-link bg-dark border-success text-success" href="?page=1">&laquo; Primeira</a>
-            </li>
-            <li class="page-item">
-                <a class="page-link bg-dark border-success text-success" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
-            </li>
-            {% endif %}
-            
-            <li class="page-item active">
-                <span class="page-link bg-success text-white border-success">
-                    {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
-                </span>
-            </li>
-            
-            {% if page_obj.has_next %}
-            <li class="page-item">
-                <a class="page-link bg-dark border-success text-success" href="?page={{ page_obj.next_page_number }}">Próxima</a>
-            </li>
-            <li class="page-item">
-                <a class="page-link bg-dark border-success text-success" href="?page={{ page_obj.paginator.num_pages }}">Última &raquo;</a>
-            </li>
-            {% endif %}
-        </ul>
-    </nav>
-    {% endif %}
-    
-    {% else %}
-    <!-- Estado vazio -->
-    <div class="text-center py-5">
-        <div class="mb-4">
-            <i class="fas fa-file-contract text-success" style="font-size: 4rem; opacity: 0.6;"></i>
-        </div>
-        <h3 class="text-white mb-3">Nenhum contrato cadastrado</h3>
-        <p class="text-white-50 mb-4">
-            Você ainda não possui contratos cadastrados no sistema.<br>
-            Que tal começar adicionando seu primeiro contrato?
-        </p>
-        <div class="d-flex justify-content-center gap-3">
-            <a href="{% url 'create-contract' %}" class="btn btn-success">
-                <i class="fas fa-plus me-2"></i>Cadastrar Primeiro Contrato
-            </a>
-            <a href="{% url 'home' %}" class="btn btn-outline-light">
-                <i class="fas fa-home me-2"></i>Voltar ao Início
-            </a>
-        </div>
-    </div>
-    {% endif %}
-    
 </div>
 {% endblock %}
+
+{% block about_image %}{% endblock %}
+{% block projects_content %}{% endblock %}
+{% block signup_content %}{% endblock %}
+{% block contact_content %}{% endblock %}
+{% block copyright %}Projeto Athena LGPD 2025{% endblock %}

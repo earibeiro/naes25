@@ -1,155 +1,217 @@
 {% extends "pages/base.html" %}
 {% load static %}
 
-{% block title %}Minhas Empresas - Athena{% endblock %}
+{% block title %}Empresas Cadastradas - Athena{% endblock %}
 
-{% block content %}
-<div class="container-fluid px-4 px-lg-5 mt-5">
+{% block hero_content %}
+<div class="container px-4 px-lg-5 text-center" style="padding: 60px 0;">
+    <h1 class="text-white">🏢 Empresas</h1>
+    <p class="text-white-50">Gestão completa de empresas cadastradas no sistema</p>
+    <a href="{% url 'company-create' %}" class="btn btn-warning btn-lg">
+        <i class="fas fa-building me-2"></i>Cadastrar Nova Empresa
+    </a>
+</div>
+{% endblock %}
+
+{% block about_content %}
+<div class="container px-4 px-lg-5">
     
-    <!-- Cabeçalho com indicação de owner -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="text-white">
-                <i class="fas fa-building mr-3"></i>Minhas Empresas
-            </h1>
-            <p class="text-white-50 mb-0">
-                <i class="fas fa-user mr-2"></i>
-                Gerenciando empresas de <strong>{{ user.username }}</strong>
-            </p>
+    <!-- Estatísticas -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark">
+                <div class="card-body text-center">
+                    <i class="fas fa-building fa-2x mb-2"></i>
+                    <h3>{{ companies|length }}</h3>
+                    <p class="mb-0">Total de Empresas</p>
+                </div>
+            </div>
         </div>
-        
-        <!-- CORRIGIR URL -->
-        <a href="{% url 'create-company' %}" class="btn btn-warning">
-            <i class="fas fa-plus mr-2"></i>Nova Empresa
-        </a>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-calendar-week fa-2x mb-2"></i>
+                    <h3>{{ companies|length }}</h3>
+                    <p class="mb-0">Esta Semana</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-check-circle fa-2x mb-2"></i>
+                    <h3>{{ companies|length }}</h3>
+                    <p class="mb-0">Ativas</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-file-contract fa-2x mb-2"></i>
+                    <h3>0</h3>
+                    <p class="mb-0">Com Contratos</p>
+                </div>
+            </div>
+        </div>
     </div>
-
-    {% if companies %}
-    <!-- Lista de empresas -->
+    
+    <!-- Lista de Empresas -->
     <div class="row">
-        {% for company in companies %}
-        <div class="col-lg-6 col-xl-4 mb-4">
-            <div class="card bg-dark border-warning h-100">
-                <div class="card-header bg-warning text-dark">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h6 class="mb-0 fw-bold">
-                            <i class="fas fa-building mr-2"></i>{{ company.corporate_name|truncatechars:25 }}
-                        </h6>
-                        <small class="text-dark">
-                            <i class="fas fa-hashtag mr-1"></i>{{ company.cnpj }}
-                        </small>
-                    </div>
+        <div class="col-12">
+            <div class="card bg-dark text-white">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list me-2"></i>Lista de Empresas ({{ companies|length }})
+                    </h5>
+                    <a href="{% url 'company-create' %}" class="btn btn-warning btn-sm">
+                        <i class="fas fa-plus me-1"></i>Nova Empresa
+                    </a>
                 </div>
-                
                 <div class="card-body">
-                    <div class="row mb-3">
-                        <div class="col-sm-6">
-                            <p class="text-white-50 mb-1">
-                                <i class="fas fa-store mr-2"></i><strong>Nome Fantasia:</strong>
-                            </p>
-                            <p class="text-white mb-0">{{ company.trade_name|default:"Não informado" }}</p>
+                    {% if companies %}
+                        <div class="table-responsive">
+                            <table class="table table-dark table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th><i class="fas fa-building me-1"></i>Razão Social</th>
+                                        <th><i class="fas fa-id-card me-1"></i>CNPJ</th>
+                                        <th><i class="fas fa-phone me-1"></i>Telefone</th>
+                                        <th><i class="fas fa-map-marker-alt me-1"></i>Cidade</th>
+                                        <th><i class="fas fa-calendar me-1"></i>Cadastrado</th>
+                                        <th><i class="fas fa-cogs me-1"></i>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for company in companies %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ company.nome }}</strong>
+                                                {% if company.email %}
+                                                    <br><small class="text-muted">{{ company.email }}</small>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <code class="text-warning">{{ company.cnpj }}</code>
+                                            </td>
+                                            <td>{{ company.telefone|default:"-" }}</td>
+                                            <td>
+                                                {% if company.cidade %}
+                                                    {{ company.cidade.name }}
+                                                    <small class="text-muted">/{{ company.cidade.state.abbreviation }}</small>
+                                                {% else %}
+                                                    <span class="text-muted">-</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <small>{{ company.created_at|date:"d/m/Y" }}</small>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                    <a href="{% url 'company-detail' company.pk %}" 
+                                                       class="btn btn-outline-info" title="Ver Detalhes">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="{% url 'company-update' company.pk %}" 
+                                                       class="btn btn-outline-warning" title="Editar">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a href="{% url 'company-delete' company.pk %}" 
+                                                       class="btn btn-outline-danger" title="Excluir">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
-                        <div class="col-sm-6">
-                            <p class="text-white-50 mb-1">
-                                <i class="fas fa-phone mr-2"></i><strong>Telefone:</strong>
+                        
+                        <!-- Paginação -->
+                        {% if is_paginated %}
+                            <nav aria-label="Navegação das páginas">
+                                <ul class="pagination justify-content-center mt-4">
+                                    {% if page_obj.has_previous %}
+                                        <li class="page-item">
+                                            <a class="page-link bg-dark border-secondary text-white" 
+                                               href="?page=1">Primeira</a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link bg-dark border-secondary text-white" 
+                                               href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                                        </li>
+                                    {% endif %}
+                                    
+                                    <li class="page-item active">
+                                        <span class="page-link bg-warning border-warning text-dark">
+                                            Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                                        </span>
+                                    </li>
+                                    
+                                    {% if page_obj.has_next %}
+                                        <li class="page-item">
+                                            <a class="page-link bg-dark border-secondary text-white" 
+                                               href="?page={{ page_obj.next_page_number }}">Próxima</a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link bg-dark border-secondary text-white" 
+                                               href="?page={{ page_obj.paginator.num_pages }}">Última</a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                        {% endif %}
+                        
+                    {% else %}
+                        <!-- Estado vazio -->
+                        <div class="text-center py-5">
+                            <i class="fas fa-building fa-4x text-muted mb-3"></i>
+                            <h4 class="text-white">Nenhuma empresa cadastrada</h4>
+                            <p class="text-white-50 mb-4">
+                                Comece cadastrando sua primeira empresa no sistema.
                             </p>
-                            <p class="text-white mb-0">{{ company.phone|default:"Não informado" }}</p>
+                            <a href="{% url 'company-create' %}" class="btn btn-warning btn-lg">
+                                <i class="fas fa-building me-2"></i>Cadastrar Primeira Empresa
+                            </a>
                         </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <p class="text-white-50 mb-1">
-                            <i class="fas fa-envelope mr-2"></i><strong>Email:</strong>
-                        </p>
-                        <p class="text-white mb-0">{{ company.email|default:"Não informado" }}</p>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <p class="text-white-50 mb-1">
-                            <i class="fas fa-map-marker-alt mr-2"></i><strong>Endereço:</strong>
-                        </p>
-                        <p class="text-white mb-0">
-                            {{ company.address }}<br>
-                            {{ company.city.name }}, {{ company.city.state.abbreviation }}
-                        </p>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <p class="text-white-50 mb-1">
-                            <i class="fas fa-info-circle mr-2"></i><strong>Finalidade:</strong>
-                        </p>
-                        <p class="text-white mb-0">{{ company.data_processing_purpose|truncatechars:100 }}</p>
-                    </div>
+                    {% endif %}
                 </div>
-                
-                <div class="card-footer bg-transparent border-warning">
-                    <div class="d-flex justify-content-between">
-                        <a href="{% url 'update-company' company.pk %}" class="btn btn-warning btn-sm">
-                            <i class="fas fa-edit mr-1"></i>Editar
+            </div>
+        </div>
+    </div>
+    
+    <!-- Ações Rápidas -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card" style="background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);">
+                <div class="card-body text-center py-4">
+                    <h5 class="text-dark mb-3">
+                        <i class="fas fa-rocket me-2"></i>Ações Rápidas
+                    </h5>
+                    <div class="d-flex justify-content-center gap-2 flex-wrap">
+                        <a href="{% url 'company-create' %}" class="btn btn-dark">
+                            <i class="fas fa-building me-1"></i>Nova Empresa
                         </a>
-                        <a href="{% url 'delete-company' company.pk %}" class="btn btn-danger btn-sm">
-                            <i class="fas fa-trash mr-1"></i>Excluir
+                        <a href="{% url 'person-list' %}" class="btn btn-outline-dark">
+                            <i class="fas fa-users me-1"></i>Pessoas
+                        </a>
+                        <a href="{% url 'contract-list' %}" class="btn btn-outline-dark">
+                            <i class="fas fa-file-contract me-1"></i>Contratos
+                        </a>
+                        <a href="{% url 'home' %}" class="btn btn-outline-dark">
+                            <i class="fas fa-home me-1"></i>Dashboard
                         </a>
                     </div>
                 </div>
             </div>
         </div>
-        {% endfor %}
     </div>
-    
-    <!-- Paginação -->
-    {% if is_paginated %}
-    <nav aria-label="Navegação de empresas">
-        <ul class="pagination justify-content-center">
-            {% if page_obj.has_previous %}
-            <li class="page-item">
-                <a class="page-link bg-dark border-warning text-warning" href="?page=1">&laquo; Primeira</a>
-            </li>
-            <li class="page-item">
-                <a class="page-link bg-dark border-warning text-warning" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
-            </li>
-            {% endif %}
-            
-            <li class="page-item active">
-                <span class="page-link bg-warning text-dark border-warning">
-                    {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
-                </span>
-            </li>
-            
-            {% if page_obj.has_next %}
-            <li class="page-item">
-                <a class="page-link bg-dark border-warning text-warning" href="?page={{ page_obj.next_page_number }}">Próxima</a>
-            </li>
-            <li class="page-item">
-                <a class="page-link bg-dark border-warning text-warning" href="?page={{ page_obj.paginator.num_pages }}">Última &raquo;</a>
-            </li>
-            {% endif %}
-        </ul>
-    </nav>
-    {% endif %}
-    
-    {% else %}
-    <!-- Estado vazio -->
-    <div class="text-center py-5">
-        <div class="mb-4">
-            <i class="fas fa-building text-warning" style="font-size: 4rem; opacity: 0.6;"></i>
-        </div>
-        <h3 class="text-white mb-3">Nenhuma empresa cadastrada</h3>
-        <p class="text-white-50 mb-4">
-            Você ainda não possui empresas cadastradas no sistema.<br>
-            Que tal começar adicionando sua primeira empresa?
-        </p>
-        <div class="d-flex justify-content-center gap-3">
-            <!-- CORRIGIR URL -->
-            <a href="{% url 'create-company' %}" class="btn btn-warning">
-                <i class="fas fa-plus mr-2"></i>Cadastrar Primeira Empresa
-            </a>
-            <a href="{% url 'home' %}" class="btn btn-outline-light">
-                <i class="fas fa-home mr-2"></i>Voltar ao Início
-            </a>
-        </div>
-    </div>
-    {% endif %}
-    
 </div>
 {% endblock %}
+
+{% block about_image %}{% endblock %}
+{% block projects_content %}{% endblock %}
+{% block signup_content %}{% endblock %}
+{% block contact_content %}{% endblock %}
+{% block copyright %}Projeto Athena LGPD 2025{% endblock %}

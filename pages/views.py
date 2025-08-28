@@ -442,3 +442,49 @@ class AboutView(ListView):
     
     def get_queryset(self):
         return Person.objects.none()
+
+# ADICIONAR AS VIEWS DE DETAIL QUE ESTÃO FALTANDO (se necessário)
+
+class StateDetailView(GroupRequiredMixin, DetailView):
+    """View para detalhar Estado (apenas empresa_admin)"""
+    model = State
+    template_name = 'pages/detail/state_detail.html'
+    context_object_name = 'state'
+    group_required = ['empresa_admin']
+
+class CityDetailView(GroupRequiredMixin, DetailView):
+    """View para detalhar Cidade (apenas empresa_admin)"""
+    model = City
+    template_name = 'pages/detail/city_detail.html'
+    context_object_name = 'city'
+    group_required = ['empresa_admin']
+
+class ContractDetailView(LoginRequiredMixin, DetailView):
+    """View para detalhar Contrato"""
+    model = Contract
+    template_name = 'pages/detail/contract_detail.html'
+    context_object_name = 'contract'
+    login_url = reverse_lazy('login')
+    
+    def get_queryset(self):
+        return Contract.objects.filter(usuario=self.request.user)
+
+class CompanyDetailView(LoginRequiredMixin, DetailView):
+    """View para detalhar Empresa"""
+    model = Company
+    template_name = 'pages/detail/company_detail.html'
+    context_object_name = 'company'
+    login_url = reverse_lazy('login')
+    
+    def get_queryset(self):
+        return Company.objects.filter(usuario=self.request.user)
+
+class PersonDetailView(LoginRequiredMixin, DetailView):
+    """View para detalhar Pessoa"""
+    model = Person
+    template_name = 'pages/detail/person_detail.html'
+    context_object_name = 'person'
+    login_url = reverse_lazy('login')
+    
+    def get_queryset(self):
+        return Person.objects.filter(usuario=self.request.user)
