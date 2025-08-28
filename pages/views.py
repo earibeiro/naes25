@@ -389,11 +389,13 @@ class HomeView(LoginRequiredMixin, TemplateView):
         context['ultimas_empresas'] = Company.objects.filter(usuario=user).order_by('-created_at')[:5]
         context['ultimos_contratos'] = Contract.objects.filter(usuario=user).order_by('-created_at')[:5]
         
-        # Dados adicionais para o dashboard
-        context['contratos_ativos'] = Contract.objects.filter(
-            usuario=user,
-            is_active=True
-        ).count()
+        # CORRIGIR ESTA LINHA - REMOVER O FILTRO is_active
+        # OPÇÃO 1: Usar todos os contratos
+        context['contratos_ativos'] = Contract.objects.filter(usuario=user).count()
+        
+        # OPÇÃO 2: Calcular contratos ativos manualmente (se quiser usar a property)
+        # all_contracts = Contract.objects.filter(usuario=user)
+        # context['contratos_ativos'] = sum(1 for contract in all_contracts if contract.is_date_active)
         
         # Estatísticas mensais
         um_mes_atras = timezone.now() - timedelta(days=30)
@@ -442,8 +444,6 @@ class AboutView(ListView):
     
     def get_queryset(self):
         return Person.objects.none()
-
-# ADICIONAR AS VIEWS DE DETAIL QUE ESTÃO FALTANDO (se necessário)
 
 class StateDetailView(GroupRequiredMixin, DetailView):
     """View para detalhar Estado (apenas empresa_admin)"""

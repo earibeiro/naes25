@@ -85,49 +85,27 @@ class CompanyForm(forms.ModelForm):
         }
 
 class ContractForm(forms.ModelForm):
+    """Form para contratos"""
+    
     class Meta:
         model = Contract
         fields = [
-            'title', 'description', 'contract_type', 'start_date', 
-            'end_date', 'value', 'company', 'person', 'data_processing_purpose'
+            'title', 'description', 'contract_type',
+            'start_date', 'end_date', 'value',
+            'company', 'person', 'data_processing_purpose',
+            'is_active'  # ADICIONAR ESTE CAMPO
         ]
         widgets = {
-            'title': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Título do contrato'
-            }),
-            'description': forms.Textarea(attrs={
-                'class': 'form-control',
-                'rows': 4,
-                'placeholder': 'Descrição detalhada do contrato'
-            }),
-            'contract_type': forms.Select(attrs={
-                'class': 'form-control'
-            }),
-            'start_date': forms.DateInput(attrs={
-                'class': 'form-control',
-                'type': 'date'
-            }),
-            'end_date': forms.DateInput(attrs={
-                'class': 'form-control',
-                'type': 'date'
-            }),
-            'value': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'step': '0.01',
-                'placeholder': '0.00'
-            }),
-            'company': forms.Select(attrs={
-                'class': 'form-control'
-            }),
-            'person': forms.Select(attrs={
-                'class': 'form-control'
-            }),
-            'data_processing_purpose': forms.Textarea(attrs={
-                'class': 'form-control',
-                'rows': 3,
-                'placeholder': 'Finalidade do tratamento dos dados'
-            }),
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex: Contrato de Trabalho'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Descrição detalhada do contrato...'}),
+            'contract_type': forms.Select(attrs={'class': 'form-select'}),
+            'start_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'end_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'value': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'placeholder': '0.00'}),
+            'company': forms.Select(attrs={'class': 'form-select'}),
+            'person': forms.Select(attrs={'class': 'form-select'}),
+            'data_processing_purpose': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'})  # WIDGET PARA CHECKBOX
         }
     
     def clean(self):

@@ -148,26 +148,24 @@ class Contract(models.Model):
     """
     Modelo para contratos entre empresas e pessoas
     """
-    
-    # Choices para tipo de contrato
-    CONTRACT_TYPES = [
-        ('servico', 'Prestação de Serviços'),
-        ('trabalho', 'Contrato de Trabalho'),
-        ('fornecimento', 'Fornecimento'),
-        ('consultoria', 'Consultoria'),
-        ('manutencao', 'Manutenção'),
-        ('licenca', 'Licença de Software'),
-        ('outro', 'Outro'),
-    ]
-    
     # Dados básicos do contrato
     title = models.CharField(max_length=200, verbose_name="Título do Contrato")
-    description = models.TextField(verbose_name="Descrição do Contrato")
+    description = models.TextField(
+        verbose_name="Descrição", 
+        blank=True,
+        help_text="Descrição detalhada do contrato"
+    )
     contract_type = models.CharField(
-        max_length=20,
-        choices=CONTRACT_TYPES,
+        max_length=50, 
         verbose_name="Tipo de Contrato",
-        default='servico'
+        choices=[
+            ('TRABALHO', 'Contrato de Trabalho'),
+            ('SERVICO', 'Prestação de Serviços'),
+            ('FORNECIMENTO', 'Fornecimento'),
+            ('PARCERIA', 'Parceria'),
+            ('OUTRO', 'Outro'),
+        ],
+        default='TRABALHO'
     )
     
     # Datas
@@ -187,6 +185,13 @@ class Contract(models.Model):
         blank=True,
         null=True,
         help_text="Valor total do contrato em reais"
+    )
+    
+    # ADICIONAR ESTE CAMPO
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name="Contrato Ativo",
+        help_text="Indica se o contrato está ativo no sistema"
     )
     
     # Relacionamentos
@@ -231,8 +236,8 @@ class Contract(models.Model):
         return f"{self.title} - {self.company} x {self.person}"
     
     @property
-    def is_active(self):
-        """Verifica se o contrato está ativo"""
+    def is_date_active(self):
+        """Verifica se o contrato está ativo baseado nas datas"""
         from django.utils import timezone
         today = timezone.now().date()
         
@@ -251,7 +256,16 @@ class Contract(models.Model):
     def clean(self):
         """Validações customizadas"""
         from django.core.exceptions import ValidationError
+        from django.utils import timezone
         
-        if self.end_date and self.start_date > self.end_date:
-            raise ValidationError('Data de início não pode ser posterior à data de fim.')
+        if self.end_date and self.start_date:
+            if self.end_date <= self.start_date:
+                raise ValidationError("A data de fim deve ser posterior à data de início.")
+        
+        if self.start_date and self.start_date < timezone.now().date():
+            pass  # Permitir contratos retroativos
+    
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
