@@ -3,11 +3,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.urls import reverse_lazy, reverse
 from django.views.generic import (
-    ListView, CreateView, UpdateView, DeleteView, DetailView
+    ListView, CreateView, UpdateView, DeleteView, DetailView, TemplateView
 )
 from braces.views import GroupRequiredMixin
 from .models import Person, Company, State, City, Contract
 from .forms import PersonForm, CompanyForm, ContractForm, StateForm, CityForm
+from django.utils import timezone
+from datetime import timedelta
 
 # ===========================================
 # VIEWS PARA PERSON (PESSOA FÍSICA)
@@ -352,26 +354,59 @@ class CityDeleteView(GroupRequiredMixin, LoginRequiredMixin, DeleteView):
 # VIEW PARA HOME
 # ===========================================
 
-class HomeView(LoginRequiredMixin, ListView):
+class HomeView(LoginRequiredMixin, TemplateView):
+    """
+    Dashboard principal com KPIs e registros recentes
+    """
     login_url = reverse_lazy('login')
-    model = Person
     template_name = 'pages/home.html'
-    context_object_name = 'recent_persons'
-    
-    def get_queryset(self):
-        return Person.objects.filter(usuario=self.request.user)[:5]
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         
-        context.update({
-            'recent_companies': Company.objects.filter(usuario=user)[:5],
-            'recent_contracts': Contract.objects.filter(usuario=user)[:5],
-            'total_persons': Person.objects.filter(usuario=user).count(),
-            'total_companies': Company.objects.filter(usuario=user).count(),
-            'total_contracts': Contract.objects.filter(usuario=user).count(),
-        })
+        # Data de uma semana atrás para filtros
+        uma_semana_atras = timezone.now() - timedelta(days=7)
+        
+        # KPIs principais - contagens totais
+        context['total_pessoas'] = Person.objects.filter(usuario=user).count()
+        context['total_empresas'] = Company.objects.filter(usuario=user).count() 
+        context['total_contratos'] = Contract.objects.filter(usuario=user).count()
+        
+        # KPI da semana
+        context['pessoas_ultima_semana'] = Person.objects.filter(
+            usuario=user, 
+            created_at__gte=uma_semana_atras
+        ).count()
+        
+        # Para compatibilidade com templates existentes
+        context['minhas_pessoas'] = context['total_pessoas']
+        context['minhas_empresas'] = context['total_empresas'] 
+        context['meus_contratos'] = context['total_contratos']
+        
+        # Listas de registros recentes (últimos 5)
+        context['ultimas_pessoas'] = Person.objects.filter(usuario=user).order_by('-created_at')[:5]
+        context['ultimas_empresas'] = Company.objects.filter(usuario=user).order_by('-created_at')[:5]
+        context['ultimos_contratos'] = Contract.objects.filter(usuario=user).order_by('-created_at')[:5]
+        
+        # Dados adicionais para o dashboard
+        context['contratos_ativos'] = Contract.objects.filter(
+            usuario=user,
+            is_active=True
+        ).count()
+        
+        # Estatísticas mensais
+        um_mes_atras = timezone.now() - timedelta(days=30)
+        context['empresas_ultimo_mes'] = Company.objects.filter(
+            usuario=user,
+            created_at__gte=um_mes_atras
+        ).count()
+        
+        context['contratos_ultimo_mes'] = Contract.objects.filter(
+            usuario=user,
+            created_at__gte=um_mes_atras
+        ).count()
+        
         return context
 
 # ===========================================
