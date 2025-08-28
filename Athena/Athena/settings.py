@@ -149,9 +149,9 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
 CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 # URLs de redirecionamento após login/logout
-LOGIN_URL = '/usuarios/login/'
-LOGIN_REDIRECT_URL = '/dashboard/'  # Redireciona para dashboard após login
-LOGOUT_REDIRECT_URL = '/'  # Redireciona para index após logout
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'home'
 
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Sao_Paulo'

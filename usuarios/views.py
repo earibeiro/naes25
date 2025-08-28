@@ -4,6 +4,10 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.views.generic import CreateView, TemplateView
 from django.urls import reverse_lazy
+from django.contrib.auth.views import LogoutView
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.http import require_POST
 from .forms import CadastroPessoaFisicaForm, CadastroPessoaJuridicaForm
 from .models import UserProfile
 
@@ -58,6 +62,19 @@ class CadastroPessoaJuridicaView(CreateView):
             '❌ Erro ao criar conta de Pessoa Jurídica. Verifique os dados.'
         )
         return super().form_invalid(form)
+
+# LOGOUT SEGURO - só aceita POST
+class CustomLogoutView(LogoutView):
+    """
+    Logout customizado que aceita POST e redireciona
+    """
+    template_name = 'usuarios/logout.html'  # Template de confirmação
+    next_page = 'home'  # Redireciona para home
+    
+    @method_decorator(require_POST)
+    def dispatch(self, request, *args, **kwargs):
+        messages.success(request, '✅ Logout realizado com sucesso!')
+        return super().dispatch(request, *args, **kwargs)
 
 @login_required
 def perfil_view(request):
