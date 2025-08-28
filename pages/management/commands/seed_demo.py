@@ -42,52 +42,64 @@ class Command(BaseCommand):
             
             if created:
                 self.stdout.write('✅ Estado e cidade criados')
-        except:
+        except Exception as e:
             cidade_sp = None
-            self.stdout.write('⚠️ Erro ao criar estado/cidade (ignorando)')
+            self.stdout.write(f'⚠️ Erro ao criar estado/cidade: {e}')
         
         # Criar empresas demo
-        empresas_nomes = [
-            'Tech Solutions Ltda',
-            'Data Corp S.A.',
-            'Innovation Systems',
-            'Digital Services Pro'
+        empresas_dados = [
+            ('Tech Solutions Ltda', 'Tech Solutions'),
+            ('Data Corp S.A.', 'Data Corp'),
+            ('Innovation Systems Ltda', 'Innovation Systems'),
+            ('Digital Services Pro Ltda', 'Digital Pro')
         ]
         
         empresas = []
-        for nome in empresas_nomes:
+        for razao_social, nome_fantasia in empresas_dados:
+            # Gerar CNPJ fake válido
+            cnpj = f'{random.randint(10,99)}.{random.randint(100,999)}.{random.randint(100,999)}/{random.randint(1000,9999)}-{random.randint(10,99)}'
+            
             empresa, created = Company.objects.get_or_create(
-                nome=nome,
+                corporate_name=razao_social,  # ✅ CAMPO CORRETO
                 usuario=user,
                 defaults={
-                    'email': f'contato@{nome.lower().replace(" ", "").replace("ltda", "com").replace("s.a.", "com").replace(".", "")}.com',
-                    'telefone': f'({random.randint(10,99)}) {random.randint(1000,9999)}-{random.randint(1000,9999)}',
-                    'cidade': cidade_sp
+                    'trade_name': nome_fantasia,
+                    'cnpj': cnpj,
+                    'email': f'contato@{nome_fantasia.lower().replace(" ", "")}.com',
+                    'phone': f'({random.randint(10,99)}) {random.randint(1000,9999)}-{random.randint(1000,9999)}',
+                    'address': f'Rua das Empresas, {random.randint(100,999)}',
+                    'city': cidade_sp,
+                    'data_processing_purpose': f'Processamento de dados da empresa {nome_fantasia} para fins comerciais e LGPD.'
                 }
             )
             empresas.append(empresa)
             if created:
-                self.stdout.write(f'✅ Empresa criada: {nome}')
+                self.stdout.write(f'✅ Empresa criada: {razao_social}')
         
         # Criar pessoas demo
-        pessoas_nomes = [
-            ('João Silva', 'joao@email.com'),
-            ('Maria Santos', 'maria@email.com'),
-            ('Pedro Oliveira', 'pedro@email.com'),
-            ('Ana Costa', 'ana@email.com'),
-            ('Carlos Ferreira', 'carlos@email.com')
+        pessoas_dados = [
+            ('João Silva', 'joao@email.com', '1990-01-15'),
+            ('Maria Santos', 'maria@email.com', '1985-03-22'),
+            ('Pedro Oliveira', 'pedro@email.com', '1992-07-10'),
+            ('Ana Costa', 'ana@email.com', '1988-11-05'),
+            ('Carlos Ferreira', 'carlos@email.com', '1995-09-30')
         ]
         
         pessoas = []
-        for nome, email in pessoas_nomes:
+        for nome, email, nascimento in pessoas_dados:
+            # Gerar CPF fake válido
+            cpf = f'{random.randint(100,999)}.{random.randint(100,999)}.{random.randint(100,999)}-{random.randint(10,99)}'
+            
             pessoa, created = Person.objects.get_or_create(
-                nome=nome,
+                full_name=nome,  # ✅ CAMPO CORRETO
                 usuario=user,
                 defaults={
-                    'email': email,
-                    'telefone': f'({random.randint(10,99)}) {random.randint(1000,9999)}-{random.randint(1000,9999)}',
-                    'cpf': f'{random.randint(100,999)}.{random.randint(100,999)}.{random.randint(100,999)}-{random.randint(10,99)}',
-                    'cidade': cidade_sp
+                    'cpf': cpf,
+                    'phone': f'({random.randint(10,99)}) {random.randint(1000,9999)}-{random.randint(1000,9999)}',
+                    'birth_date': nascimento,
+                    'address': f'Rua das Pessoas, {random.randint(100,999)}',
+                    'city': cidade_sp,
+                    'data_processing_purpose': f'Processamento de dados pessoais de {nome} para fins contratuais e LGPD.'
                 }
             )
             pessoas.append(pessoa)
@@ -104,8 +116,11 @@ class Command(BaseCommand):
         ]
         
         for i, titulo in enumerate(contratos_titulos):
-            empresa = random.choice(empresas)
-            pessoa = random.choice(pessoas)
+            empresa = random.choice(empresas) if empresas else None
+            pessoa = random.choice(pessoas) if pessoas else None
+            
+            # Valores possíveis para contract_type (verificar se existe no modelo)
+            tipos_contrato = ['SERVICO', 'CONSULTORIA', 'FORNECIMENTO', 'TRABALHO']
             
             contrato, created = Contract.objects.get_or_create(
                 title=titulo,
@@ -117,7 +132,7 @@ class Command(BaseCommand):
                     'start_date': timezone.now().date(),
                     'end_date': timezone.now().date() + timezone.timedelta(days=365),
                     'value': random.randint(1000, 10000),
-                    'contract_type': random.choice(['TRABALHO', 'SERVICO', 'FORNECIMENTO']),
+                    'contract_type': random.choice(tipos_contrato),
                     'data_processing_purpose': f'Finalidade específica para {titulo.lower()}: processamento de dados pessoais necessários para a execução do contrato.',
                     'is_active': random.choice([True, True, True, False])  # 75% ativos
                 }

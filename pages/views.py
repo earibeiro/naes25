@@ -522,12 +522,15 @@ class ContratoDraftFinalizeView(View):
             company = None
             if draft.get('empresa_nome'):
                 company, created = Company.objects.get_or_create(
-                    nome=draft['empresa_nome'],
+                    corporate_name=draft['empresa_nome'],  # ✅ CAMPO CORRETO
                     usuario=request.user,
                     defaults={
+                        'trade_name': draft['empresa_nome'],
                         'email': '',
-                        'telefone': '',
-                        'cidade': None
+                        'phone': '',
+                        'address': '',
+                        'city': None,
+                        'data_processing_purpose': f"Empresa criada via rascunho: {draft['empresa_nome']}"
                     }
                 )
             
