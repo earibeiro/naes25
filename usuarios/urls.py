@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, reverse_lazy
 from django.contrib.auth import views as auth_views
 from .views import (
     EscolhaTipoCadastroView,
@@ -9,6 +9,7 @@ from .views import (
     CustomLogoutView,
     teste_view
 )
+from .forms import CustomPasswordChangeForm
 
 app_name = "usuarios"
 
@@ -23,16 +24,22 @@ urlpatterns = [
     path('cadastro-pessoa-fisica/', CadastroPessoaFisicaView.as_view(), name='cadastro-pessoa-fisica'),
     path('cadastro-pessoa-juridica/', CadastroPessoaJuridicaView.as_view(), name='cadastro-pessoa-juridica'),
     
+    # Adicionar rota que pode estar sendo referenciada em templates antigos
+    path('cadastro-pj/', CadastroPessoaJuridicaView.as_view(), name='cadastro-pj'),
+    path('cadastro-pf/', CadastroPessoaFisicaView.as_view(), name='cadastro-pf'),
+    
     # Login/Logout específicos
     path('login/', auth_views.LoginView.as_view(template_name='usuarios/login.html'), name='login'),
     path('logout/', CustomLogoutView.as_view(), name='logout'),
     
-    # Alteração de senha
+    # Alteração de senha com redirecionamento para home
     path('alterar-senha/', auth_views.PasswordChangeView.as_view(
         template_name='usuarios/change_password.html',
-        success_url='/usuarios/senha-alterada/'
+        form_class=CustomPasswordChangeForm,  
+        success_url=reverse_lazy('home')     
     ), name='change-password'),
     
+    # Página de confirmação (opcional)
     path('senha-alterada/', auth_views.PasswordChangeDoneView.as_view(
         template_name='usuarios/password_change_done.html'
     ), name='password-change-done'),

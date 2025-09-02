@@ -2,10 +2,12 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import Group
+from django.contrib.auth.forms import PasswordChangeForm
 
 User = get_user_model()
 
 
+# Adicionar classes CSS aos campos de formulário
 class BaseSignupForm(UserCreationForm):
     """Formulário base para cadastro de usuários"""
     email = forms.EmailField(
@@ -77,3 +79,18 @@ class CadastroPessoaFisicaForm(FuncionarioSignupForm):
 class CadastroPessoaJuridicaForm(AdminSignupForm):
     """Alias para pessoa jurídica (admin)"""
     pass
+
+
+# Formulário customizado para alteração de senha (opcional)
+class CustomPasswordChangeForm(PasswordChangeForm):
+    """Formulário customizado para alterar senha com classes CSS"""
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Adicionar classes CSS aos campos
+        for field_name, field in self.fields.items():
+            field.widget.attrs.update({
+                'class': 'form-control',
+                'placeholder': f'Digite sua {field.label.lower()}'
+            })

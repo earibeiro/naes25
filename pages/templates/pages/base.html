@@ -45,6 +45,7 @@
                                     <i class="fas fa-home me-1"></i>Dashboard
                                 </a></li>
                                 <li><hr class="dropdown-divider"></li>
+                                
                                 <!-- LINKS PARA AS LISTAS -->
                                 <li><a class="dropdown-item" href="{% url 'person-list' %}">
                                     <i class="fas fa-users me-1"></i>Pessoas
@@ -55,6 +56,21 @@
                                 <li><a class="dropdown-item" href="{% url 'contract-list' %}">
                                     <i class="fas fa-file-contract me-1"></i>Contratos
                                 </a></li>
+                                
+                                <li><hr class="dropdown-divider"></li>
+                                
+                                <!-- ✅ NOVO: LINK PARA ALTERAR SENHA -->
+                                <li><a class="dropdown-item" href="{% url 'usuarios:change-password' %}">
+                                    <i class="fas fa-key me-1"></i>Alterar Senha
+                                </a></li>
+                                
+                                <!-- LINK PARA LOGS (SE IMPLEMENTADO) -->
+                                {% if user.is_superuser or user.groups.exists %}
+                                    <li><a class="dropdown-item" href="{% url 'auditoria:activity-logs' %}">
+                                        <i class="fas fa-history me-1"></i>Logs de Atividade
+                                    </a></li>
+                                {% endif %}
+                                
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <!-- LOGOUT SEGURO POR POST -->
