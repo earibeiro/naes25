@@ -8,83 +8,108 @@ from django.contrib.auth.views import LogoutView
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_POST
-from .forms import CadastroPessoaFisicaForm, CadastroPessoaJuridicaForm
+from django.contrib.auth import get_user_model
+
+from .forms import (
+    CadastroPessoaFisicaForm, 
+    CadastroPessoaJuridicaForm,
+    AdminSignupForm,
+    FuncionarioSignupForm
+)
 from .models import UserProfile
 
-# View simples para teste (pode remover depois)
-def teste_view(request):
-    return render(request, 'usuarios/teste.html')
+User = get_user_model()
+
 
 class EscolhaTipoCadastroView(TemplateView):
     """View para escolher tipo de cadastro"""
-    template_name = 'usuarios/escolha_tipo_cadastro.html'
+    template_name = "usuarios/escolha_tipo_cadastro.html"
 
-class CadastroPessoaFisicaView(CreateView):
-    """View para cadastro de Pessoa Física"""
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["next"] = self.request.GET.get("next", "")
+        return ctx
+
+
+class SignUpEmpresaAdminView(CreateView):
+    """Cadastro de Empresa/Administrador"""
+    template_name = "usuarios/signup_admin.html"
+    form_class = AdminSignupForm
+    success_url = reverse_lazy("home")
+
+    def get_success_url(self):
+        # Respeita ?next=
+        nxt = self.request.GET.get("next")
+        return nxt or super().get_success_url()
+
+    def form_valid(self, form):
+        resp = super().form_valid(form)
+        login(self.request, self.object)
+        messages.success(
+            self.request, 
+            f'✅ Conta de administrador criada com sucesso! Bem-vindo, {self.object.username}!'
+        )
+        return resp
+
+    def form_invalid(self, form):
+        messages.error(self.request, '❌ Erro ao criar conta. Verifique os dados informados.')
+        return super().form_invalid(form)
+
+
+class SignUpFuncionarioView(CreateView):
+    """Cadastro de Funcionário/Colaborador"""
+    template_name = "usuarios/signup_funcionario.html"
+    form_class = FuncionarioSignupForm
+    success_url = reverse_lazy("home")
+
+    def get_success_url(self):
+        nxt = self.request.GET.get("next")
+        return nxt or super().get_success_url()
+
+    def form_valid(self, form):
+        resp = super().form_valid(form)
+        login(self.request, self.object)
+        messages.success(
+            self.request, 
+            f'✅ Conta de funcionário criada com sucesso! Bem-vindo, {self.object.username}!'
+        )
+        return resp
+
+    def form_invalid(self, form):
+        messages.error(self.request, '❌ Erro ao criar conta. Verifique os dados informados.')
+        return super().form_invalid(form)
+
+
+# MANTER VIEWS EXISTENTES PARA COMPATIBILIDADE
+class CadastroPessoaFisicaView(SignUpFuncionarioView):
+    """View para cadastro de Pessoa Física (alias)"""
+    template_name = "usuarios/cadastro_pessoa_fisica.html"
     form_class = CadastroPessoaFisicaForm
-    template_name = 'usuarios/cadastro_pessoa_fisica.html'
-    success_url = reverse_lazy('login')
-    
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        messages.success(
-            self.request, 
-            f'✅ Conta de Pessoa Física criada com sucesso! '
-            f'CPF: {form.cleaned_data["cpf"]}. Faça login para continuar.'
-        )
-        return response
-    
-    def form_invalid(self, form):
-        messages.error(
-            self.request, 
-            '❌ Erro ao criar conta de Pessoa Física. Verifique os dados.'
-        )
-        return super().form_invalid(form)
 
-class CadastroPessoaJuridicaView(CreateView):
-    """View para cadastro de Pessoa Jurídica"""
+
+class CadastroPessoaJuridicaView(SignUpEmpresaAdminView):
+    """View para cadastro de Pessoa Jurídica (alias)"""
+    template_name = "usuarios/cadastro_pessoa_juridica.html"
     form_class = CadastroPessoaJuridicaForm
-    template_name = 'usuarios/cadastro_pessoa_juridica.html'
-    success_url = reverse_lazy('login')
-    
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        messages.success(
-            self.request, 
-            f'✅ Conta de Pessoa Jurídica criada com sucesso! '
-            f'CNPJ: {form.cleaned_data["cnpj"]}. Faça login para continuar.'
-        )
-        return response
-    
-    def form_invalid(self, form):
-        messages.error(
-            self.request, 
-            '❌ Erro ao criar conta de Pessoa Jurídica. Verifique os dados.'
-        )
-        return super().form_invalid(form)
+
 
 # LOGOUT SEGURO - só aceita POST
 class CustomLogoutView(LogoutView):
     """
-    Logout customizado que aceita POST e redireciona
+    Logout que aceita apenas POST por segurança
     """
-    template_name = 'usuarios/logout.html'  # Template de confirmação
-    next_page = 'home'  # Redireciona para home
+    http_method_names = ['post']
     
-    @method_decorator(require_POST)
     def dispatch(self, request, *args, **kwargs):
-        messages.success(request, '✅ Logout realizado com sucesso!')
+        if request.method.upper() not in self.http_method_names:
+            messages.warning(request, '⚠️ Logout deve ser feito via POST por segurança.')
+            return redirect('home')
         return super().dispatch(request, *args, **kwargs)
 
-@login_required
-def perfil_view(request):
-    """View para visualizar perfil do usuário"""
-    try:
-        profile = request.user.profile
-    except UserProfile.DoesNotExist:
-        messages.warning(request, 'Perfil não encontrado. Entre em contato com o suporte.')
-        profile = None
-    
-    return render(request, 'usuarios/perfil.html', {
-        'profile': profile
+
+# View simples para teste (pode remover depois)
+def teste_view(request):
+    return render(request, 'usuarios/teste.html', {
+        'titulo': 'Teste de Usuários',
+        'user': request.user
     })

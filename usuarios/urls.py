@@ -1,27 +1,42 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from . import views
+from .views import (
+    EscolhaTipoCadastroView,
+    SignUpEmpresaAdminView,
+    SignUpFuncionarioView,
+    CadastroPessoaFisicaView,
+    CadastroPessoaJuridicaView,
+    CustomLogoutView,
+    teste_view
+)
+
+app_name = "usuarios"
 
 urlpatterns = [
-    # URLs de autenticação básicas
-    path('login/', auth_views.LoginView.as_view(template_name='usuarios/login.html'), name='login'),
-    # LOGOUT SIMPLES - só aceita POST
-    path('logout/', views.CustomLogoutView.as_view(), name='logout'),
+    # Novas rotas de cadastro
+    path("cadastro/", EscolhaTipoCadastroView.as_view(), name="cadastro-escolha"),
+    path("cadastro/admin/", SignUpEmpresaAdminView.as_view(), name="cadastro-admin"),
+    path("cadastro/funcionario/", SignUpFuncionarioView.as_view(), name="cadastro-funcionario"),
     
-    # ALTERAR SENHA - se quiser adicionar no futuro
+    # Rotas existentes para compatibilidade
+    path('escolha-tipo-cadastro/', EscolhaTipoCadastroView.as_view(), name='escolha-tipo-cadastro'),
+    path('cadastro-pessoa-fisica/', CadastroPessoaFisicaView.as_view(), name='cadastro-pessoa-fisica'),
+    path('cadastro-pessoa-juridica/', CadastroPessoaJuridicaView.as_view(), name='cadastro-pessoa-juridica'),
+    
+    # Login/Logout específicos
+    path('login/', auth_views.LoginView.as_view(template_name='usuarios/login.html'), name='login'),
+    path('logout/', CustomLogoutView.as_view(), name='logout'),
+    
+    # Alteração de senha
     path('alterar-senha/', auth_views.PasswordChangeView.as_view(
         template_name='usuarios/change_password.html',
-        success_url='/usuarios/alterar-senha/concluido/'
-    ), name='alterar-senha'),
-    path('alterar-senha/concluido/', auth_views.PasswordChangeDoneView.as_view(
-        template_name='usuarios/change_password_done.html'
-    ), name='password_change_done'),
+        success_url='/usuarios/senha-alterada/'
+    ), name='change-password'),
     
-    # Cadastro de usuários
-    path('cadastro/', views.EscolhaTipoCadastroView.as_view(), name='escolha-tipo-cadastro'),
-    path('cadastro/pessoa-fisica/', views.CadastroPessoaFisicaView.as_view(), name='cadastro-pf'),
-    path('cadastro/pessoa-juridica/', views.CadastroPessoaJuridicaView.as_view(), name='cadastro-pj'),
+    path('senha-alterada/', auth_views.PasswordChangeDoneView.as_view(
+        template_name='usuarios/password_change_done.html'
+    ), name='password-change-done'),
     
-    # Perfil
-    path('perfil/', views.perfil_view, name='perfil'),
+    # Teste
+    path('teste/', teste_view, name='teste'),
 ]

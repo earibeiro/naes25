@@ -1,0 +1,153 @@
+{% extends "pages/base.html" %}
+{% load static %}
+
+{% block title %}Tipo de Cadastro - Athena{% endblock %}
+
+{% block hero_content %}
+<div class="container px-4 px-lg-5 text-center" style="padding: 80px 0;">
+    <h1 class="text-white">Criar Nova Conta</h1>
+    <p class="text-white-50">Escolha o tipo de cadastro mais adequado para você</p>
+</div>
+{% endblock %}
+
+{% block about_content %}
+<div class="container px-4 px-lg-5">
+    <div class="row gx-4 gx-lg-5 justify-content-center">
+        <div class="col-lg-10">
+            
+            <h2 class="text-white mb-5 text-center">
+                <i class="fas fa-user-plus me-2"></i>
+                Qual tipo de conta você deseja criar?
+            </h2>
+            
+            <div class="row">
+                <!-- Empresa / Administrador -->
+                <div class="col-md-6 mb-4">
+                    <div class="card bg-dark border-warning h-100 hover-card">
+                        <div class="card-header bg-warning text-dark text-center">
+                            <i class="fas fa-building fa-3x mb-2"></i>
+                            <h4 class="mb-0">Empresa / Administrador</h4>
+                        </div>
+                        <div class="card-body d-flex flex-column text-center">
+                            <p class="text-white-50 mb-3">
+                                Ideal para empresas e administradores que precisam gerenciar equipes, 
+                                contratos e ter acesso completo ao sistema.
+                            </p>
+                            
+                            <div class="text-white-50 text-start mb-4">
+                                <h6 class="text-warning">✨ Funcionalidades:</h6>
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-check text-success me-2"></i>Gerenciamento completo</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Controle de equipes</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Relatórios avançados</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Configurações do sistema</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="mt-auto">
+                                <a class="btn btn-warning btn-lg text-dark"
+                                   href="{% url 'usuarios:cadastro-admin' %}{% if next %}?next={{ next|urlencode }}{% endif %}">
+                                   <i class="fas fa-arrow-right me-2"></i>Continuar como Admin
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Funcionário / Colaborador -->
+                <div class="col-md-6 mb-4">
+                    <div class="card bg-dark border-primary h-100 hover-card">
+                        <div class="card-header bg-primary text-white text-center">
+                            <i class="fas fa-user fa-3x mb-2"></i>
+                            <h4 class="mb-0">Funcionário / Colaborador</h4>
+                        </div>
+                        <div class="card-body d-flex flex-column text-center">
+                            <p class="text-white-50 mb-3">
+                                Perfeito para funcionários e colaboradores que precisam acessar 
+                                contratos e autorizações sob sua responsabilidade.
+                            </p>
+                            
+                            <div class="text-white-50 text-start mb-4">
+                                <h6 class="text-primary">⚡ Funcionalidades:</h6>
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-check text-success me-2"></i>Acesso a contratos</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Gestão de pessoas</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Visualização de dados</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Relatórios básicos</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="mt-auto">
+                                <a class="btn btn-primary btn-lg"
+                                   href="{% url 'usuarios:cadastro-funcionario' %}{% if next %}?next={{ next|urlencode }}{% endif %}">
+                                   <i class="fas fa-arrow-right me-2"></i>Continuar como Funcionário
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Informações adiciais -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card bg-dark border-info">
+                        <div class="card-body">
+                            <h5 class="text-info mb-3">
+                                <i class="fas fa-info-circle me-2"></i>Informações Importantes
+                            </h5>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="text-white-50">
+                                        <strong class="text-info">🔒 Dados Seguros:</strong><br>
+                                        Todas as informações são protegidas conforme LGPD
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="text-white-50">
+                                        <strong class="text-info">✅ Verificação:</strong><br>
+                                        Os usuários são validados no momento do cadastro
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="text-white-50">
+                                        <strong class="text-info">🆘 Suporte:</strong><br>
+                                        Em caso de dúvidas, entre em contato conosco
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <p class="text-white-50">
+                    Já tem uma conta? 
+                    <a href="{% url 'login' %}" class="text-primary">Faça login aqui</a>
+                </p>
+                <a href="{% url 'index' %}" class="btn btn-outline-light">
+                    <i class="fas fa-arrow-left me-2"></i>Voltar ao Início
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block about_image %}{% endblock %}
+{% block projects_content %}{% endblock %}
+{% block signup_content %}{% endblock %}
+{% block contact_content %}{% endblock %}
+{% block copyright %}Projeto Athena LGPD 2025{% endblock %}
+
+{% block extra_css %}
+<style>
+.hover-card {
+    transition: transform 0.2s;
+}
+.hover-card:hover {
+    transform: translateY(-5px);
+}
+</style>
+{% endblock %}

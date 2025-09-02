@@ -5,9 +5,10 @@ from django.contrib.auth import views as auth_views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('pages.urls')),
-    path('usuarios/', include('usuarios.urls')),
-    path('auditoria/', include('auditoria.urls')),  # ✅ ADICIONAR
+    path('usuarios/', include('usuarios.urls')),  # ✅ CONFIRMADO
+    path('auditoria/', include('auditoria.urls')),
     
-    # Logout padrão do Django - aceita apenas POST
+    # Login/Logout padrão
+    path('accounts/login/', auth_views.LoginView.as_view(template_name='pages/login.html'), name='login'),
     path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
 ]

@@ -41,10 +41,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'pages.apps.PagesConfig',
     'usuarios.apps.UsuariosConfig',
-    'auditoria.apps.AuditoriaConfig',  # ✅ ADICIONAR AQUI
+    'auditoria.apps.AuditoriaConfig',
     'crispy_forms',
     'crispy_bootstrap4',
-    #'django_extensions',
 ]
 
 MIDDLEWARE = [
@@ -53,7 +52,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'auditoria.middleware.RequestStoreMiddleware',  # ✅ ADICIONAR DEPOIS DO AUTH
+    'auditoria.middleware.RequestStoreMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -151,9 +150,9 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
 CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 # URLs de redirecionamento após login/logout
-LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'home'
-LOGOUT_REDIRECT_URL = 'home'
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "home"
+LOGOUT_REDIRECT_URL = "home"
 
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Sao_Paulo'

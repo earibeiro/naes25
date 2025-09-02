@@ -508,8 +508,9 @@ class ContratoDraftFinalizeView(View):
         if not request.user.is_authenticated:
             # Salva intenção de finalizar após login
             request.session['draft_next'] = 'finalize'
-            messages.info(request, 'Faça login para finalizar seu contrato.')
-            return redirect(f"{reverse('login')}?next={reverse('contrato-draft-finalize')}")
+            messages.info(request, 'Faça login ou crie uma conta para finalizar seu contrato.')
+            # Redireciona para escolha de cadastro com next
+            return redirect(f"{reverse('usuarios:cadastro-escolha')}?next={reverse('contrato-draft-finalize')}")
         
         # Usuário autenticado - cria contrato real
         return self.finalize_contract(request)
