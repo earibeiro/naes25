@@ -3,8 +3,8 @@
 
 {% block title %}Dashboard - Athena{% endblock %}
 
-<!-- ✅ MASTHEAD COMPACTO PARA DASHBOARD -->
-{% block masthead_class %} masthead--compact{% endblock %}
+<!-- ✅ HERO REDUZIDO COM MASTHEAD--MINIMAL -->
+{% block masthead_class %} masthead--minimal{% endblock %}
 
 {% block hero_content %}
 <div class="container px-4 px-lg-5 text-center">
@@ -13,7 +13,7 @@
         <p class="text-white-50">Dashboard de Gestão LGPD - Controle total dos seus dados</p>
         
         <!-- Atalhos rápidos para usuários autenticados -->
-        <div class="mt-4">
+        <div class="mt-3">
             <a href="{% url 'contrato-draft-start' %}" class="btn btn-success btn-lg me-2">
                 <i class="fas fa-file-contract me-2"></i>Começar um Contrato
             </a>
@@ -28,15 +28,17 @@
         <h1 class="text-white">Sistema Athena</h1>
         <p class="text-white-50">Gestão de Dados Pessoais e Empresariais com Conformidade LGPD</p>
         
-        <!-- Call-to-Action para usuários não autenticados -->
-        <div class="mt-4">
+        <!-- ✅ BOTÕES VISÍVEIS PARA USUÁRIOS NÃO AUTENTICADOS -->
+        <div class="mt-3">
             <a href="{% url 'contrato-draft-start' %}" class="btn btn-success btn-lg me-3">
                 <i class="fas fa-file-contract me-2"></i>Começar um Contrato
             </a>
-            <a href="{% url 'login' %}" class="btn btn-primary btn-lg me-3">
+            <!-- ✅ CORRIGIDO: usuarios:login em vez de login -->
+            <a href="{% url 'usuarios:login' %}" class="btn btn-primary btn-lg me-3">
                 <i class="fas fa-sign-in-alt me-2"></i>Entrar no Sistema
             </a>
-            <a href="{% url 'usuarios:cadastro-escolha' %}" class="btn btn-outline-light btn-lg">
+            <!-- ✅ BOTÃO CRIAR CONTA VISÍVEL (NÃO MAIS OUTLINE-LIGHT) -->
+            <a href="{% url 'usuarios:cadastro-escolha' %}" class="btn btn-light btn-lg">
                 <i class="fas fa-user-plus me-2"></i>Criar Conta
             </a>
         </div>
@@ -50,11 +52,11 @@
     {% if user.is_authenticated %}
         <!-- Dashboard KPIs para usuários autenticados -->
         
-        <!-- Título do Dashboard -->
-        <div class="row mb-5">
+        <!-- ✅ TÍTULOS EM PRETO -->
+        <div class="row mb-4">
             <div class="col-12 text-center">
-                <h2 class="text-white">📊 Seus Dados em Números</h2>
-                <p class="text-white-50">Visão geral do seu sistema LGPD</p>
+                <h2 class="text-dark">📊 Seus Dados em Números</h2>
+                <p class="text-dark">Visão geral do seu sistema LGPD</p>
             </div>
         </div>
         
@@ -126,7 +128,7 @@
         </div>
         
         <!-- ✅ SEÇÃO "ÚLTIMOS..." COM ALTURA IGUAL -->
-        <div class="row g-4 last-grid mb-5">
+        <div class="row g-4 last-grid">
             <div class="col-12 col-lg-4">
                 <div class="card last-card bg-dark text-white h-100 shadow-lg rounded-4">
                     <div class="card-header bg-primary border-0 text-center">
@@ -173,7 +175,7 @@
                                 {% for empresa in ultimas_empresas %}
                                     <li class="mb-2 d-flex justify-content-between align-items-center">
                                         <div>
-                                            <strong>{{ empresa.business_name|truncatechars:20 }}</strong>
+                                            <strong>{{ empresa.corporate_name|truncatechars:20 }}</strong>
                                             <br><small class="text-white-50">{{ empresa.created_at|date:"d/m/Y" }}</small>
                                         </div>
                                         <a href="{% url 'company-detail' empresa.pk %}" class="btn btn-outline-light btn-sm">
@@ -233,50 +235,53 @@
             </div>
         </div>
         
-        <!-- Ações Rápidas -->
-        <div class="row g-4 mb-5">
-            <div class="col-12">
-                <div class="card bg-dark border-light rounded-4">
-                    <div class="card-body text-center py-5">
-                        <h3 class="text-white mb-3">🚀 Ações Rápidas</h3>
-                        <p class="text-white-50 mb-4">
-                            Acesso direto às funcionalidades mais utilizadas
-                        </p>
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <a href="{% url 'person-create' %}" class="btn btn-primary btn-lg w-100">
-                                    <i class="fas fa-user-plus me-2"></i>Nova Pessoa
-                                </a>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="{% url 'company-create' %}" class="btn btn-warning btn-lg w-100">
-                                    <i class="fas fa-building me-2"></i>Nova Empresa
-                                </a>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="{% url 'contract-create' %}" class="btn btn-success btn-lg w-100">
-                                    <i class="fas fa-file-contract me-2"></i>Novo Contrato
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
     {% else %}
         <!-- ✅ CONTEÚDO PARA USUÁRIOS NÃO AUTENTICADOS -->
-        <div class="row g-4 mb-5">
+        <div class="row g-4 mb-4">
             <div class="col-12 text-center">
-                <h2 class="text-white mb-4">Por que escolher o Athena?</h2>
-                <p class="text-white-50 mb-5">
+                <!-- ✅ TÍTULOS EM PRETO -->
+                <h2 class="text-dark mb-4">🛡️ Por que escolher o Athena?</h2>
+                <p class="text-dark mb-5">
                     Sistema completo de gestão LGPD com conformidade garantida e interface intuitiva.
                 </p>
             </div>
         </div>
         
+        <!-- ✅ BOTÕES BRANCOS MAIORES SEM AUMENTAR A SEÇÃO -->
+        <div class="container app-tiles py-3">
+            <div class="row g-4 justify-content-center">
+                <div class="col-12 col-md-4 d-flex justify-content-center">
+                    <a href="{% url 'person-list' %}" class="card app-tile text-dark text-decoration-none">
+                        <div class="card-body d-flex flex-column align-items-center">
+                            <div class="tile-icon mb-2">👥</div>
+                            <div class="tile-label fw-semibold">PESSOAS</div>
+                            <small class="text-muted mt-1">Gestão de pessoas físicas</small>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-12 col-md-4 d-flex justify-content-center">
+                    <a href="{% url 'company-list' %}" class="card app-tile text-dark text-decoration-none">
+                        <div class="card-body d-flex flex-column align-items-center">
+                            <div class="tile-icon mb-2">🏢</div>
+                            <div class="tile-label fw-semibold">EMPRESAS</div>
+                            <small class="text-muted mt-1">Gestão de pessoas jurídicas</small>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-12 col-md-4 d-flex justify-content-center">
+                    <a href="{% url 'contract-list' %}" class="card app-tile text-dark text-decoration-none">
+                        <div class="card-body d-flex flex-column align-items-center">
+                            <div class="tile-icon mb-2">📄</div>
+                            <div class="tile-label fw-semibold">CONTRATOS</div>
+                            <small class="text-muted mt-1">Documentação LGPD</small>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
         <!-- Cards de benefícios com altura igual -->
-        <div class="row g-4 kpi-grid mb-5">
+        <div class="row g-4 kpi-grid">
             <div class="col-12 col-md-4">
                 <div class="card kpi-card bg-primary text-white h-100 shadow-lg rounded-4">
                     <div class="card-body text-center">
@@ -313,31 +318,10 @@
                         <p>Interface intuitiva para pessoa física e jurídica.</p>
                     </div>
                     <div class="card-footer bg-transparent border-0">
+                        <!-- ✅ BOTÃO CRIAR CONTA VISÍVEL -->
                         <a href="{% url 'usuarios:cadastro-escolha' %}" class="btn btn-light w-100">
                             <i class="fas fa-user-plus me-1"></i>Criar Conta
                         </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Call-to-Action final -->
-        <div class="row">
-            <div class="col-12 text-center">
-                <div class="card bg-dark border-light rounded-4">
-                    <div class="card-body py-5">
-                        <h3 class="text-white mb-3">Pronto para começar?</h3>
-                        <p class="text-white-50 mb-4">
-                            Junte-se ao Athena e gerencie seus dados com total conformidade LGPD.
-                        </p>
-                        <div>
-                            <a href="{% url 'usuarios:cadastro-escolha' %}" class="btn btn-primary btn-lg me-3">
-                                <i class="fas fa-user-plus me-2"></i>Criar Conta Gratuita
-                            </a>
-                            <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg">
-                                <i class="fas fa-sign-in-alt me-2"></i>Entrar
-                            </a>
-                        </div>
                     </div>
                 </div>
             </div>
