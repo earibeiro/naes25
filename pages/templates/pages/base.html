@@ -113,7 +113,8 @@
                         </li>
                     {% else %}
                         <!-- Menu para usuários não autenticados -->
-                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Entrar</a></li>
+                        <!-- ✅ CORRIGIDO: usuarios:login em vez de login -->
+                        <li class="nav-item"><a class="nav-link" href="{% url 'usuarios:login' %}">Entrar</a></li>
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'usuarios:cadastro-escolha' %}{% if request.GET.next %}?next={{ request.GET.next|urlencode }}{% endif %}">
                                 Criar Conta
