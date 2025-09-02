@@ -2,6 +2,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.contrib import messages
 from django.shortcuts import redirect
+from django.http import Http404 
 
 
 class OwnerQuerysetMixin(LoginRequiredMixin):
@@ -70,6 +71,34 @@ class OwnerObjectPermissionMixin(UserPassesTestMixin):
             return redirect(f'{model_name}-list')
         except:
             return redirect('home')
+
+    def get_object(self, queryset=None):
+        """
+        Sobrescreve get_object para garantir escopo por usuário
+        """
+        if queryset is None:
+            queryset = self.get_queryset()
+        
+        # Busca o objeto pelo pk
+        pk = self.kwargs.get(self.pk_url_kwarg)
+        if pk is not None:
+            # Admin pode acessar qualquer objeto
+            if self.is_admin():
+                queryset = self.model.objects.all()
+            else:
+                # Usuário comum apenas seus objetos
+                filter_kwargs = {
+                    'pk': pk,
+                    self.owner_field_name: self.request.user
+                }
+                queryset = queryset.filter(**filter_kwargs)
+        
+        try:
+            obj = queryset.get()
+        except queryset.model.DoesNotExist:
+            raise Http404(f"Nenhum {self.model._meta.verbose_name} encontrado.")
+        
+        return obj
 
 
 class OwnerCreateMixin(LoginRequiredMixin):

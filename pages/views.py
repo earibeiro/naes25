@@ -105,13 +105,18 @@ class PersonListView(OwnerQuerysetMixin, ListView):
 class PersonCreateView(OwnerCreateMixin, GroupRequiredMixin, CreateView):
     """CreateView para pessoas"""
     model = Person
-    fields = ['nome', 'cpf', 'email', 'telefone', 'cidade', 'data_processing_purpose']
+    form_class = PersonForm  # ✅ USAR FORM CUSTOMIZADO
     template_name = 'pages/forms/person_form.html'
     success_url = reverse_lazy('person-list')
     group_required = 'funcionario'
     
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+    
     def form_valid(self, form):
-        messages.success(self.request, f'✅ Pessoa "{form.instance.nome}" criada com sucesso!')
+        messages.success(self.request, f'✅ Pessoa "{form.instance.full_name}" criada com sucesso!')
         return super().form_valid(form)
     
     def form_invalid(self, form):
@@ -127,11 +132,16 @@ class PersonDetailView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, DetailVie
 class PersonUpdateView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, UpdateView):
     """UpdateView para pessoas (apenas dono pode editar)"""
     model = Person
-    fields = ['nome', 'cpf', 'email', 'telefone', 'cidade', 'data_processing_purpose']
+    form_class = PersonForm  # ✅ USAR FORM CUSTOMIZADO
     template_name = 'pages/forms/person_form.html'
     
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+    
     def form_valid(self, form):
-        messages.success(self.request, f'✅ Pessoa "{form.instance.nome}" atualizada com sucesso!')
+        messages.success(self.request, f'✅ Pessoa "{form.instance.full_name}" atualizada com sucesso!')
         return super().form_valid(form)
     
     def get_success_url(self):
@@ -144,12 +154,12 @@ class PersonDeleteView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, DeleteVie
     success_url = reverse_lazy('person-list')
     
     def delete(self, request, *args, **kwargs):
-        person_name = self.get_object().nome
+        person_name = self.get_object().full_name  # ✅ CAMPO CORRETO
         messages.success(request, f'✅ Pessoa "{person_name}" excluída com sucesso!')
         return super().delete(request, *args, **kwargs)
 
 # ===========================================
-# VIEWS PARA COMPANY (EMPRESA)
+# VIEWS PARA COMPANY (EMPRESA) - CORRIGIDAS
 # ===========================================
 
 class CompanyListView(OwnerQuerysetMixin, ListView):
@@ -162,13 +172,18 @@ class CompanyListView(OwnerQuerysetMixin, ListView):
 class CompanyCreateView(OwnerCreateMixin, GroupRequiredMixin, CreateView):
     """CreateView para empresas"""
     model = Company
-    fields = ['nome', 'cnpj', 'email', 'telefone', 'cidade', 'data_processing_purpose']
+    form_class = CompanyForm  # ✅ USAR FORM CUSTOMIZADO
     template_name = 'pages/forms/company_form.html'
     success_url = reverse_lazy('company-list')
     group_required = 'funcionario'
     
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+    
     def form_valid(self, form):
-        messages.success(self.request, f'✅ Empresa "{form.instance.nome}" criada com sucesso!')
+        messages.success(self.request, f'✅ Empresa "{form.instance.corporate_name}" criada com sucesso!')
         return super().form_valid(form)
     
     def form_invalid(self, form):
@@ -184,11 +199,16 @@ class CompanyDetailView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, DetailVi
 class CompanyUpdateView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, UpdateView):
     """UpdateView para empresas (apenas dono pode editar)"""
     model = Company
-    fields = ['nome', 'cnpj', 'email', 'telefone', 'cidade', 'data_processing_purpose']
+    form_class = CompanyForm  # ✅ USAR FORM CUSTOMIZADO
     template_name = 'pages/forms/company_form.html'
     
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+    
     def form_valid(self, form):
-        messages.success(self.request, f'✅ Empresa "{form.instance.nome}" atualizada com sucesso!')
+        messages.success(self.request, f'✅ Empresa "{form.instance.corporate_name}" atualizada com sucesso!')
         return super().form_valid(form)
     
     def get_success_url(self):
@@ -201,12 +221,12 @@ class CompanyDeleteView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, DeleteVi
     success_url = reverse_lazy('company-list')
     
     def delete(self, request, *args, **kwargs):
-        company_name = self.get_object().nome
+        company_name = self.get_object().corporate_name  # ✅ CAMPO CORRETO
         messages.success(request, f'✅ Empresa "{company_name}" excluída com sucesso!')
         return super().delete(request, *args, **kwargs)
 
 # ===========================================
-# VIEWS PARA CONTRACT (CONTRATO)
+# VIEWS PARA CONTRACT (CONTRATO) - CORRIGIDAS
 # ===========================================
 
 class ContractListView(OwnerQuerysetMixin, ListView):
@@ -219,8 +239,9 @@ class ContractListView(OwnerQuerysetMixin, ListView):
 class ContractCreateView(OwnerCreateMixin, CreateView):
     """CreateView para contratos"""
     model = Contract
-    form_class = ContractForm
+    form_class = ContractForm  # Usar form customizado
     template_name = 'pages/forms/contract_form.html'
+    success_url = reverse_lazy('contract-list')
     
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -228,18 +249,12 @@ class ContractCreateView(OwnerCreateMixin, CreateView):
         return kwargs
     
     def form_valid(self, form):
-        # Se não tiver data de início, usar hoje
-        if not form.instance.start_date:
-            form.instance.start_date = timezone.now().date()
         messages.success(self.request, f'✅ Contrato "{form.instance.title}" criado com sucesso!')
         return super().form_valid(form)
     
     def form_invalid(self, form):
         messages.error(self.request, '❌ Erro ao criar contrato. Verifique os dados.')
         return super().form_invalid(form)
-    
-    def get_success_url(self):
-        return reverse_lazy('contract-detail', kwargs={'pk': self.object.pk})
 
 class ContractDetailView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, DetailView):
     """DetailView para contratos (apenas dono pode ver)"""
@@ -250,7 +265,7 @@ class ContractDetailView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, DetailV
 class ContractUpdateView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, UpdateView):
     """UpdateView para contratos (apenas dono pode editar)"""
     model = Contract
-    form_class = ContractForm
+    form_class = ContractForm  # Usar form customizado
     template_name = 'pages/forms/contract_form.html'
     
     def get_form_kwargs(self):
