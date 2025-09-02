@@ -108,11 +108,25 @@ class Command(BaseCommand):
         
         # Criar contratos demo
         contratos_titulos = [
-            'Contrato de Prestação de Serviços',
-            'Termo de Consentimento LGPD',
-            'Acordo de Processamento de Dados',
-            'Contrato de Consultoria',
-            'Termo de Uso de Dados'
+            'Contrato de Prestação de Serviços LGPD',
+            'Termo de Consentimento para Tratamento de Dados',
+            'Acordo de Processamento de Dados Pessoais',
+            'Contrato de Consultoria em Privacidade',
+            'Termo de Uso de Plataforma Digital',
+            'Contrato de Desenvolvimento de Software',
+            'Acordo de Compartilhamento de Dados',
+            'Termo de Autorização para Marketing',
+        ]
+        
+        contratos_descricoes = [
+            'Contrato para prestação de serviços com tratamento de dados pessoais conforme LGPD.',
+            'Documento formal de consentimento para coleta e processamento de dados.',
+            'Acordo específico para definir responsabilidades no tratamento de dados.',
+            'Contrato para serviços especializados em adequação à LGPD.',
+            'Termos e condições para uso de plataforma digital.',
+            'Contrato para desenvolvimento com cláusulas de proteção de dados.',
+            'Acordo para compartilhamento seguro de informações.',
+            'Autorização para atividades de marketing direto.',
         ]
         
         for i, titulo in enumerate(contratos_titulos):
@@ -120,38 +134,44 @@ class Command(BaseCommand):
             pessoa = random.choice(pessoas) if pessoas else None
             
             # Valores possíveis para contract_type (verificar se existe no modelo)
-            tipos_contrato = ['SERVICO', 'CONSULTORIA', 'FORNECIMENTO', 'TRABALHO']
+            tipos_contrato = ['SERVICO', 'CONSULTORIA', 'FORNECIMENTO', 'TRABALHO', 'MARKETING', 'DESENVOLVIMENTO']
+            
+            # Data aleatória dos últimos 60 dias
+            data_inicio = timezone.now() - timedelta(days=random.randint(1, 60))
+            data_fim = data_inicio + timedelta(days=random.randint(30, 365))
             
             contrato, created = Contract.objects.get_or_create(
                 title=titulo,
                 usuario=user,
                 defaults={
-                    'description': f'Descrição detalhada do {titulo.lower()}. Este contrato estabelece os termos e condições para o processamento de dados pessoais conforme LGPD.',
+                    'description': contratos_descricoes[i] if i < len(contratos_descricoes) else 'Contrato de exemplo para demonstração do sistema.',
+                    'contract_type': random.choice(tipos_contrato),
+                    'start_date': data_inicio.date(),
+                    'end_date': data_fim.date(),
+                    'value': round(random.uniform(1000, 50000), 2),
                     'company': empresa,
                     'person': pessoa,
-                    'start_date': timezone.now().date(),
-                    'end_date': timezone.now().date() + timezone.timedelta(days=365),
-                    'value': random.randint(1000, 10000),
-                    'contract_type': random.choice(tipos_contrato),
-                    'data_processing_purpose': f'Finalidade específica para {titulo.lower()}: processamento de dados pessoais necessários para a execução do contrato.',
-                    'is_active': random.choice([True, True, True, False])  # 75% ativos
+                    'is_active': random.choice([True, True, True, False]),  # 75% ativos
+                    'data_processing_purpose': f'Finalidade específica do contrato: {titulo.lower()}',
+                    'created_at': data_inicio,
                 }
             )
             
             if created:
-                self.stdout.write(f'✅ Contrato criado: {titulo}')
+                self.stdout.write(f'✅ Contrato criado: {titulo[:50]}...')
         
         # Estatísticas finais
         total_pessoas = Person.objects.filter(usuario=user).count()
         total_empresas = Company.objects.filter(usuario=user).count()
         total_contratos = Contract.objects.filter(usuario=user).count()
         
-        self.stdout.write('\n' + '=' * 50)
+        self.stdout.write('\n' + '=' * 60)
         self.stdout.write('📊 RESUMO DOS DADOS CRIADOS')
-        self.stdout.write('=' * 50)
+        self.stdout.write('=' * 60)
         self.stdout.write(f'👥 Pessoas: {total_pessoas}')
         self.stdout.write(f'🏢 Empresas: {total_empresas}')
         self.stdout.write(f'📋 Contratos: {total_contratos}')
         self.stdout.write(f'👤 Usuário: {user.username} (senha: demo123)')
         self.stdout.write('\n🎉 Dados de demonstração criados com sucesso!')
-        self.stdout.write('💡 Use estes dados para testar o sistema.')
+        self.stdout.write('💡 Use estes dados para testar o sistema Athena.')
+        self.stdout.write('\n🔗 Acesse: http://127.0.0.1:8000/home/')

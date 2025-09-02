@@ -55,15 +55,16 @@
             </div>
         </div>
         
-        <!-- Cards de KPIs Principais -->
+        <!-- ✅ CARDS DE KPIs PRINCIPAIS (sempre mostra 0 se vazio) -->
         <div class="row mb-5">
+            <!-- Total de Pessoas -->
             <div class="col-md-3 mb-4">
                 <div class="card bg-primary text-white shadow-lg h-100">
                     <div class="card-body text-center">
                         <i class="fas fa-users fa-3x mb-3"></i>
                         <h2 class="display-4 mb-2">{{ total_pessoas|default:0 }}</h2>
-                        <h5 class="mb-0">Pessoas Cadastradas</h5>
-                        <small class="text-white-75">Total no sistema</small>
+                        <h5 class="mb-0">Pessoas Físicas</h5>
+                        <small class="text-white-75">Total cadastradas</small>
                     </div>
                     <div class="card-footer bg-primary border-0">
                         <a href="{% url 'person-list' %}" class="btn btn-light btn-sm">
@@ -73,6 +74,7 @@
                 </div>
             </div>
             
+            <!-- Total de Empresas -->
             <div class="col-md-3 mb-4">
                 <div class="card bg-warning text-dark shadow-lg h-100">
                     <div class="card-body text-center">
@@ -89,6 +91,7 @@
                 </div>
             </div>
             
+            <!-- Total de Contratos -->
             <div class="col-md-3 mb-4">
                 <div class="card bg-success text-white shadow-lg h-100">
                     <div class="card-body text-center">
@@ -105,42 +108,39 @@
                 </div>
             </div>
             
+            <!-- Total de Usuários (apenas para admin) ou Estatística da semana -->
             <div class="col-md-3 mb-4">
-                <div class="card bg-info text-white shadow-lg h-100">
-                    <div class="card-body text-center">
-                        <i class="fas fa-chart-line fa-3x mb-3"></i>
-                        <h2 class="display-4 mb-2">{{ pessoas_ultima_semana|default:0 }}</h2>
-                        <h5 class="mb-0">Esta Semana</h5>
-                        <small class="text-white-75">Novos cadastros</small>
+                {% if user.is_superuser or user.groups.all %}
+                    <div class="card bg-info text-white shadow-lg h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-user-shield fa-3x mb-3"></i>
+                            <h2 class="display-4 mb-2">{{ total_usuarios|default:0 }}</h2>
+                            <h5 class="mb-0">Usuários do Sistema</h5>
+                            <small class="text-white-75">Total registrados</small>
+                        </div>
+                        <div class="card-footer bg-info border-0">
+                            <small class="text-white">Controle administrativo</small>
+                        </div>
                     </div>
-                    <div class="card-footer bg-info border-0">
-                        <small class="text-white">Últimos 7 dias</small>
+                {% else %}
+                    <div class="card bg-info text-white shadow-lg h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-chart-line fa-3x mb-3"></i>
+                            <h2 class="display-4 mb-2">{{ pessoas_ultima_semana|default:0 }}</h2>
+                            <h5 class="mb-0">Esta Semana</h5>
+                            <small class="text-white-75">Novos cadastros</small>
+                        </div>
+                        <div class="card-footer bg-info border-0">
+                            <small class="text-white">Últimos 7 dias</small>
+                        </div>
                     </div>
-                </div>
+                {% endif %}
             </div>
         </div>
         
         <!-- Cards de Estatísticas Secundárias -->
         <div class="row mb-5">
-            <div class="col-md-4 mb-3">
-                <div class="card bg-dark text-white border-primary">
-                    <div class="card-body text-center py-4">
-                        <i class="fas fa-handshake text-primary fa-2x mb-2"></i>
-                        <h4>{{ contratos_ativos|default:0 }}</h4>
-                        <p class="mb-0 text-white-50">Contratos Ativos</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-3">
-                <div class="card bg-dark text-white border-warning">
-                    <div class="card-body text-center py-4">
-                        <i class="fas fa-calendar-week text-warning fa-2x mb-2"></i>
-                        <h4>{{ empresas_ultimo_mes|default:0 }}</h4>
-                        <p class="mb-0 text-white-50">Empresas este mês</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-3">
+            <div class="col-md-4 mb-4">
                 <div class="card bg-dark text-white border-success">
                     <div class="card-body text-center py-4">
                         <i class="fas fa-file-signature text-success fa-2x mb-2"></i>
@@ -149,9 +149,29 @@
                     </div>
                 </div>
             </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card bg-dark text-white border-warning">
+                    <div class="card-body text-center py-4">
+                        <i class="fas fa-building text-warning fa-2x mb-2"></i>
+                        <h4>{{ empresas_ultimo_mes|default:0 }}</h4>
+                        <p class="mb-0 text-white-50">Empresas este mês</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card bg-dark text-white border-primary">
+                    <div class="card-body text-center py-4">
+                        <i class="fas fa-check-circle text-primary fa-2x mb-2"></i>
+                        <h4>{{ contratos_ativos|default:0 }}</h4>
+                        <p class="mb-0 text-white-50">Contratos ativos</p>
+                    </div>
+                </div>
+            </div>
         </div>
         
-        <!-- Seção de Registros Recentes -->
+        <!-- ✅ SEÇÃO DE REGISTROS RECENTES -->
         <div class="row mb-5">
             <div class="col-12 text-center mb-4">
                 <h2 class="text-white">📋 Atividade Recente</h2>
@@ -175,7 +195,7 @@
                                     <div class="list-group-item bg-transparent text-white border-secondary py-2">
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div>
-                                                <h6 class="mb-1">{{ pessoa.nome|truncatechars:25 }}</h6>
+                                                <h6 class="mb-1">{{ pessoa.full_name|truncatechars:25 }}</h6>
                                                 <small class="text-white-50">
                                                     <i class="fas fa-clock me-1"></i>
                                                     {{ pessoa.created_at|date:"d/m/Y H:i" }}
@@ -221,7 +241,8 @@
                                     <div class="list-group-item bg-transparent text-white border-secondary py-2">
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div>
-                                                <h6 class="mb-1">{{ empresa.nome|truncatechars:25 }}</h6>
+                                                <!-- ✅ CORRIGIR: usar corporate_name ao invés de nome -->
+                                                <h6 class="mb-1">{{ empresa.corporate_name|truncatechars:25 }}</h6>
                                                 <small class="text-white-50">
                                                     <i class="fas fa-clock me-1"></i>
                                                     {{ empresa.created_at|date:"d/m/Y H:i" }}
@@ -252,7 +273,7 @@
                 </div>
             </div>
             
-            <!-- Últimos Contratos -->
+            <!-- ✅ ÚLTIMOS CONTRATOS - SEMPRE MOSTRA (mesmo vazio) -->
             <div class="col-md-4 mb-4">
                 <div class="card bg-dark text-white border-success h-100">
                     <div class="card-header bg-success">
@@ -267,7 +288,8 @@
                                     <div class="list-group-item bg-transparent text-white border-secondary py-2">
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div>
-                                                <h6 class="mb-1">{{ contrato.titulo|truncatechars:25 }}</h6>
+                                                <!-- ✅ CORRIGIR: usar title ao invés de titulo -->
+                                                <h6 class="mb-1">{{ contrato.title|truncatechars:25 }}</h6>
                                                 <small class="text-white-50">
                                                     <i class="fas fa-clock me-1"></i>
                                                     {{ contrato.created_at|date:"d/m/Y H:i" }}
@@ -305,27 +327,29 @@
         </div>
         
         <!-- Ações Rápidas -->
-        <div class="row">
+        <div class="row mt-5">
             <div class="col-12">
-                <div class="card bg-gradient-primary border-0 shadow-lg">
-                    <div class="card-body text-center py-5">
-                        <h3 class="text-white mb-3">
-                            <i class="fas fa-rocket me-2"></i>
-                            Ações Rápidas
-                        </h3>
-                        <p class="text-white mb-4">
-                            Acesse rapidamente as principais funcionalidades do sistema.
-                        </p>
-                        <div class="d-flex justify-content-center gap-3 flex-wrap">
-                            <a href="{% url 'person-create' %}" class="btn btn-light">
-                                <i class="fas fa-user-plus me-2"></i>Cadastrar Pessoa
-                            </a>
-                            <a href="{% url 'company-create' %}" class="btn btn-outline-light">
-                                <i class="fas fa-building me-2"></i>Cadastrar Empresa
-                            </a>
-                            <a href="{% url 'contract-create' %}" class="btn btn-outline-light">
-                                <i class="fas fa-file-contract me-2"></i>Novo Contrato
-                            </a>
+                <div class="card bg-secondary text-white">
+                    <div class="card-body text-center py-4">
+                        <h4 class="text-white mb-4">🚀 Ações Rápidas</h4>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <a href="{% url 'contrato-draft-start' %}" class="btn btn-success btn-lg mb-2 w-100">
+                                    <i class="fas fa-file-contract me-2"></i>Novo Contrato
+                                </a>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="{% url 'person-create' %}" class="btn btn-primary btn-lg mb-2 w-100">
+                                    <i class="fas fa-user-plus me-2"></i>Nova Pessoa
+                                </a>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="{% url 'company-create' %}" class="btn btn-warning btn-lg mb-2 w-100">
+                                    <i class="fas fa-building me-2"></i>Nova Empresa
+                                </a>
+                            </div>
+                        </div>
+                        <div class="mt-3">
                             <a href="{% url 'about' %}" class="btn btn-outline-light">
                                 <i class="fas fa-info-circle me-2"></i>Sobre o Sistema
                             </a>
@@ -336,7 +360,7 @@
         </div>
         
     {% else %}
-        <!-- Conteúdo para usuários não autenticados -->
+        <!-- ✅ CONTEÚDO PARA USUÁRIOS NÃO AUTENTICADOS -->
         <div class="row mb-5">
             <div class="col-12 text-center">
                 <h2 class="text-white mb-4">Por que escolher o Athena?</h2>
@@ -349,56 +373,65 @@
             <div class="col-md-4 mb-4">
                 <div class="card bg-primary text-white h-100 shadow-lg">
                     <div class="card-body text-center">
-                        <i class="fas fa-shield-alt fa-4x mb-3"></i>
-                        <h4>100% Seguro</h4>
-                        <p>Conformidade total com LGPD e proteção de dados pessoais.</p>
+                        <i class="fas fa-shield-alt fa-3x mb-3"></i>
+                        <h4>Segurança Total</h4>
+                        <p>Seus dados protegidos conforme a LGPD com criptografia avançada.</p>
                     </div>
                 </div>
             </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card bg-success text-white h-100 shadow-lg">
+                    <div class="card-body text-center">
+                        <i class="fas fa-file-contract fa-3x mb-3"></i>
+                        <h4>Contratos Inteligentes</h4>
+                        <p>Crie e gerencie contratos LGPD de forma automatizada.</p>
+                    </div>
+                </div>
+            </div>
+            
             <div class="col-md-4 mb-4">
                 <div class="card bg-warning text-dark h-100 shadow-lg">
                     <div class="card-body text-center">
-                        <i class="fas fa-chart-line fa-4x mb-3"></i>
-                        <h4>Gestão Eficiente</h4>
-                        <p>Dashboard completo com relatórios e indicadores em tempo real.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="card bg-info text-white h-100 shadow-lg">
-                    <div class="card-body text-center">
-                        <i class="fas fa-users fa-4x mb-3"></i>
-                        <h4>Fácil de Usar</h4>
-                        <p>Interface intuitiva para pessoa física e jurídica.</p>
+                        <i class="fas fa-chart-line fa-3x mb-3"></i>
+                        <h4>Relatórios Completos</h4>
+                        <p>Dashboards e análises em tempo real para melhor gestão.</p>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- Call-to-Action final -->
+        <!-- CTA Principal para Anônimos -->
         <div class="row">
             <div class="col-12 text-center">
-                <div class="card bg-dark border-light">
+                <div class="card bg-gradient-primary text-white shadow-lg">
                     <div class="card-body py-5">
-                        <h3 class="text-white mb-3">Pronto para começar?</h3>
-                        <p class="text-white-50 mb-4">
-                            Junte-se ao Athena e gerencie seus dados com total conformidade LGPD.
-                        </p>
-                        <div>
-                            <a href="{% url 'escolha-tipo-cadastro' %}" class="btn btn-primary btn-lg me-3">
-                                <i class="fas fa-user-plus me-2"></i>Criar Conta Gratuita
-                            </a>
-                            <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg">
-                                <i class="fas fa-sign-in-alt me-2"></i>Entrar
-                            </a>
+                        <h3 class="mb-4">🎯 Comece Agora Mesmo!</h3>
+                        <p class="mb-4">Teste nosso sistema criando um contrato de exemplo.</p>
+                        
+                        <div class="row justify-content-center">
+                            <div class="col-md-8">
+                                <a href="{% url 'contrato-draft-start' %}" class="btn btn-success btn-lg me-3 mb-2">
+                                    <i class="fas fa-file-contract me-2"></i>Começar um Contrato
+                                </a>
+                                <a href="{% url 'usuarios:cadastro-escolha' %}" class="btn btn-outline-light btn-lg mb-2">
+                                    <i class="fas fa-user-plus me-2"></i>Criar Conta Gratuita
+                                </a>
+                            </div>
                         </div>
+                        
+                        <p class="text-white-50 mt-3 mb-0">
+                            <small>
+                                <i class="fas fa-info-circle me-1"></i>
+                                Ao começar um contrato, você poderá salvá-lo após criar sua conta.
+                            </small>
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
         
     {% endif %}
-    
 </div>
 {% endblock %}
 

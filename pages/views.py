@@ -357,91 +357,183 @@ class CityDeleteView(AdminOnlyMixin, DeleteView):
 # VIEWS DE FLUXO DE RASCUNHO E HOME
 # ===========================================
 
-class HomeView(LoginRequiredMixin, TemplateView):
-    """Dashboard principal com KPIs e registros recentes"""
-    login_url = reverse_lazy('login')
+class HomeView(TemplateView):
+    """Dashboard principal com KPIs e registros recentes - permite acesso anônimo"""
     template_name = 'pages/home.html'
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        
+        # Se usuário não estiver autenticado, retorna contexto vazio
+        if not self.request.user.is_authenticated:
+            context.update({
+                'total_usuarios': 0,
+                'total_empresas': 0,
+                'total_contratos': 0,
+                'total_pessoas': 0,
+                'pessoas_ultima_semana': 0,
+                'contratos_ultimo_mes': 0,
+                'empresas_ultimo_mes': 0,
+                'contratos_ativos': 0,
+                'ultimos_contratos': [],
+                'ultimas_pessoas': [],
+                'ultimas_empresas': [],
+            })
+            return context
+        
+        # Resto da lógica para usuários autenticados permanece igual...
         user = self.request.user
         
-        # Data de uma semana atrás para filtros
+        # Datas para filtros
         uma_semana_atras = timezone.now() - timedelta(days=7)
+        um_mes_atras = timezone.now() - timedelta(days=30)
         
-        # KPIs principais - contagens totais (com try/except para segurança)
+        # ===========================================
+        # KPIs PRINCIPAIS - TOTAIS (sempre mostrar 0 se não existir)
+        # ===========================================
+        
+        # Total de usuários (apenas admin vê, funcionário vê apenas dele)
         try:
-            context['total_pessoas'] = Person.objects.filter(usuario=user).count()
+            if user.is_superuser or user.groups.filter(name='empresa_admin').exists():
+                from django.contrib.auth import get_user_model
+                User = get_user_model()
+                context['total_usuarios'] = User.objects.count()
+            else:
+                context['total_usuarios'] = 1  # O próprio usuário
         except:
-            context['total_pessoas'] = 0
-            
+            context['total_usuarios'] = 0
+        
+        # Total de empresas do usuário
         try:
-            context['total_empresas'] = Company.objects.filter(usuario=user).count()
+            if user.is_superuser or user.groups.filter(name='empresa_admin').exists():
+                context['total_empresas'] = Company.objects.count()
+            else:
+                context['total_empresas'] = Company.objects.filter(usuario=user).count()
         except:
             context['total_empresas'] = 0
-            
+        
+        # Total de contratos do usuário
         try:
-            context['total_contratos'] = Contract.objects.filter(usuario=user).count()
+            if user.is_superuser or user.groups.filter(name='empresa_admin').exists():
+                context['total_contratos'] = Contract.objects.count()
+            else:
+                context['total_contratos'] = Contract.objects.filter(usuario=user).count()
         except:
             context['total_contratos'] = 0
         
-        # KPI da semana
+        # Total de pessoas do usuário
         try:
-            context['pessoas_ultima_semana'] = Person.objects.filter(
-                usuario=user, 
-                created_at__gte=uma_semana_atras
-            ).count()
+            if user.is_superuser or user.groups.filter(name='empresa_admin').exists():
+                context['total_pessoas'] = Person.objects.count()
+            else:
+                context['total_pessoas'] = Person.objects.filter(usuario=user).count()
+        except:
+            context['total_pessoas'] = 0
+        
+        # ===========================================
+        # ESTATÍSTICAS TEMPORAIS
+        # ===========================================
+        
+        # Registros da última semana
+        try:
+            if user.is_superuser or user.groups.filter(name='empresa_admin').exists():
+                context['pessoas_ultima_semana'] = Person.objects.filter(
+                    created_at__gte=uma_semana_atras
+                ).count()
+            else:
+                context['pessoas_ultima_semana'] = Person.objects.filter(
+                    usuario=user, 
+                    created_at__gte=uma_semana_atras
+                ).count()
         except:
             context['pessoas_ultima_semana'] = 0
         
-        # Para compatibilidade com templates existentes
-        context['minhas_pessoas'] = context['total_pessoas']
-        context['minhas_empresas'] = context['total_empresas'] 
-        context['meus_contratos'] = context['total_contratos']
+        # Contratos do último mês
+        try:
+            if user.is_superuser or user.groups.filter(name='empresa_admin').exists():
+                context['contratos_ultimo_mes'] = Contract.objects.filter(
+                    created_at__gte=um_mes_atras
+                ).count()
+            else:
+                context['contratos_ultimo_mes'] = Contract.objects.filter(
+                    usuario=user,
+                    created_at__gte=um_mes_atras
+                ).count()
+        except:
+            context['contratos_ultimo_mes'] = 0
         
-        # Listas de registros recentes (últimos 5)
+        # Empresas do último mês
         try:
-            context['ultimas_pessoas'] = Person.objects.filter(usuario=user).order_by('-created_at')[:5]
-        except:
-            context['ultimas_pessoas'] = []
-            
-        try:
-            context['ultimas_empresas'] = Company.objects.filter(usuario=user).order_by('-created_at')[:5]
-        except:
-            context['ultimas_empresas'] = []
-            
-        try:
-            context['ultimos_contratos'] = Contract.objects.filter(usuario=user).order_by('-created_at')[:5]
-        except:
-            context['ultimos_contratos'] = []
-        
-        # Contratos ativos (usando campo is_active se existir)
-        try:
-            context['contratos_ativos'] = Contract.objects.filter(
-                usuario=user, 
-                is_active=True
-            ).count()
-        except:
-            # Fallback se campo não existir
-            context['contratos_ativos'] = context['total_contratos']
-        
-        # Estatísticas mensais
-        um_mes_atras = timezone.now() - timedelta(days=30)
-        try:
-            context['empresas_ultimo_mes'] = Company.objects.filter(
-                usuario=user,
-                created_at__gte=um_mes_atras
-            ).count()
+            if user.is_superuser or user.groups.filter(name='empresa_admin').exists():
+                context['empresas_ultimo_mes'] = Company.objects.filter(
+                    created_at__gte=um_mes_atras
+                ).count()
+            else:
+                context['empresas_ultimo_mes'] = Company.objects.filter(
+                    usuario=user,
+                    created_at__gte=um_mes_atras
+                ).count()
         except:
             context['empresas_ultimo_mes'] = 0
         
+        # ===========================================
+        # LISTAS DE REGISTROS RECENTES (sempre lista, mesmo vazia)
+        # ===========================================
+        
+        # Últimos contratos (corrigir campo para 'title' ao invés de 'titulo')
         try:
-            context['contratos_ultimo_mes'] = Contract.objects.filter(
-                usuario=user,
-                created_at__gte=um_mes_atras
-            ).count()
+            if user.is_superuser or user.groups.filter(name='empresa_admin').exists():
+                context['ultimos_contratos'] = Contract.objects.all().order_by('-id')[:5]
+            else:
+                context['ultimos_contratos'] = Contract.objects.filter(
+                    usuario=user
+                ).order_by('-id')[:5]
         except:
-            context['contratos_ultimo_mes'] = 0
+            context['ultimos_contratos'] = []
+        
+        # Últimas pessoas
+        try:
+            if user.is_superuser or user.groups.filter(name='empresa_admin').exists():
+                context['ultimas_pessoas'] = Person.objects.all().order_by('-id')[:5]
+            else:
+                context['ultimas_pessoas'] = Person.objects.filter(
+                    usuario=user
+                ).order_by('-id')[:5]
+        except:
+            context['ultimas_pessoas'] = []
+        
+        # Últimas empresas (corrigir campo para 'corporate_name' ao invés de 'nome')
+        try:
+            if user.is_superuser or user.groups.filter(name='empresa_admin').exists():
+                context['ultimas_empresas'] = Company.objects.all().order_by('-id')[:5]
+            else:
+                context['ultimas_empresas'] = Company.objects.filter(
+                    usuario=user
+                ).order_by('-id')[:5]
+        except:
+            context['ultimas_empresas'] = []
+        
+        # ===========================================
+        # CONTRATOS ATIVOS (se campo existir)
+        # ===========================================
+        try:
+            if user.is_superuser or user.groups.filter(name='empresa_admin').exists():
+                context['contratos_ativos'] = Contract.objects.filter(is_active=True).count()
+            else:
+                context['contratos_ativos'] = Contract.objects.filter(
+                    usuario=user, 
+                    is_active=True
+                ).count()
+        except:
+            # Fallback se campo is_active não existir
+            context['contratos_ativos'] = context['total_contratos']
+        
+        # ===========================================
+        # COMPATIBILIDADE COM TEMPLATES EXISTENTES
+        # ===========================================
+        context['minhas_pessoas'] = context['total_pessoas']
+        context['minhas_empresas'] = context['total_empresas'] 
+        context['meus_contratos'] = context['total_contratos']
         
         return context
 
