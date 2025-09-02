@@ -111,51 +111,41 @@
             </div>
         </div>
     </header>
-
-    <!-- Messages Toast -->
+    
+    <!-- ✅ SISTEMA DE MENSAGENS -->
     {% if messages %}
-        <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+        <div class="messages-container" style="position: fixed; top: 80px; right: 20px; z-index: 9999; max-width: 400px;">
             {% for message in messages %}
-                <div class="toast align-items-center text-white bg-{{ message.tags }} border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="5000">
-                    <div class="d-flex">
-                        <div class="toast-body">
-                            {% if message.tags == 'success' %}
-                                <i class="fas fa-check-circle me-2"></i>
-                            {% elif message.tags == 'error' %}
-                                <i class="fas fa-exclamation-triangle me-2"></i>
-                            {% elif message.tags == 'warning' %}
-                                <i class="fas fa-exclamation-circle me-2"></i>
-                            {% else %}
-                                <i class="fas fa-info-circle me-2"></i>
-                            {% endif %}
-                            {{ message }}
-                        </div>
-                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-                    </div>
+                <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show shadow-lg mb-2" role="alert">
+                    {% if message.tags == 'error' %}
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                    {% elif message.tags == 'warning' %}
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                    {% elif message.tags == 'success' %}
+                        <i class="fas fa-check-circle me-2"></i>
+                    {% elif message.tags == 'info' %}
+                        <i class="fas fa-info-circle me-2"></i>
+                    {% else %}
+                        <i class="fas fa-bell me-2"></i>
+                    {% endif %}
+                    
+                    <strong>{{ message }}</strong>
+                    
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             {% endfor %}
         </div>
     {% endif %}
 
-    <!-- About-->
-    <section class="about-section text-center" id="about">
+    <!-- CONTEÚDO PRINCIPAL -->
+    {% block content %}
+        {% block hero_content %}{% endblock %}
         {% block about_content %}{% endblock %}
-    </section>
-
-    <!-- Projects-->
-    <section class="projects-section bg-light" id="projects">
+        {% block about_image %}{% endblock %}
         {% block projects_content %}{% endblock %}
-    </section>
-
-    <!-- Signup-->
-    <section class="signup-section" id="signup">
         {% block signup_content %}{% endblock %}
-    </section>
-
-    <!-- Contact-->
-    <section class="contact-section bg-black">
         {% block contact_content %}{% endblock %}
-    </section>
+    {% endblock %}
 
     <!-- Footer-->
     <footer class="footer bg-black small text-center text-white-50">
@@ -174,13 +164,26 @@
     <!-- Core theme JS-->
     <script src="{% static 'js/scripts.js' %}" defer></script>
     
-    <!-- Auto-show toasts -->
+    <!-- JAVASCRIPT PARA AUTO-HIDE DAS MENSAGENS -->
     <script>
+        // Auto-hide messages after 5 seconds (success/info only)
         document.addEventListener('DOMContentLoaded', function() {
-            var toasts = document.querySelectorAll('.toast');
-            toasts.forEach(function(toast) {
-                var bsToast = new bootstrap.Toast(toast);
-                bsToast.show();
+            const messages = document.querySelectorAll('.alert');
+            
+            messages.forEach(function(message) {
+                // Auto-hide apenas success e info
+                if (message.classList.contains('alert-success') || message.classList.contains('alert-info')) {
+                    setTimeout(function() {
+                        if (message && message.parentNode) {
+                            message.classList.remove('show');
+                            setTimeout(function() {
+                                if (message.parentNode) {
+                                    message.parentNode.removeChild(message);
+                                }
+                            }, 150);
+                        }
+                    }, 5000); // 5 segundos
+                }
             });
         });
     </script>

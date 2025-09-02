@@ -16,99 +16,29 @@ from .mixins import (
     OwnerObjectPermissionMixin, 
     OwnerCreateMixin,
     AdminOnlyMixin,
-    GroupRequiredMixin
+    GroupRequiredMixin,
+    FuncionarioRequiredMixin,
+    AdminRequiredMixin,
+    StaffRequiredMixin
 )
 
-# Tentar importar mixins existentes
-try:
-    from .mixins import GroupRequiredMixin
-    MIXINS_AVAILABLE = True
-except ImportError:
-    MIXINS_AVAILABLE = False
-    
-    # Criar mixins básicos inline
-    class GroupRequiredMixin:
-        group_required = None
-        
-        def dispatch(self, request, *args, **kwargs):
-            if self.group_required and not request.user.groups.filter(name=self.group_required).exists():
-                raise PermissionDenied("Você não tem permissão para acessar esta página.")
-            return super().dispatch(request, *args, **kwargs)
-    
-    class OwnerQuerysetMixin(LoginRequiredMixin):
-        owner_field_name = "usuario"
-        
-        def get_queryset(self):
-            qs = super().get_queryset()
-            return qs.filter(**{self.owner_field_name: self.request.user})
-    
-    class OwnerObjectPermissionMixin(UserPassesTestMixin):
-        owner_field_name = "usuario"
-        
-        def test_func(self):
-            try:
-                obj = self.get_object()
-                owner = getattr(obj, self.owner_field_name, None)
-                return owner == self.request.user
-            except:
-                return False
-    
-    class OwnerCreateMixin(LoginRequiredMixin):
-        owner_field_name = "usuario"
-        
-        def form_valid(self, form):
-            if hasattr(form.instance, self.owner_field_name):
-                setattr(form.instance, self.owner_field_name, self.request.user)
-            return super().form_valid(form)
-    
-    class AdminOnlyMixin(UserPassesTestMixin):
-        def test_func(self):
-            u = self.request.user
-            return u.is_superuser or u.groups.filter(name="empresa_admin").exists()
-
-# IMPORTAR FORMS COM TRATAMENTO DE ERRO
-try:
-    from .forms import PersonForm, CompanyForm, ContractForm, StateForm, CityForm
-except ImportError:
-    # Se não existirem, criar forms básicos
-    from django import forms
-    
-    class PersonForm(forms.ModelForm):
-        class Meta:
-            model = Person
-            fields = '__all__'
-            exclude = ['usuario']
-    
-    class CompanyForm(forms.ModelForm):
-        class Meta:
-            model = Company
-            fields = '__all__'
-            exclude = ['usuario']
-    
-    class ContractForm(forms.ModelForm):
-        class Meta:
-            model = Contract
-            fields = '__all__'
-            exclude = ['usuario']
-
 # ===========================================
-# VIEWS PARA PERSON (PESSOA)
+# VIEWS PARA PERSON (PESSOA) - COM PROTEÇÃO
 # ===========================================
 
-class PersonListView(OwnerQuerysetMixin, ListView):
-    """ListView para pessoas com escopo por owner"""
+class PersonListView(OwnerQuerysetMixin, FuncionarioRequiredMixin, ListView):
+    """ListView para pessoas - requer grupo funcionario"""
     model = Person
     template_name = 'pages/lists/person_list.html'
     context_object_name = 'persons'
     paginate_by = 10
 
-class PersonCreateView(OwnerCreateMixin, GroupRequiredMixin, CreateView):
-    """CreateView para pessoas"""
+class PersonCreateView(OwnerCreateMixin, FuncionarioRequiredMixin, CreateView):
+    """CreateView para pessoas - requer grupo funcionario"""
     model = Person
-    form_class = PersonForm  # ✅ USAR FORM CUSTOMIZADO
+    form_class = PersonForm
     template_name = 'pages/forms/person_form.html'
     success_url = reverse_lazy('person-list')
-    group_required = 'funcionario'
     
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -123,16 +53,16 @@ class PersonCreateView(OwnerCreateMixin, GroupRequiredMixin, CreateView):
         messages.error(self.request, '❌ Erro ao criar pessoa. Verifique os dados.')
         return super().form_invalid(form)
 
-class PersonDetailView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, DetailView):
-    """DetailView para pessoas (apenas dono pode ver)"""
+class PersonDetailView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, FuncionarioRequiredMixin, DetailView):
+    """DetailView para pessoas - requer grupo funcionario + ownership"""
     model = Person
     template_name = 'pages/detail/person_detail.html'
     context_object_name = 'person'
 
-class PersonUpdateView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, UpdateView):
-    """UpdateView para pessoas (apenas dono pode editar)"""
+class PersonUpdateView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, FuncionarioRequiredMixin, UpdateView):
+    """UpdateView para pessoas - requer grupo funcionario + ownership"""
     model = Person
-    form_class = PersonForm  # ✅ USAR FORM CUSTOMIZADO
+    form_class = PersonForm
     template_name = 'pages/forms/person_form.html'
     
     def get_form_kwargs(self):
@@ -147,35 +77,34 @@ class PersonUpdateView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, UpdateVie
     def get_success_url(self):
         return reverse_lazy('person-detail', kwargs={'pk': self.object.pk})
 
-class PersonDeleteView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, DeleteView):
-    """DeleteView para pessoas (apenas dono pode deletar)"""
+class PersonDeleteView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, FuncionarioRequiredMixin, DeleteView):
+    """DeleteView para pessoas - requer grupo funcionario + ownership"""
     model = Person
     template_name = 'pages/delete/person_confirm_delete.html'
     success_url = reverse_lazy('person-list')
     
     def delete(self, request, *args, **kwargs):
-        person_name = self.get_object().full_name  # ✅ CAMPO CORRETO
+        person_name = self.get_object().full_name
         messages.success(request, f'✅ Pessoa "{person_name}" excluída com sucesso!')
         return super().delete(request, *args, **kwargs)
 
 # ===========================================
-# VIEWS PARA COMPANY (EMPRESA) - CORRIGIDAS
+# VIEWS PARA COMPANY (EMPRESA) - COM PROTEÇÃO
 # ===========================================
 
-class CompanyListView(OwnerQuerysetMixin, ListView):
-    """ListView para empresas com escopo por owner"""
+class CompanyListView(OwnerQuerysetMixin, FuncionarioRequiredMixin, ListView):
+    """ListView para empresas - requer grupo funcionario"""
     model = Company
     template_name = 'pages/lists/company_list.html'
     context_object_name = 'companies'
     paginate_by = 10
 
-class CompanyCreateView(OwnerCreateMixin, GroupRequiredMixin, CreateView):
-    """CreateView para empresas"""
+class CompanyCreateView(OwnerCreateMixin, FuncionarioRequiredMixin, CreateView):
+    """CreateView para empresas - requer grupo funcionario"""
     model = Company
-    form_class = CompanyForm  # ✅ USAR FORM CUSTOMIZADO
+    form_class = CompanyForm
     template_name = 'pages/forms/company_form.html'
     success_url = reverse_lazy('company-list')
-    group_required = 'funcionario'
     
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -190,16 +119,16 @@ class CompanyCreateView(OwnerCreateMixin, GroupRequiredMixin, CreateView):
         messages.error(self.request, '❌ Erro ao criar empresa. Verifique os dados.')
         return super().form_invalid(form)
 
-class CompanyDetailView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, DetailView):
-    """DetailView para empresas (apenas dono pode ver)"""
+class CompanyDetailView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, FuncionarioRequiredMixin, DetailView):
+    """DetailView para empresas - requer grupo funcionario + ownership"""
     model = Company
     template_name = 'pages/detail/company_detail.html'
     context_object_name = 'company'
 
-class CompanyUpdateView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, UpdateView):
-    """UpdateView para empresas (apenas dono pode editar)"""
+class CompanyUpdateView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, FuncionarioRequiredMixin, UpdateView):
+    """UpdateView para empresas - requer grupo funcionario + ownership"""
     model = Company
-    form_class = CompanyForm  # ✅ USAR FORM CUSTOMIZADO
+    form_class = CompanyForm
     template_name = 'pages/forms/company_form.html'
     
     def get_form_kwargs(self):
@@ -214,32 +143,32 @@ class CompanyUpdateView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, UpdateVi
     def get_success_url(self):
         return reverse_lazy('company-detail', kwargs={'pk': self.object.pk})
 
-class CompanyDeleteView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, DeleteView):
-    """DeleteView para empresas (apenas dono pode deletar)"""
+class CompanyDeleteView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, FuncionarioRequiredMixin, DeleteView):
+    """DeleteView para empresas - requer grupo funcionario + ownership"""
     model = Company
     template_name = 'pages/delete/company_confirm_delete.html'
     success_url = reverse_lazy('company-list')
     
     def delete(self, request, *args, **kwargs):
-        company_name = self.get_object().corporate_name  # ✅ CAMPO CORRETO
+        company_name = self.get_object().corporate_name
         messages.success(request, f'✅ Empresa "{company_name}" excluída com sucesso!')
         return super().delete(request, *args, **kwargs)
 
 # ===========================================
-# VIEWS PARA CONTRACT (CONTRATO) - CORRIGIDAS
+# VIEWS PARA CONTRACT (CONTRATO) - COM PROTEÇÃO
 # ===========================================
 
-class ContractListView(OwnerQuerysetMixin, ListView):
-    """ListView para contratos com escopo por owner"""
+class ContractListView(OwnerQuerysetMixin, FuncionarioRequiredMixin, ListView):
+    """ListView para contratos - requer grupo funcionario"""
     model = Contract
     template_name = 'pages/lists/contract_list.html'
     context_object_name = 'contracts'
     paginate_by = 10
 
-class ContractCreateView(OwnerCreateMixin, CreateView):
-    """CreateView para contratos"""
+class ContractCreateView(OwnerCreateMixin, FuncionarioRequiredMixin, CreateView):
+    """CreateView para contratos - requer grupo funcionario"""
     model = Contract
-    form_class = ContractForm  # Usar form customizado
+    form_class = ContractForm
     template_name = 'pages/forms/contract_form.html'
     success_url = reverse_lazy('contract-list')
     
@@ -256,16 +185,16 @@ class ContractCreateView(OwnerCreateMixin, CreateView):
         messages.error(self.request, '❌ Erro ao criar contrato. Verifique os dados.')
         return super().form_invalid(form)
 
-class ContractDetailView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, DetailView):
-    """DetailView para contratos (apenas dono pode ver)"""
+class ContractDetailView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, FuncionarioRequiredMixin, DetailView):
+    """DetailView para contratos - requer grupo funcionario + ownership"""
     model = Contract
     template_name = 'pages/detail/contract_detail.html'
     context_object_name = 'contract'
 
-class ContractUpdateView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, UpdateView):
-    """UpdateView para contratos (apenas dono pode editar)"""
+class ContractUpdateView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, FuncionarioRequiredMixin, UpdateView):
+    """UpdateView para contratos - requer grupo funcionario + ownership"""
     model = Contract
-    form_class = ContractForm  # Usar form customizado
+    form_class = ContractForm
     template_name = 'pages/forms/contract_form.html'
     
     def get_form_kwargs(self):
@@ -284,8 +213,8 @@ class ContractUpdateView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, UpdateV
     def get_success_url(self):
         return reverse_lazy('contract-detail', kwargs={'pk': self.object.pk})
 
-class ContractDeleteView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, DeleteView):
-    """DeleteView para contratos (apenas dono pode deletar)"""
+class ContractDeleteView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, FuncionarioRequiredMixin, DeleteView):
+    """DeleteView para contratos - requer grupo funcionario + ownership"""
     model = Contract
     template_name = 'pages/delete/contract_confirm_delete.html'
     success_url = reverse_lazy('contract-list')
@@ -296,263 +225,99 @@ class ContractDeleteView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, DeleteV
         return super().delete(request, *args, **kwargs)
 
 # ===========================================
-# VIEWS ADMINISTRATIVAS (ESTADOS E CIDADES)
+# VIEWS ADMINISTRATIVAS (APENAS ADMIN) - PROTEÇÃO DUPLA
 # ===========================================
 
-class StateListView(AdminOnlyMixin, ListView):
-    """ListView para estados (apenas admin)"""
+class StateListView(AdminRequiredMixin, ListView):
+    """ListView para estados - APENAS empresa_admin"""
     model = State
     template_name = 'pages/lists/state_list.html'
     context_object_name = 'states'
     paginate_by = 50
 
-class StateCreateView(AdminOnlyMixin, CreateView):
-    """CreateView para estados (apenas admin)"""
+class StateCreateView(AdminRequiredMixin, CreateView):
+    """CreateView para estados - APENAS empresa_admin"""
     model = State
     fields = '__all__'
     template_name = 'pages/forms/state_form.html'
     success_url = reverse_lazy('state-list')
+    
+    def form_valid(self, form):
+        messages.success(self.request, f'✅ Estado "{form.instance.name}" criado com sucesso!')
+        return super().form_valid(form)
 
-class StateUpdateView(AdminOnlyMixin, UpdateView):
-    """UpdateView para estados (apenas admin)"""
+class StateUpdateView(AdminRequiredMixin, UpdateView):
+    """UpdateView para estados - APENAS empresa_admin"""
     model = State
     fields = '__all__'
     template_name = 'pages/forms/state_form.html'
     success_url = reverse_lazy('state-list')
+    
+    def form_valid(self, form):
+        messages.success(self.request, f'✅ Estado "{form.instance.name}" atualizado com sucesso!')
+        return super().form_valid(form)
 
-class StateDeleteView(AdminOnlyMixin, DeleteView):
-    """DeleteView para estados (apenas admin)"""
+class StateDeleteView(AdminRequiredMixin, DeleteView):
+    """DeleteView para estados - APENAS empresa_admin"""
     model = State
     template_name = 'pages/delete/state_confirm_delete.html'
     success_url = reverse_lazy('state-list')
+    
+    def delete(self, request, *args, **kwargs):
+        state_name = self.get_object().name
+        messages.success(request, f'✅ Estado "{state_name}" excluído com sucesso!')
+        return super().delete(request, *args, **kwargs)
 
-class CityListView(AdminOnlyMixin, ListView):
-    """ListView para cidades (apenas admin)"""
+class CityListView(AdminRequiredMixin, ListView):
+    """ListView para cidades - APENAS empresa_admin"""
     model = City
     template_name = 'pages/lists/city_list.html'
     context_object_name = 'cities'
     paginate_by = 50
 
-class CityCreateView(AdminOnlyMixin, CreateView):
-    """CreateView para cidades (apenas admin)"""
+class CityCreateView(AdminRequiredMixin, CreateView):
+    """CreateView para cidades - APENAS empresa_admin"""
     model = City
     fields = '__all__'
     template_name = 'pages/forms/city_form.html'
     success_url = reverse_lazy('city-list')
+    
+    def form_valid(self, form):
+        messages.success(self.request, f'✅ Cidade "{form.instance.name}" criada com sucesso!')
+        return super().form_valid(form)
 
-class CityUpdateView(AdminOnlyMixin, UpdateView):
-    """UpdateView para cidades (apenas admin)"""
+class CityUpdateView(AdminRequiredMixin, UpdateView):
+    """UpdateView para cidades - APENAS empresa_admin"""
     model = City
     fields = '__all__'
     template_name = 'pages/forms/city_form.html'
     success_url = reverse_lazy('city-list')
+    
+    def form_valid(self, form):
+        messages.success(self.request, f'✅ Cidade "{form.instance.name}" atualizada com sucesso!')
+        return super().form_valid(form)
 
-class CityDeleteView(AdminOnlyMixin, DeleteView):
-    """DeleteView para cidades (apenas admin)"""
+class CityDeleteView(AdminRequiredMixin, DeleteView):
+    """DeleteView para cidades - APENAS empresa_admin"""
     model = City
     template_name = 'pages/delete/city_confirm_delete.html'
     success_url = reverse_lazy('city-list')
-
-# ===========================================
-# VIEWS DE FLUXO DE RASCUNHO E HOME
-# ===========================================
-
-class HomeView(TemplateView):
-    """Dashboard principal com KPIs e registros recentes - permite acesso anônimo"""
-    template_name = 'pages/home.html'
     
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        
-        # Se usuário não estiver autenticado, retorna contexto vazio
-        if not self.request.user.is_authenticated:
-            context.update({
-                'total_usuarios': 0,
-                'total_empresas': 0,
-                'total_contratos': 0,
-                'total_pessoas': 0,
-                'pessoas_ultima_semana': 0,
-                'contratos_ultimo_mes': 0,
-                'empresas_ultimo_mes': 0,
-                'contratos_ativos': 0,
-                'ultimos_contratos': [],
-                'ultimas_pessoas': [],
-                'ultimas_empresas': [],
-            })
-            return context
-        
-        # Resto da lógica para usuários autenticados permanece igual...
-        user = self.request.user
-        
-        # Datas para filtros
-        uma_semana_atras = timezone.now() - timedelta(days=7)
-        um_mes_atras = timezone.now() - timedelta(days=30)
-        
-        # ===========================================
-        # KPIs PRINCIPAIS - TOTAIS (sempre mostrar 0 se não existir)
-        # ===========================================
-        
-        # Total de usuários (apenas admin vê, funcionário vê apenas dele)
-        try:
-            if user.is_superuser or user.groups.filter(name='empresa_admin').exists():
-                from django.contrib.auth import get_user_model
-                User = get_user_model()
-                context['total_usuarios'] = User.objects.count()
-            else:
-                context['total_usuarios'] = 1  # O próprio usuário
-        except:
-            context['total_usuarios'] = 0
-        
-        # Total de empresas do usuário
-        try:
-            if user.is_superuser or user.groups.filter(name='empresa_admin').exists():
-                context['total_empresas'] = Company.objects.count()
-            else:
-                context['total_empresas'] = Company.objects.filter(usuario=user).count()
-        except:
-            context['total_empresas'] = 0
-        
-        # Total de contratos do usuário
-        try:
-            if user.is_superuser or user.groups.filter(name='empresa_admin').exists():
-                context['total_contratos'] = Contract.objects.count()
-            else:
-                context['total_contratos'] = Contract.objects.filter(usuario=user).count()
-        except:
-            context['total_contratos'] = 0
-        
-        # Total de pessoas do usuário
-        try:
-            if user.is_superuser or user.groups.filter(name='empresa_admin').exists():
-                context['total_pessoas'] = Person.objects.count()
-            else:
-                context['total_pessoas'] = Person.objects.filter(usuario=user).count()
-        except:
-            context['total_pessoas'] = 0
-        
-        # ===========================================
-        # ESTATÍSTICAS TEMPORAIS
-        # ===========================================
-        
-        # Registros da última semana
-        try:
-            if user.is_superuser or user.groups.filter(name='empresa_admin').exists():
-                context['pessoas_ultima_semana'] = Person.objects.filter(
-                    created_at__gte=uma_semana_atras
-                ).count()
-            else:
-                context['pessoas_ultima_semana'] = Person.objects.filter(
-                    usuario=user, 
-                    created_at__gte=uma_semana_atras
-                ).count()
-        except:
-            context['pessoas_ultima_semana'] = 0
-        
-        # Contratos do último mês
-        try:
-            if user.is_superuser or user.groups.filter(name='empresa_admin').exists():
-                context['contratos_ultimo_mes'] = Contract.objects.filter(
-                    created_at__gte=um_mes_atras
-                ).count()
-            else:
-                context['contratos_ultimo_mes'] = Contract.objects.filter(
-                    usuario=user,
-                    created_at__gte=um_mes_atras
-                ).count()
-        except:
-            context['contratos_ultimo_mes'] = 0
-        
-        # Empresas do último mês
-        try:
-            if user.is_superuser or user.groups.filter(name='empresa_admin').exists():
-                context['empresas_ultimo_mes'] = Company.objects.filter(
-                    created_at__gte=um_mes_atras
-                ).count()
-            else:
-                context['empresas_ultimo_mes'] = Company.objects.filter(
-                    usuario=user,
-                    created_at__gte=um_mes_atras
-                ).count()
-        except:
-            context['empresas_ultimo_mes'] = 0
-        
-        # ===========================================
-        # LISTAS DE REGISTROS RECENTES (sempre lista, mesmo vazia)
-        # ===========================================
-        
-        # Últimos contratos (corrigir campo para 'title' ao invés de 'titulo')
-        try:
-            if user.is_superuser or user.groups.filter(name='empresa_admin').exists():
-                context['ultimos_contratos'] = Contract.objects.all().order_by('-id')[:5]
-            else:
-                context['ultimos_contratos'] = Contract.objects.filter(
-                    usuario=user
-                ).order_by('-id')[:5]
-        except:
-            context['ultimos_contratos'] = []
-        
-        # Últimas pessoas
-        try:
-            if user.is_superuser or user.groups.filter(name='empresa_admin').exists():
-                context['ultimas_pessoas'] = Person.objects.all().order_by('-id')[:5]
-            else:
-                context['ultimas_pessoas'] = Person.objects.filter(
-                    usuario=user
-                ).order_by('-id')[:5]
-        except:
-            context['ultimas_pessoas'] = []
-        
-        # Últimas empresas (corrigir campo para 'corporate_name' ao invés de 'nome')
-        try:
-            if user.is_superuser or user.groups.filter(name='empresa_admin').exists():
-                context['ultimas_empresas'] = Company.objects.all().order_by('-id')[:5]
-            else:
-                context['ultimas_empresas'] = Company.objects.filter(
-                    usuario=user
-                ).order_by('-id')[:5]
-        except:
-            context['ultimas_empresas'] = []
-        
-        # ===========================================
-        # CONTRATOS ATIVOS (se campo existir)
-        # ===========================================
-        try:
-            if user.is_superuser or user.groups.filter(name='empresa_admin').exists():
-                context['contratos_ativos'] = Contract.objects.filter(is_active=True).count()
-            else:
-                context['contratos_ativos'] = Contract.objects.filter(
-                    usuario=user, 
-                    is_active=True
-                ).count()
-        except:
-            # Fallback se campo is_active não existir
-            context['contratos_ativos'] = context['total_contratos']
-        
-        # ===========================================
-        # COMPATIBILIDADE COM TEMPLATES EXISTENTES
-        # ===========================================
-        context['minhas_pessoas'] = context['total_pessoas']
-        context['minhas_empresas'] = context['total_empresas'] 
-        context['meus_contratos'] = context['total_contratos']
-        
-        return context
-
-class IndexView(TemplateView):
-    """Página inicial pública"""
-    template_name = 'pages/index.html'
-
-class AboutView(TemplateView):
-    """Página sobre o sistema"""
-    template_name = 'pages/about.html'
+    def delete(self, request, *args, **kwargs):
+        city_name = self.get_object().name
+        messages.success(request, f'✅ Cidade "{city_name}" excluída com sucesso!')
+        return super().delete(request, *args, **kwargs)
 
 # ===========================================
-# VIEWS DE FLUXO DE RASCUNHO ANÔNIMO
+# VIEWS HÍBRIDAS - RASCUNHOS (ANÔNIMO + FUNCIONARIO)
 # ===========================================
 
 class ContratoDraftStartView(FormView):
-    """View para iniciar rascunho de contrato anônimo"""
+    """View para iniciar rascunho - PERMITE ANÔNIMO"""
     template_name = 'pages/contratos/contrato_draft_form.html'
     success_url = reverse_lazy('contrato-draft-review')
+    
+    # Não requer grupo - permite acesso anônimo
     
     def get_form_class(self):
         """Cria form dinamicamente para evitar dependências"""
@@ -591,35 +356,38 @@ class ContratoDraftStartView(FormView):
             'empresa_nome': form.cleaned_data.get('empresa_nome', ''),
             'created_at': timezone.now().isoformat()
         }
+        
+        if self.request.user.is_authenticated:
+            messages.success(self.request, '✅ Rascunho salvo! Revise antes de finalizar.')
+        else:
+            messages.info(self.request, 'ℹ️ Rascunho criado! Você precisará fazer login para finalizar.')
+            
         return super().form_valid(form)
 
 class ContratoDraftReviewView(TemplateView):
-    """View para revisar rascunho de contrato"""
+    """View para revisar rascunho - PERMITE ANÔNIMO"""
     template_name = 'pages/contratos/contrato_draft_review.html'
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         draft = self.request.session.get('draft_contrato', {})
         context['draft'] = draft
+        
+        if not draft:
+            messages.warning(self.request, '⚠️ Nenhum rascunho encontrado. Comece um novo contrato.')
+        
         return context
 
-class ContratoDraftFinalizeView(View):
-    """View para finalizar rascunho e criar contrato real"""
+class ContratoDraftFinalizeView(FuncionarioRequiredMixin, View):
+    """View para finalizar rascunho - REQUER FUNCIONARIO"""
     
     def get(self, request):
         # Verifica se há draft na sessão
         if 'draft_contrato' not in request.session:
-            messages.error(request, 'Nenhum rascunho encontrado.')
+            messages.error(request, '❌ Nenhum rascunho encontrado.')
             return redirect('contrato-draft-start')
         
-        if not request.user.is_authenticated:
-            # Salva intenção de finalizar após login
-            request.session['draft_next'] = 'finalize'
-            messages.info(request, 'Faça login ou crie uma conta para finalizar seu contrato.')
-            # Redireciona para escolha de cadastro com next
-            return redirect(f"{reverse('usuarios:cadastro-escolha')}?next={reverse('contrato-draft-finalize')}")
-        
-        # Usuário autenticado - cria contrato real
+        # Usuário autenticado com grupo correto - cria contrato real
         return self.finalize_contract(request)
     
     def finalize_contract(self, request):
@@ -630,7 +398,7 @@ class ContratoDraftFinalizeView(View):
             company = None
             if draft.get('empresa_nome'):
                 company, created = Company.objects.get_or_create(
-                    corporate_name=draft['empresa_nome'],  # ✅ CAMPO CORRETO
+                    corporate_name=draft['empresa_nome'],
                     usuario=request.user,
                     defaults={
                         'trade_name': draft['empresa_nome'],
@@ -641,13 +409,16 @@ class ContratoDraftFinalizeView(View):
                         'data_processing_purpose': f"Empresa criada via rascunho: {draft['empresa_nome']}"
                     }
                 )
+                
+                if created:
+                    messages.info(request, f'ℹ️ Empresa "{company.corporate_name}" criada automaticamente.')
             
             # Cria contrato
             contract = Contract.objects.create(
                 title=draft['titulo'],
                 description=draft['descricao'],
                 company=company,
-                person=None,  # Pode ser adicionado depois
+                person=None,
                 usuario=request.user,
                 data_processing_purpose=f"Contrato: {draft['titulo']}",
                 is_active=True

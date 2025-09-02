@@ -138,25 +138,71 @@ class AdminOnlyMixin(UserPassesTestMixin):
 class GroupRequiredMixin(UserPassesTestMixin):
     """
     Mixin que exige pertencer a um grupo específico
+    Compatível com django-braces mas implementado nativamente
     """
-    group_required = None
+    group_required = None  # String ou lista de grupos
     
     def test_func(self):
-        """Verifica se o usuário pertence ao grupo"""
+        """Verifica se o usuário pertence ao grupo obrigatório"""
         if not self.group_required:
-            return True
+            return True  # Se não especificou grupo, permite acesso
             
-        u = self.request.user
-        return (
-            u.is_superuser or 
-            u.groups.filter(name=self.group_required).exists() or
-            u.groups.filter(name="empresa_admin").exists()
-        )
+        user = self.request.user
+        
+        # Superuser sempre pode acessar
+        if user.is_superuser:
+            return True
+        
+        # Empresa admin sempre pode acessar (grupo master)
+        if user.groups.filter(name="empresa_admin").exists():
+            return True
+        
+        # Verificar grupo específico
+        if isinstance(self.group_required, str):
+            # Grupo único
+            return user.groups.filter(name=self.group_required).exists()
+        elif isinstance(self.group_required, (list, tuple)):
+            # Lista de grupos - usuário deve estar em pelo menos um
+            for group_name in self.group_required:
+                if user.groups.filter(name=group_name).exists():
+                    return True
+            return False
+        
+        return False
     
     def handle_no_permission(self):
         """Customiza tratamento de grupo não autorizado"""
+        if not self.request.user.is_authenticated:
+            # Usuário não logado - redireciona para login
+            messages.warning(
+                self.request, 
+                "⚠️ Você precisa fazer login para acessar esta página."
+            )
+            return redirect('login')
+        
+        # Usuário logado mas sem permissão
+        group_display = self.group_required
+        if isinstance(self.group_required, (list, tuple)):
+            group_display = ', '.join(self.group_required)
+        
         messages.error(
             self.request, 
-            f"❌ Acesso restrito ao grupo '{self.group_required}'."
+            f"❌ Acesso restrito ao(s) grupo(s): '{group_display}'. "
+            f"Contate o administrador para solicitar permissões."
         )
         return redirect('home')
+
+
+class FuncionarioRequiredMixin(GroupRequiredMixin):
+    """Mixin específico para funcionários - atalho comum"""
+    group_required = 'funcionario'
+
+
+class AdminRequiredMixin(GroupRequiredMixin):
+    """Mixin específico para admins - atalho comum"""
+    group_required = 'empresa_admin'
+
+
+class StaffRequiredMixin(GroupRequiredMixin):
+    """Mixin para staff (funcionario OU admin) - grupos múltiplos"""
+    group_required = ['funcionario', 'empresa_admin']
