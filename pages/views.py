@@ -22,6 +22,198 @@ from .mixins import (
     StaffRequiredMixin
 )
 
+# ✅ IMPORTAR FORMS COM TRATAMENTO DE ERRO SEGURO
+try:
+    from .forms import PersonForm, CompanyForm, ContractForm, StateForm, CityForm
+except ImportError:
+    # Se não existirem os forms customizados, criar forms básicos
+    from django import forms
+    
+    class PersonForm(forms.ModelForm):
+        class Meta:
+            model = Person
+            fields = ['full_name', 'cpf', 'phone', 'birth_date', 'address', 'city', 'data_processing_purpose']
+            widgets = {
+                'full_name': forms.TextInput(attrs={'class': 'form-control'}),
+                'cpf': forms.TextInput(attrs={'class': 'form-control'}),
+                'phone': forms.TextInput(attrs={'class': 'form-control'}),
+                'birth_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+                'address': forms.TextInput(attrs={'class': 'form-control'}),
+                'city': forms.Select(attrs={'class': 'form-select'}),
+                'data_processing_purpose': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            }
+    
+    class CompanyForm(forms.ModelForm):
+        class Meta:
+            model = Company
+            fields = ['corporate_name', 'trade_name', 'cnpj', 'email', 'phone', 'address', 'city', 'data_processing_purpose']
+            widgets = {
+                'corporate_name': forms.TextInput(attrs={'class': 'form-control'}),
+                'trade_name': forms.TextInput(attrs={'class': 'form-control'}),
+                'cnpj': forms.TextInput(attrs={'class': 'form-control'}),
+                'email': forms.EmailInput(attrs={'class': 'form-control'}),
+                'phone': forms.TextInput(attrs={'class': 'form-control'}),
+                'address': forms.TextInput(attrs={'class': 'form-control'}),
+                'city': forms.Select(attrs={'class': 'form-select'}),
+                'data_processing_purpose': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            }
+    
+    class ContractForm(forms.ModelForm):
+        class Meta:
+            model = Contract
+            fields = ['title', 'description', 'contract_type', 'start_date', 'end_date', 'value', 'company', 'person', 'is_active', 'data_processing_purpose']
+            widgets = {
+                'title': forms.TextInput(attrs={'class': 'form-control'}),
+                'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+                'contract_type': forms.Select(attrs={'class': 'form-select'}),
+                'start_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+                'end_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+                'value': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+                'company': forms.Select(attrs={'class': 'form-select'}),
+                'person': forms.Select(attrs={'class': 'form-select'}),
+                'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+                'data_processing_purpose': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            }
+    
+    class StateForm(forms.ModelForm):
+        class Meta:
+            model = State
+            fields = '__all__'
+            widgets = {
+                'name': forms.TextInput(attrs={'class': 'form-control'}),
+                'abbreviation': forms.TextInput(attrs={'class': 'form-control'}),
+            }
+    
+    class CityForm(forms.ModelForm):
+        class Meta:
+            model = City
+            fields = '__all__'
+            widgets = {
+                'name': forms.TextInput(attrs={'class': 'form-control'}),
+                'state': forms.Select(attrs={'class': 'form-select'}),
+            }
+
+# ===========================================
+# VIEWS BÁSICAS (INDEX, ABOUT, HOME)
+# ===========================================
+
+class IndexView(TemplateView):
+    """Página inicial pública"""
+    template_name = 'pages/index.html'
+
+class AboutView(TemplateView):
+    """Página sobre o sistema"""
+    template_name = 'pages/about.html'
+
+class HomeView(TemplateView):
+    """Dashboard principal com KPIs e registros recentes - permite acesso anônimo"""
+    template_name = 'pages/home.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Se usuário não estiver autenticado, retorna contexto vazio
+        if not self.request.user.is_authenticated:
+            context.update({
+                'total_usuarios': 0,
+                'total_empresas': 0,
+                'total_contratos': 0,
+                'total_pessoas': 0,
+                'pessoas_ultima_semana': 0,
+                'contratos_ultimo_mes': 0,
+                'empresas_ultimo_mes': 0,
+                'contratos_ativos': 0,
+                'ultimos_contratos': [],
+                'ultimas_pessoas': [],
+                'ultimas_empresas': [],
+            })
+            return context
+        
+        user = self.request.user
+        
+        # Datas para filtros
+        uma_semana_atras = timezone.now() - timedelta(days=7)
+        um_mes_atras = timezone.now() - timedelta(days=30)
+        
+        # KPIs PRINCIPAIS - TOTAIS (sempre mostrar 0 se não existir)
+        try:
+            if user.is_superuser or user.groups.filter(name='empresa_admin').exists():
+                from django.contrib.auth import get_user_model
+                User = get_user_model()
+                context['total_usuarios'] = User.objects.count()
+            else:
+                context['total_usuarios'] = 1  # O próprio usuário
+        except:
+            context['total_usuarios'] = 0
+        
+        # Total de empresas do usuário
+        try:
+            if user.is_superuser or user.groups.filter(name='empresa_admin').exists():
+                context['total_empresas'] = Company.objects.count()
+            else:
+                context['total_empresas'] = Company.objects.filter(usuario=user).count()
+        except:
+            context['total_empresas'] = 0
+        
+        # Total de contratos do usuário
+        try:
+            if user.is_superuser or user.groups.filter(name='empresa_admin').exists():
+                context['total_contratos'] = Contract.objects.count()
+            else:
+                context['total_contratos'] = Contract.objects.filter(usuario=user).count()
+        except:
+            context['total_contratos'] = 0
+        
+        # Total de pessoas do usuário
+        try:
+            if user.is_superuser or user.groups.filter(name='empresa_admin').exists():
+                context['total_pessoas'] = Person.objects.count()
+            else:
+                context['total_pessoas'] = Person.objects.filter(usuario=user).count()
+        except:
+            context['total_pessoas'] = 0
+        
+        # LISTAS DE REGISTROS RECENTES (sempre lista, mesmo vazia)
+        try:
+            if user.is_superuser or user.groups.filter(name='empresa_admin').exists():
+                context['ultimos_contratos'] = Contract.objects.all().order_by('-id')[:5]
+                context['ultimas_pessoas'] = Person.objects.all().order_by('-id')[:5]
+                context['ultimas_empresas'] = Company.objects.all().order_by('-id')[:5]
+            else:
+                context['ultimos_contratos'] = Contract.objects.filter(usuario=user).order_by('-id')[:5]
+                context['ultimas_pessoas'] = Person.objects.filter(usuario=user).order_by('-id')[:5]
+                context['ultimas_empresas'] = Company.objects.filter(usuario=user).order_by('-id')[:5]
+        except:
+            context['ultimos_contratos'] = []
+            context['ultimas_pessoas'] = []
+            context['ultimas_empresas'] = []
+        
+        # Estatísticas temporais
+        try:
+            if user.is_superuser or user.groups.filter(name='empresa_admin').exists():
+                context['pessoas_ultima_semana'] = Person.objects.filter(created_at__gte=uma_semana_atras).count()
+                context['contratos_ultimo_mes'] = Contract.objects.filter(created_at__gte=um_mes_atras).count()
+                context['empresas_ultimo_mes'] = Company.objects.filter(created_at__gte=um_mes_atras).count()
+            else:
+                context['pessoas_ultima_semana'] = Person.objects.filter(usuario=user, created_at__gte=uma_semana_atras).count()
+                context['contratos_ultimo_mes'] = Contract.objects.filter(usuario=user, created_at__gte=um_mes_atras).count()
+                context['empresas_ultimo_mes'] = Company.objects.filter(usuario=user, created_at__gte=um_mes_atras).count()
+        except:
+            context['pessoas_ultima_semana'] = 0
+            context['contratos_ultimo_mes'] = 0
+            context['empresas_ultimo_mes'] = 0
+        
+        # Contratos ativos
+        try:
+            if user.is_superuser or user.groups.filter(name='empresa_admin').exists():
+                context['contratos_ativos'] = Contract.objects.filter(is_active=True).count()
+            else:
+                context['contratos_ativos'] = Contract.objects.filter(usuario=user, is_active=True).count()
+        except:
+            context['contratos_ativos'] = context.get('total_contratos', 0)
+        
+        return context
+
 # ===========================================
 # VIEWS PARA PERSON (PESSOA) - COM PROTEÇÃO
 # ===========================================
@@ -225,7 +417,7 @@ class ContractDeleteView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, Funcion
         return super().delete(request, *args, **kwargs)
 
 # ===========================================
-# VIEWS ADMINISTRATIVAS (APENAS ADMIN) - PROTEÇÃO DUPLA
+# VIEWS ADMINISTRATIVAS (APENAS ADMIN)
 # ===========================================
 
 class StateListView(AdminRequiredMixin, ListView):
@@ -316,8 +508,6 @@ class ContratoDraftStartView(FormView):
     """View para iniciar rascunho - PERMITE ANÔNIMO"""
     template_name = 'pages/contratos/contrato_draft_form.html'
     success_url = reverse_lazy('contrato-draft-review')
-    
-    # Não requer grupo - permite acesso anônimo
     
     def get_form_class(self):
         """Cria form dinamicamente para evitar dependências"""
@@ -418,7 +608,7 @@ class ContratoDraftFinalizeView(FuncionarioRequiredMixin, View):
                 title=draft['titulo'],
                 description=draft['descricao'],
                 company=company,
-                person=None,
+                person=None,  # Pode ser adicionado depois
                 usuario=request.user,
                 data_processing_purpose=f"Contrato: {draft['titulo']}",
                 is_active=True

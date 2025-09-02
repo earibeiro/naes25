@@ -2,7 +2,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.contrib import messages
 from django.shortcuts import redirect
-from django.http import Http404 
+from django.http import Http404
 
 
 class OwnerQuerysetMixin(LoginRequiredMixin):
@@ -116,25 +116,6 @@ class OwnerCreateMixin(LoginRequiredMixin):
         return super().form_valid(form)
 
 
-class AdminOnlyMixin(UserPassesTestMixin):
-    """
-    Mixin que permite acesso apenas para admins
-    """
-    
-    def test_func(self):
-        """Permite acesso apenas para admins"""
-        u = self.request.user
-        return u.is_superuser or u.groups.filter(name="empresa_admin").exists()
-    
-    def handle_no_permission(self):
-        """Customiza tratamento de acesso negado para admins"""
-        messages.error(
-            self.request, 
-            "❌ Acesso restrito a administradores."
-        )
-        return redirect('home')
-
-
 class GroupRequiredMixin(UserPassesTestMixin):
     """
     Mixin que exige pertencer a um grupo específico
@@ -206,3 +187,15 @@ class AdminRequiredMixin(GroupRequiredMixin):
 class StaffRequiredMixin(GroupRequiredMixin):
     """Mixin para staff (funcionario OU admin) - grupos múltiplos"""
     group_required = ['funcionario', 'empresa_admin']
+
+
+class AdminOnlyMixin(UserPassesTestMixin):
+    """Apenas superuser ou empresa_admin - versão legacy"""
+    
+    def test_func(self):
+        u = self.request.user
+        return u.is_superuser or u.groups.filter(name="empresa_admin").exists()
+    
+    def handle_no_permission(self):
+        messages.error(self.request, "❌ Acesso restrito a administradores.")
+        return redirect('home')
