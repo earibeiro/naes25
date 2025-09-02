@@ -5,7 +5,7 @@ from django.contrib.auth import views as auth_views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('pages.urls')),
-    path('usuarios/', include('usuarios.urls')),  # ✅ CONFIRMADO
+    path('usuarios/', include('usuarios.urls')),
     path('auditoria/', include('auditoria.urls')),
     
     # Login/Logout padrão

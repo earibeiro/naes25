@@ -9,7 +9,13 @@ from .views import (
     CustomLogoutView,
     teste_view
 )
-from .forms import CustomPasswordChangeForm
+
+# ✅ CORRIGIR IMPORT DO FORM
+try:
+    from .forms import CustomPasswordChangeForm
+except ImportError:
+    # Fallback se form não existir
+    CustomPasswordChangeForm = None
 
 app_name = "usuarios"
 
@@ -32,14 +38,13 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(template_name='usuarios/login.html'), name='login'),
     path('logout/', CustomLogoutView.as_view(), name='logout'),
     
-    # Alteração de senha com redirecionamento para home
+    # ✅ ALTERAÇÃO DE SENHA COM FORM OPCIONAL
     path('alterar-senha/', auth_views.PasswordChangeView.as_view(
         template_name='usuarios/change_password.html',
-        form_class=CustomPasswordChangeForm,  
-        success_url=reverse_lazy('home')     
+        form_class=CustomPasswordChangeForm if CustomPasswordChangeForm else None,
+        success_url=reverse_lazy('home')
     ), name='change-password'),
     
-    # Página de confirmação (opcional)
     path('senha-alterada/', auth_views.PasswordChangeDoneView.as_view(
         template_name='usuarios/password_change_done.html'
     ), name='password-change-done'),

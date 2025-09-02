@@ -59,12 +59,12 @@
                                 
                                 <li><hr class="dropdown-divider"></li>
                                 
-                                <!-- ✅ NOVO: LINK PARA ALTERAR SENHA -->
+                                <!-- ✅ LINK PARA ALTERAR SENHA -->
                                 <li><a class="dropdown-item" href="{% url 'usuarios:change-password' %}">
                                     <i class="fas fa-key me-1"></i>Alterar Senha
                                 </a></li>
                                 
-                                <!-- LINK PARA LOGS (SE IMPLEMENTADO) -->
+                                <!-- ✅ LINK PARA LOGS (APENAS PARA USUÁRIOS COM GRUPOS) -->
                                 {% if user.is_superuser or user.groups.exists %}
                                     <li><a class="dropdown-item" href="{% url 'auditoria:activity-logs' %}">
                                         <i class="fas fa-history me-1"></i>Logs de Atividade
