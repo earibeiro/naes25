@@ -1,14 +1,10 @@
 /* ====== Correções gerais de layout/overflow ====== */
 
 /* Some a rolagem horizontal causada por elementos com largura "fugitiva" */
-html, body {
-  overflow-x: hidden;
-}
+html, body { overflow-x: hidden; }
 
 /* Garante que imagens e tabelas não estourem a largura */
-img, table {
-  max-width: 100%;
-}
+img, table, .container, .container-fluid, .row, section, header, footer { max-width: 100%; }
 
 /* Se algum container/linha estourar, não deixa gerar scroll horizontal */
 .container, .container-fluid, .row, section, header, footer {
@@ -17,10 +13,7 @@ img, table {
 }
 
 /* Quebra linhas de <pre>/<code> para evitar overflow em textos longos */
-pre, code {
-  white-space: pre-wrap;      /* wrap preservando quebra de linha */
-  word-wrap: break-word;
-}
+pre, code { white-space: pre-wrap; word-break: break-word; }
 
 /* ====== "Faixa branca" (masthead vazio demais em páginas internas) ====== */
 /* O Grayscale usa .masthead ocupando a tela toda (100vh).
@@ -40,17 +33,41 @@ pre, code {
 
 /* ====== Contraste e estados de links/menus/listas ====== */
 /* Corrige casos de link "invisível" (mesma cor do fundo) até o hover */
-a, .btn-link {
-  text-decoration: none;
+a, .btn-link { text-decoration: none; }
+
+a:link, a:visited { color: #212529; }            /* legível em fundo claro */
+a:hover, a:focus { color: #0d6efd; text-decoration: underline; }
+
+/* Botões base */
+.btn { font-weight: 600; }
+
+/* Botão claro: texto escuro (para fundos claros ou coloridos) */
+.btn-light, .btn-outline-light {
+  color: #212529 !important;
+  border-color: rgba(0,0,0,.15);
+}
+.btn-light:hover, .btn-outline-light:hover {
+  color: #0d6efd !important;
+  background-color: #f8f9fa;
 }
 
-a:link, a:visited {
-  color: var(--bs-primary, #0d6efd); /* usa cor do Bootstrap se disponível */
+/* Botões primários/cores sólidas: texto branco */
+.btn-primary, .btn-success, .btn-danger, .btn-warning, .btn-info, .btn-dark {
+  color: #fff !important;
+}
+.btn-primary:hover, .btn-success:hover, .btn-danger:hover,
+.btn-warning:hover, .btn-info:hover, .btn-dark:hover {
+  filter: brightness(0.93);
 }
 
-a:hover, a:focus {
-  color: #0a58ca;              /* levemente mais escuro para sinalizar interação */
-  text-decoration: underline;
+/* Botões outline escuros: texto escuro visível */
+.btn-outline-secondary, .btn-outline-dark {
+  color: #212529 !important;
+  border-color: #212529 !important;
+}
+.btn-outline-secondary:hover, .btn-outline-dark:hover {
+  color: #fff !important;
+  background-color: #212529 !important;
 }
 
 /* Navbar: se for navbar-dark sobre fundo escuro, garanta visibilidade dos links */
@@ -82,15 +99,10 @@ a:hover, a:focus {
 /* "Pessoas" (http://localhost:8000/pessoas/): links que estavam invisíveis */
 .list-group-item a,
 .card a,
-.table a {
-  color: inherit;              /* mantém contraste do elemento pai */
-}
+.table a { color: inherit; }
 .list-group-item a:hover,
 .card a:hover,
-.table a:hover {
-  color: var(--bs-primary, #0d6efd);
-  text-decoration: underline;
-}
+.table a:hover { color: #0d6efd; text-decoration: underline; }
 
 /* ====== Estados/feedbacks visuais (heurísticas) ====== */
 .btn, .btn:focus {
@@ -99,24 +111,14 @@ a:hover, a:focus {
 }
 
 /* Foco acessível sem "pular" layout */
-:focus-visible {
-  outline: 2px solid #0d6efd;
-  outline-offset: 2px;
-}
-
-/* Cards KPI: manter legibilidade se valores forem 0 */
-.kpi-card .kpi-value {
-  font-size: 2rem;
-  font-weight: 700;
-}
-.kpi-card .kpi-label {
-  opacity: 0.85;
-}
+:focus-visible { outline: 2px solid #0d6efd; outline-offset: 2px; }
 
 /* Mensagens de feedback (caso o base.html tenha um loop de messages) */
-.alert {
-  margin-top: 1rem;
-}
+.alert { margin-top: 1rem; }
+
+/* ====== Cards KPI: manter legibilidade se valores forem 0 */
+.kpi-card .kpi-value { font-size: 2rem; font-weight: 700; }
+.kpi-card .kpi-label { opacity: .9; }
 
 /* ====== Melhorias específicas para tabelas ====== */
 .table-responsive {
@@ -192,6 +194,10 @@ a:hover, a:focus {
   .table-responsive {
     font-size: 0.875rem;
   }
+  
+  .kpi-grid .col {
+    margin-bottom: 1rem;
+  }
 }
 
 /* ====== Acessibilidade ====== */
@@ -229,4 +235,24 @@ a:hover, a:focus {
   to {
     transform: rotate(360deg);
   }
+}
+
+/* ===== Classes utilitárias ===== */
+.bg-teal {
+  background-color: #20c997 !important;
+}
+
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rounded-4 {
+  border-radius: 1rem !important;
+}
+
+/* ===== Spacing consistente ===== */
+.g-4 > .col {
+  padding: 1rem;
 }
