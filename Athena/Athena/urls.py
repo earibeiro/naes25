@@ -6,6 +6,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('pages.urls')),
     path('usuarios/', include('usuarios.urls')),
+    path('auditoria/', include('auditoria.urls')),  # ✅ ADICIONAR
     
     # Logout padrão do Django - aceita apenas POST
     path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),

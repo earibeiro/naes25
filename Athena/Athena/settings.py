@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'pages.apps.PagesConfig',
     'usuarios.apps.UsuariosConfig',
+    'auditoria.apps.AuditoriaConfig',  # ✅ ADICIONAR AQUI
     'crispy_forms',
     'crispy_bootstrap4',
     #'django_extensions',
@@ -52,6 +53,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'auditoria.middleware.RequestStoreMiddleware',  # ✅ ADICIONAR DEPOIS DO AUTH
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
