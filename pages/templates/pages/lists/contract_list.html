@@ -1,20 +1,28 @@
 {% extends "pages/base.html" %}
 {% load static %}
 
-{% block title %}Contratos LGPD - Athena{% endblock %}
+{% block title %}Contratos - Athena{% endblock %}
+
+<!-- ✅ MASTHEAD COMPACTO -->
+{% block masthead_class %} masthead--compact{% endblock %}
 
 {% block hero_content %}
-<div class="container px-4 px-lg-5 text-center" style="padding: 60px 0;">
+<div class="container px-4 px-lg-5 text-center">
     <h1 class="text-white">📋 Contratos LGPD</h1>
-    <p class="text-white-50">Gestão completa de contratos e conformidade</p>
-    <a href="{% url 'contract-create' %}" class="btn btn-success btn-lg">
-        <i class="fas fa-file-contract me-2"></i>Novo Contrato
-    </a>
+    <p class="text-white-50">Gestão completa de contratos e documentação</p>
 </div>
 {% endblock %}
 
 {% block about_content %}
-<div class="container px-4 px-lg-5">
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 m-0 text-white">
+            <i class="fas fa-file-contract me-2"></i>Contratos
+        </h1>
+        <a class="btn btn-success" href="{% url 'contract-create' %}">
+            <i class="fas fa-plus me-2"></i>Novo Contrato
+        </a>
+    </div>
     
     <!-- Estatísticas -->
     <div class="row mb-4">
