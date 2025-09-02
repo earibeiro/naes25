@@ -1,6 +1,6 @@
 # IMPORTS SEGUROS
 from django.shortcuts import render, redirect
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView, TemplateView, FormView, View
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView, TemplateView, FormView, View, RedirectView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy, reverse
@@ -46,7 +46,8 @@ except ImportError:
     class CompanyForm(forms.ModelForm):
         class Meta:
             model = Company
-            fields = ['corporate_name', 'trade_name', 'cnpj', 'email', 'phone', 'address', 'city', 'data_processing_purpose']
+            fields = ['corporate_name', 'trade_name', 'cnpj', 'email', 'phone', 'address', 'city', 'data_processing_purpose'
+            ]
             widgets = {
                 'corporate_name': forms.TextInput(attrs={'class': 'form-control'}),
                 'trade_name': forms.TextInput(attrs={'class': 'form-control'}),
@@ -104,6 +105,12 @@ class IndexView(TemplateView):
 class AboutView(TemplateView):
     """Página sobre o sistema"""
     template_name = 'pages/about.html'
+
+# ✅ REDIRECT TEMPORÁRIO PARA about/ → sobre/
+class AboutRedirectView(RedirectView):
+    """Redirect de /about/ para /sobre/ para compatibilidade"""
+    pattern_name = 'about'
+    permanent = True
 
 class HomeView(TemplateView):
     """Dashboard principal com KPIs e registros recentes - permite acesso anônimo"""
@@ -477,6 +484,12 @@ class CityCreateView(AdminRequiredMixin, CreateView):
     def form_valid(self, form):
         messages.success(self.request, f'✅ Cidade "{form.instance.name}" criada com sucesso!')
         return super().form_valid(form)
+
+class CityDetailView(AdminRequiredMixin, DetailView):
+    """DetailView para cidades - APENAS empresa_admin"""
+    model = City
+    template_name = 'pages/detail/city_detail.html'
+    context_object_name = 'city'
 
 class CityUpdateView(AdminRequiredMixin, UpdateView):
     """UpdateView para cidades - APENAS empresa_admin"""

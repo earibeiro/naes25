@@ -91,7 +91,7 @@
                 <h5 class="card-title text-white">
                     <i class="fas fa-plus mr-2"></i>Ação Rápida
                 </h5>
-                <a href="{% url 'city-create' %}" class="btn btn-primary btn-lg">
+                <a href="{% url 'create-city' %}" class="btn btn-primary btn-lg">
                     <i class="fas fa-plus me-2"></i>Nova Cidade
                 </a>
             </div>

@@ -115,7 +115,7 @@
             Cadastre o primeiro estado para começar.
         </p>
         <div class="d-flex justify-content-center gap-3">
-            <a href="{% url 'state-create' %}" class="btn btn-info">
+            <a href="{% url 'create-state' %}" class="btn btn-info">
                 <i class="fas fa-plus mr-2"></i>Cadastrar Primeiro Estado
             </a>
             <a href="{% url 'home' %}" class="btn btn-outline-light">
