@@ -1,12 +1,16 @@
 {% extends "pages/base.html" %}
 {% load static %}
 
-{% block title %}Sobre - Athena{% endblock %}
+{% block title %}Sobre o Athena - Sistema LGPD{% endblock %}
+
+<!-- ✅ MASTHEAD MINIMAL PARA PÁGINA SOBRE -->
+{% block masthead_class %} masthead--minimal{% endblock %}
 
 {% block hero_content %}
-<h1 class="mx-auto my-0 text-uppercase">Sobre o Athena</h1>
-<h2 class="text-white-50 mx-auto mt-2 mb-5">Conheça nosso sistema de gestão LGPD</h2>
-<a class="btn btn-primary" href="#about">Saiba Mais</a>
+<div class="container px-4 px-lg-5 text-center">
+    <h1 class="text-white">Sobre o Athena</h1>
+    <p class="text-white-50">Sistema completo de gestão LGPD para pessoas físicas e jurídicas</p>
+</div>
 {% endblock %}
 
 {% block about_content %}

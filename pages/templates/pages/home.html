@@ -3,8 +3,11 @@
 
 {% block title %}Dashboard - Athena{% endblock %}
 
+<!-- ✅ MASTHEAD COMPACTO PARA DASHBOARD -->
+{% block masthead_class %} masthead--compact{% endblock %}
+
 {% block hero_content %}
-<div class="container px-4 px-lg-5 text-center" style="padding: 80px 0;">
+<div class="container px-4 px-lg-5 text-center">
     {% if user.is_authenticated %}
         <h1 class="text-white">Bem-vindo, {{ user.username }}!</h1>
         <p class="text-white-50">Dashboard de Gestão LGPD - Controle total dos seus dados</p>
@@ -42,7 +45,7 @@
 {% endblock %}
 
 {% block about_content %}
-<!-- Todo o conteúdo do dashboard continua aqui... -->
+<!-- Todo o conteúdo do dashboard continua inalterado... -->
 <div class="container px-4 px-lg-5">
     
     {% if user.is_authenticated %}
