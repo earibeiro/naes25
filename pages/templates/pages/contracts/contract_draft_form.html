@@ -30,14 +30,21 @@
                         <div class="alert alert-danger mb-4">
                             <i class="fas fa-exclamation-triangle me-2"></i>
                             <strong>Erro nos dados!</strong> Verifique os campos abaixo.
+                            <ul class="mb-0 mt-2">
+                                {% for field, errors in form.errors.items %}
+                                    {% for error in errors %}
+                                        <li>{{ field|title }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
                         </div>
                     {% endif %}
 
-                    <!-- ✅ FORMULÁRIO COM CAMPOS CORRETOS -->
+                    <!-- ✅ FORMULÁRIO COM CAMPOS CORRETOS DO MODEL -->
                     <form method="post" novalidate>
                         {% csrf_token %}
                         
-                        <!-- ✅ USAR CAMPOS DO MODEL CONTRACT (title, description, etc) -->
+                        <!-- ✅ TÍTULO (campo 'title' do model) -->
                         <div class="row">
                             <div class="col-md-8">
                                 <div class="mb-3">
@@ -63,6 +70,7 @@
                             </div>
                         </div>
                         
+                        <!-- ✅ DESCRIÇÃO (campo 'description' do model) -->
                         <div class="mb-3">
                             <label for="{{ form.description.id_for_label }}" class="form-label text-white">
                                 <i class="fas fa-align-left me-1"></i>Descrição *
@@ -73,7 +81,7 @@
                             {% endif %}
                         </div>
                         
-                        <!-- ✅ CAMPOS ADICIONAIS DO MODEL -->
+                        <!-- ✅ PESSOA E EMPRESA (campos corretos do model) -->
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
@@ -81,6 +89,9 @@
                                         <i class="fas fa-user me-1"></i>Pessoa *
                                     </label>
                                     {{ form.person }}
+                                    <div class="form-text text-white-50">
+                                        Selecione a pessoa física responsável
+                                    </div>
                                     {% if form.person.errors %}
                                         <div class="text-danger small">{{ form.person.errors.0 }}</div>
                                     {% endif %}
@@ -92,6 +103,9 @@
                                         <i class="fas fa-building me-1"></i>Empresa
                                     </label>
                                     {{ form.company }}
+                                    <div class="form-text text-white-50">
+                                        Opcional - pessoa jurídica envolvida
+                                    </div>
                                     {% if form.company.errors %}
                                         <div class="text-danger small">{{ form.company.errors.0 }}</div>
                                     {% endif %}
@@ -99,6 +113,7 @@
                             </div>
                         </div>
                         
+                        <!-- ✅ FINALIDADE LGPD (campo obrigatório) -->
                         <div class="mb-4">
                             <label for="{{ form.data_processing_purpose.id_for_label }}" class="form-label text-white">
                                 <i class="fas fa-shield-alt me-1"></i>Finalidade do Tratamento de Dados (LGPD) *
@@ -112,12 +127,43 @@
                             {% endif %}
                         </div>
                         
+                        <!-- ✅ CAMPOS ADICIONAIS SE EXISTIREM -->
+                        {% if form.start_date %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.start_date.id_for_label }}" class="form-label text-white">
+                                        <i class="fas fa-calendar-alt me-1"></i>Data de Início
+                                    </label>
+                                    {{ form.start_date }}
+                                    {% if form.start_date.errors %}
+                                        <div class="text-danger small">{{ form.start_date.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.end_date.id_for_label }}" class="form-label text-white">
+                                        <i class="fas fa-calendar-check me-1"></i>Data de Fim
+                                    </label>
+                                    {{ form.end_date }}
+                                    <div class="form-text text-white-50">
+                                        Opcional - deixe vazio para contrato indeterminado
+                                    </div>
+                                    {% if form.end_date.errors %}
+                                        <div class="text-danger small">{{ form.end_date.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
                         <div class="d-flex justify-content-between">
                             <a href="{% url 'home' %}" class="btn btn-secondary">
                                 <i class="fas fa-arrow-left me-1"></i>Voltar
                             </a>
                             <button type="submit" class="btn btn-success">
-                                <i class="fas fa-arrow-right me-1"></i>Criar Contrato
+                                <i class="fas fa-save me-1"></i>Criar Contrato
                             </button>
                         </div>
                     </form>
@@ -139,6 +185,16 @@
 $(document).ready(function(){
     // ✅ GARANTIR QUE CAMPOS SEJAM EDITÁVEIS
     $('input, select, textarea').prop('disabled', false).prop('readonly', false);
+    
+    // ✅ MELHORAR SELEÇÃO DE PESSOA E EMPRESA
+    $('select[name="person"], select[name="company"]').each(function(){
+        $(this).addClass('form-select form-control');
+        
+        // Adicionar opção padrão se não existir
+        if (!$(this).find('option[value=""]').length) {
+            $(this).prepend('<option value="">Selecione...</option>');
+        }
+    });
     
     // Aplicar máscaras se existirem
     $('[data-mask]').each(function(){
