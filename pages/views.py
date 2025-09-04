@@ -177,6 +177,8 @@ class CompanyCreateView(OwnerCreateMixin, FuncionarioRequiredMixin, CreateView):
         return kwargs
     
     def form_valid(self, form):
+        """✅ GARANTIR QUE O USUARIO_ID SEJA PREENCHIDO"""
+        form.instance.usuario = self.request.user
         messages.success(self.request, f'✅ Empresa "{form.instance.corporate_name}" criada com sucesso!')
         return super().form_valid(form)
     
@@ -228,8 +230,8 @@ class ContractListView(FuncionarioRequiredMixin, OwnerQuerysetMixin, ListView):
     context_object_name = 'contracts'
     paginate_by = 10
 
-class ContractCreateView(OwnerCreateMixin, FuncionarioRequiredMixin, CreateView):
-    """CreateView para contratos - requer grupo funcionario"""
+class ContractCreateView(LoginRequiredMixin, OwnerCreateMixin, CreateView):
+    """CreateView para contratos"""
     model = Contract
     form_class = ContractForm
     template_name = 'pages/forms/contract_form.html'
@@ -241,6 +243,8 @@ class ContractCreateView(OwnerCreateMixin, FuncionarioRequiredMixin, CreateView)
         return kwargs
     
     def form_valid(self, form):
+        """✅ GARANTIR QUE O USUARIO_ID SEJA PREENCHIDO"""
+        form.instance.usuario = self.request.user
         messages.success(self.request, f'✅ Contrato "{form.instance.title}" criado com sucesso!')
         return super().form_valid(form)
     
@@ -375,26 +379,28 @@ class CityDeleteView(AdminRequiredMixin, DeleteView):
 
 class ContractDraftStartView(LoginRequiredMixin, FormView):
     """Início do rascunho de contrato"""
-    model = Contract
+    template_name = 'pages/contracts/contract_draft_form.html'
     form_class = ContractForm
-    template_name = 'pages/contracts/contract_draft_form.html'  # ← SEU ARQUIVO
     
     def get_success_url(self):
         return reverse_lazy('contract-list')
     
     def get_form_kwargs(self):
-        """Passa o usuário para o formulário"""
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user
         return kwargs
     
     def form_valid(self, form):
-        """✅ GARANTIR QUE USUARIO SEJA PREENCHIDO"""
+        """✅ GARANTIR QUE O USUARIO_ID SEJA PREENCHIDO"""
         contract = form.save(commit=False)
         contract.usuario = self.request.user
         contract.save()
-        messages.success(self.request, f'Contrato "{contract.title}" criado com sucesso!')
+        messages.success(self.request, f'✅ Contrato "{contract.title}" criado com sucesso!')
         return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        messages.error(self.request, '❌ Erro ao criar contrato. Verifique os dados.')
+        return super().form_invalid(form)
 
 class ContratoDraftReviewView(TemplateView):
     """Revisão de rascunho - permite anônimo"""
