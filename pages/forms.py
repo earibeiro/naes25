@@ -135,53 +135,56 @@ class ContractForm(forms.ModelForm):
     class Meta:
         model = Contract
         fields = [
-            'title', 'description', 'person', 'company', 
-            'contract_type', 'data_processing_purpose'
+            'title', 'description', 'contract_type', 'person', 'company', 
+            'data_processing_purpose', 'start_date', 'end_date'
         ]
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Título do contrato'
+                'placeholder': 'Ex: Contrato de Prestação de Serviços'
             }),
             'description': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 4,
-                'placeholder': 'Descrição detalhada do contrato...'
-            }),
-            'person': forms.Select(attrs={
-                'class': 'form-select'
-            }),
-            'company': forms.Select(attrs={
-                'class': 'form-select'
+                'placeholder': 'Descreva os detalhes do contrato...'
             }),
             'contract_type': forms.Select(attrs={
                 'class': 'form-select'
             }),
+            'person': forms.Select(attrs={
+                'class': 'form-select',
+                'data-placeholder': 'Selecione a pessoa física...'
+            }),
+            'company': forms.Select(attrs={
+                'class': 'form-select',
+                'data-placeholder': 'Selecione a empresa (opcional)...'
+            }),
             'data_processing_purpose': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 3,
-                'placeholder': 'Finalidade específica deste contrato...'
+                'placeholder': 'Ex: Tratamento de dados para execução do contrato de serviços...'
             }),
-        }
-        labels = {
-            'title': 'Título do Contrato',
-            'description': 'Descrição',
-            'person': 'Pessoa Física',
-            'company': 'Empresa',
-            'contract_type': 'Tipo de Contrato',
-            'data_processing_purpose': 'Finalidade do Tratamento (LGPD)',
+            'start_date': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date'
+            }),
+            'end_date': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date'
+            }),
         }
     
     def __init__(self, *args, **kwargs):
-        # Remove o argumento 'user' se presente para evitar erro
-        self.user = kwargs.pop('user', None)
+        user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         
-        # Filtrar pessoas e empresas por usuário
-        if self.user and not self.user.is_superuser:
-            self.fields['person'].queryset = Person.objects.filter(usuario=self.user)
-            self.fields['company'].queryset = Company.objects.filter(usuario=self.user)
-
+        if user:
+            self.fields['person'].queryset = Person.objects.filter(usuario=user)
+            self.fields['company'].queryset = Company.objects.filter(usuario=user)
+            
+            self.fields['person'].empty_label = "Selecione a pessoa física..."
+            self.fields['company'].empty_label = "Selecione a empresa (opcional)..."
+        
 
 class StateForm(forms.ModelForm):
     """Formulário para State (apenas admin)"""
