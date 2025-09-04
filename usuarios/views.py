@@ -95,16 +95,20 @@ class CadastroPessoaJuridicaView(SignUpEmpresaAdminView):
 
 # LOGOUT SEGURO - só aceita POST
 class CustomLogoutView(LogoutView):
-    """
-    Logout que aceita apenas POST por segurança
-    """
-    http_method_names = ['post']
+    """Logout customizado que só aceita POST"""
+    http_method_names = ['post']  # ✅ FORÇAR APENAS POST
     
-    def dispatch(self, request, *args, **kwargs):
-        if request.method.upper() not in self.http_method_names:
-            messages.warning(request, '⚠️ Logout deve ser feito via POST por segurança.')
-            return redirect('home')
-        return super().dispatch(request, *args, **kwargs)
+    def post(self, request, *args, **kwargs):
+        """Processa logout via POST com mensagem"""
+        user = request.user
+        if user.is_authenticated:
+            messages.success(request, f'Logout realizado com sucesso para {user.username}!')
+        return super().post(request, *args, **kwargs)
+    
+    def get(self, request, *args, **kwargs):
+        """Bloquear GET e mostrar aviso"""
+        messages.warning(request, '⚠️ Logout deve ser feito via POST por segurança.')
+        return redirect('home')
 
 
 # View simples para teste (pode remover depois)
