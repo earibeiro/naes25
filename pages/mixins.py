@@ -106,8 +106,11 @@ class OwnerCreateMixin:
     
     def form_valid(self, form):
         """✅ GARANTIR QUE USUARIO SEJA SEMPRE PREENCHIDO"""
-        if hasattr(form.instance, 'usuario') and not form.instance.usuario:
-            form.instance.usuario = self.request.user
+        # Verificar se o model tem campo 'usuario' e se não está preenchido
+        if hasattr(form.instance, 'usuario'):
+            if not form.instance.usuario_id:  # Verifica se usuario_id não está definido
+                form.instance.usuario = self.request.user
+        
         return super().form_valid(form)
 
 
