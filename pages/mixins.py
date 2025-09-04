@@ -101,18 +101,13 @@ class OwnerObjectPermissionMixin(UserPassesTestMixin):
         return obj
 
 
-class OwnerCreateMixin(LoginRequiredMixin):
-    """
-    Mixin para CreateView que automaticamente define o owner
-    """
-    owner_field_name = "usuario"
+class OwnerCreateMixin:
+    """Mixin para definir o proprietário do objeto na criação"""
     
     def form_valid(self, form):
-        """Define o usuário atual como owner do objeto"""
-        # Define o owner antes de salvar
-        if hasattr(form.instance, self.owner_field_name):
-            setattr(form.instance, self.owner_field_name, self.request.user)
-        
+        """✅ GARANTIR QUE USUARIO SEJA SEMPRE PREENCHIDO"""
+        if hasattr(form.instance, 'usuario') and not form.instance.usuario:
+            form.instance.usuario = self.request.user
         return super().form_valid(form)
 
 

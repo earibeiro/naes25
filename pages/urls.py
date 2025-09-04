@@ -49,7 +49,7 @@ urlpatterns = [
     path('cidades/<int:pk>/excluir/', views.CityDeleteView.as_view(), name='delete-city'),
     
     # URLs para rascunhos de contratos (permite anônimo)
-    path('rascunho/contrato/', views.ContratoDraftStartView.as_view(), name='contrato-draft-start'),
+    path('rascunho/contrato/', views.ContractDraftStartView.as_view(), name='contrato-draft-start'),
     path('rascunho/revisar/', views.ContratoDraftReviewView.as_view(), name='contrato-draft-review'),
     path('rascunho/finalizar/', views.ContratoDraftFinalizeView.as_view(), name='contrato-draft-finalize'),
 ]

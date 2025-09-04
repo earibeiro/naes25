@@ -52,10 +52,7 @@
                                     <label for="{{ form.title.id_for_label }}" class="form-label text-white">
                                         <i class="fas fa-heading me-1"></i>Título do Contrato *
                                     </label>
-                                    {{ form.title }}
-                                    {% if form.title.errors %}
-                                        <div class="text-danger small">{{ form.title.errors.0 }}</div>
-                                    {% endif %}
+                                    {{ form.title }}  <!-- ✅ Campo correto 'title' -->
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -63,10 +60,7 @@
                                     <label for="{{ form.contract_type.id_for_label }}" class="form-label text-white">
                                         <i class="fas fa-tag me-1"></i>Tipo *
                                     </label>
-                                    {{ form.contract_type }}
-                                    {% if form.contract_type.errors %}
-                                        <div class="text-danger small">{{ form.contract_type.errors.0 }}</div>
-                                    {% endif %}
+                                    {{ form.contract_type }}  <!-- ✅ Campo correto -->
                                 </div>
                             </div>
                         </div>
@@ -75,10 +69,7 @@
                             <label for="{{ form.description.id_for_label }}" class="form-label text-white">
                                 <i class="fas fa-align-left me-1"></i>Descrição *
                             </label>
-                            {{ form.description }}
-                            {% if form.description.errors %}
-                                <div class="text-danger small">{{ form.description.errors.0 }}</div>
-                            {% endif %}
+                            {{ form.description }}  <!-- ✅ Campo correto 'description' -->
                         </div>
                         
                         <div class="row">

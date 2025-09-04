@@ -39,11 +39,6 @@
                                 <i class="fas fa-heading me-1"></i>Título do Contrato *
                             </label>
                             {{ form.titulo }}
-                            {% if form.titulo.errors %}
-                                <div class="text-danger small">
-                                    {{ form.titulo.errors.0 }}
-                                </div>
-                            {% endif %}
                         </div>
                         
                         <div class="mb-3">
@@ -51,11 +46,6 @@
                                 <i class="fas fa-align-left me-1"></i>Descrição *
                             </label>
                             {{ form.descricao }}
-                            {% if form.descricao.errors %}
-                                <div class="text-danger small">
-                                    {{ form.descricao.errors.0 }}
-                                </div>
-                            {% endif %}
                         </div>
                         
                         <div class="mb-4">
