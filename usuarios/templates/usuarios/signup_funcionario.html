@@ -3,9 +3,13 @@
 
 {% block title %}Cadastro Funcionário - Athena{% endblock %}
 
+{% block masthead_class %} masthead--minimal{% endblock %}
+
 {% block hero_content %}
-<div class="container px-4 px-lg-5 text-center" style="padding: 80px 0;">
-    <h1 class="text-white">Cadastro — Funcionário / Colaborador</h1>
+<div class="container px-4 px-lg-5 text-center">
+    <h1 class="text-white">
+        <i class="fas fa-user me-2"></i>Cadastro Funcionário
+    </h1>
     <p class="text-white-50">Crie sua conta de funcionário no sistema Athena</p>
 </div>
 {% endblock %}
@@ -93,7 +97,7 @@
                     
                     <div class="text-center mt-3">
                         <small class="text-white-50">
-                            Já tem conta? <a href="{% url 'login' %}" class="text-primary">Faça login</a>
+                            Já tem conta? <a href="{% url 'usuarios:login' %}" class="text-primary">Faça login</a>
                         </small>
                     </div>
                 </div>
