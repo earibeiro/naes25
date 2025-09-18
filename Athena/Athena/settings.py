@@ -80,23 +80,23 @@ WSGI_APPLICATION = 'Athena.Athena.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'NAME': BASE_DIR / 'db.sqlite3',
+#    }
+#}
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "postgres",
+        "USER": "postgres.vcmafdafcmtlrvcxpxlz",
+        "PASSWORD": "wN5vJ&A6Aq3E6he",
+        "HOST": "aws-0-sa-east-1.pooler.supabase.com",
+        "PORT": "6543",
     }
 }
-
-#DATABASES = {
- #   "default": {
-  #      "ENGINE": "django.db.backends.postgresql",
-   #     "NAME": "postgres",
-    #    "USER": "postgres.vcmafdafcmtlrvcxpxlz",
-     #   "PASSWORD": "wN5vJ&A6Aq3E6he",
-      #  "HOST": "aws-0-sa-east-1.pooler.supabase.com",
-       # "PORT": "6543",
-    #}
-#}
 
 
 # Password validation
@@ -136,10 +136,8 @@ USE_TZ = True
 DEBUG = True
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    BASE_DIR.parent / 'static',  # Vai para a pasta raiz do projeto
-]
-STATIC_ROOT = BASE_DIR.parent / 'staticfiles'  # CORRIGIDO também
+STATICFILES_DIRS = [BASE_DIR.parent / 'static',] # Vai para a pasta raiz do projeto
+STATIC_ROOT = BASE_DIR.parent / 'static_gcloud/'  # CORRIGIDO também
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
