@@ -1,26 +1,27 @@
 {% extends "pages/base.html" %}
 {% load static %}
 
-{% block title %}Tipo de Cadastro - Athena{% endblock %}
+{% block title %}Escolha o Tipo de Cadastro - Athena{% endblock %}
+
+{% block masthead_class %} masthead--minimal{% endblock %}
 
 {% block hero_content %}
-<div class="container px-4 px-lg-5 text-center" style="padding: 80px 0;">
-    <h1 class="text-white">Criar Nova Conta</h1>
-    <p class="text-white-50">Escolha o tipo de cadastro mais adequado para você</p>
+<div class="container px-4 px-lg-5 text-center">
+    <h1 class="text-white">
+        <i class="fas fa-user-plus me-2"></i>Criar Conta
+    </h1>
+    <p class="text-white-50">Escolha o tipo de conta mais adequado para suas necessidades</p>
 </div>
 {% endblock %}
 
 {% block about_content %}
 <div class="container px-4 px-lg-5">
-    <div class="row gx-4 gx-lg-5 justify-content-center">
+    <div class="row justify-content-center">
         <div class="col-lg-10">
             
-            <h2 class="text-white mb-5 text-center">
-                <i class="fas fa-user-plus me-2"></i>
-                Qual tipo de conta você deseja criar?
-            </h2>
-            
-            <div class="row">
+            <!-- Cards de escolha -->
+            <div class="row g-4 mb-5">
+                
                 <!-- Empresa / Administrador -->
                 <div class="col-md-6 mb-4">
                     <div class="card bg-dark border-warning h-100 hover-card">
@@ -88,7 +89,7 @@
                 </div>
             </div>
             
-            <!-- Informações adiciais -->
+            <!-- Informações adicionais -->
             <div class="row mt-4">
                 <div class="col-12">
                     <div class="card bg-dark border-info">
@@ -105,14 +106,14 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="text-white-50">
-                                        <strong class="text-info">✅ Verificação:</strong><br>
-                                        Os usuários são validados no momento do cadastro
+                                        <strong class="text-info">⚡ Acesso Rápido:</strong><br>
+                                        Comece a usar o sistema imediatamente após o cadastro
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="text-white-50">
-                                        <strong class="text-info">🆘 Suporte:</strong><br>
-                                        Em caso de dúvidas, entre em contato conosco
+                                        <strong class="text-info">🎯 Suporte Completo:</strong><br>
+                                        Ajuda disponível durante todo o processo
                                     </div>
                                 </div>
                             </div>
@@ -121,15 +122,17 @@
                 </div>
             </div>
             
+            <!-- ✅ LINK DE LOGIN CORRIGIDO -->
             <div class="text-center mt-4">
                 <p class="text-white-50">
-                    Já tem uma conta? 
-                    <a href="{% url 'login' %}" class="text-primary">Faça login aqui</a>
+                    Já possui conta? 
+                    <!-- ✅ CORRIGIDO: usuarios:login em vez de login -->
+                    <a href="{% url 'usuarios:login' %}{% if next %}?next={{ next|urlencode }}{% endif %}" class="text-primary">
+                        <i class="fas fa-sign-in-alt me-1"></i>Faça login aqui
+                    </a>
                 </p>
-                <a href="{% url 'index' %}" class="btn btn-outline-light">
-                    <i class="fas fa-arrow-left me-2"></i>Voltar ao Início
-                </a>
             </div>
+            
         </div>
     </div>
 </div>
@@ -140,14 +143,3 @@
 {% block signup_content %}{% endblock %}
 {% block contact_content %}{% endblock %}
 {% block copyright %}Projeto Athena LGPD 2025{% endblock %}
-
-{% block extra_css %}
-<style>
-.hover-card {
-    transition: transform 0.2s;
-}
-.hover-card:hover {
-    transform: translateY(-5px);
-}
-</style>
-{% endblock %}
