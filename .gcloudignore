@@ -12,8 +12,27 @@
 # below:
 .git
 .gitignore
-
-# Python pycache:
+README.md
+.env
+.venv/
+venv/
 __pycache__/
-# Ignored by the build system
-/setup.cfg
+*.pyc
+*.pyo
+*.pyd
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+.tox
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.DS_Store
+.vscode/
+.idea/
+*.sqlite3
+db.sqlite3

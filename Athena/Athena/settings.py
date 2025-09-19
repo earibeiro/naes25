@@ -17,17 +17,17 @@ from django.contrib.messages import constants as messages
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# ✅ CONFIGURAÇÕES DE AMBIENTE
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-)&($w&%4f*50780q86o_55c-9e_3ij7#+_6s7)0rsnv!ur%ekw')
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-)&($w&%4f*50780q86o_55c-9e_3ij7#+_6s7)0rsnv!ur%ekw'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+# ✅ HOSTS PERMITIDOS
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '*.appspot.com',  # Google Cloud App Engine
+    'athena-lgpd.appspot.com',  # Seu domínio específico
+]
 
 
 # Application definition
@@ -80,13 +80,7 @@ WSGI_APPLICATION = 'Athena.Athena.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-#DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.sqlite3',
-#        'NAME': BASE_DIR / 'db.sqlite3',
-#    }
-#}
-
+# ✅ DATABASE - Manter PostgreSQL Supabase
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -103,59 +97,24 @@ DATABASES = {
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'pt-br'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Sao_Paulo'
 
 USE_I18N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
-DEBUG = True
-
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    BASE_DIR.parent / 'static', # Vai para a pasta raiz do projeto
-]
-STATIC_ROOT = BASE_DIR.parent / 'static_gcloud/'  # CORRIGIDO também
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
-CRISPY_TEMPLATE_PACK = "bootstrap4"
-
-# URLs de redirecionamento
-LOGIN_URL = "usuarios:login"
-LOGIN_REDIRECT_URL = "home"
-LOGOUT_REDIRECT_URL = "home"
-
-LANGUAGE_CODE = 'pt-br'
-TIME_ZONE = 'America/Sao_Paulo'
 USE_L10N = True
 
 DATE_FORMAT = 'd/m/Y'
@@ -165,6 +124,49 @@ THOUSAND_SEPARATOR = '.'
 DECIMAL_SEPARATOR = ','
 
 
+# ✅ STATIC FILES - Configuração para produção
+STATIC_URL = '/static/'
+
+if DEBUG:
+    # Desenvolvimento
+    STATICFILES_DIRS = [
+        BASE_DIR.parent / 'static',
+    ]
+else:
+    # Produção - Google Cloud
+    STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+
+# ✅ CONFIGURAÇÕES DE SEGURANÇA PARA PRODUÇÃO
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_BROWSER_XSS_FILTER = True
+    X_FRAME_OPTIONS = 'DENY'
+
+
+# Default primary key field type
+# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Crispy Forms
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
+CRISPY_TEMPLATE_PACK = "bootstrap4"
+
+
+# URLs de redirecionamento
+LOGIN_URL = "usuarios:login"
+LOGIN_REDIRECT_URL = "home"
+LOGOUT_REDIRECT_URL = "home"
+
+
+# Message Tags
 MESSAGE_TAGS = {
     messages.DEBUG: 'info',
     messages.INFO: 'info',
@@ -172,3 +174,25 @@ MESSAGE_TAGS = {
     messages.WARNING: 'warning',
     messages.ERROR: 'danger',
 }
+
+
+# ✅ LOGGING PARA PRODUÇÃO
+if not DEBUG:
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'file': {
+                'level': 'INFO',
+                'class': 'logging.FileHandler',
+                'filename': '/tmp/django.log',
+            },
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['file'],
+                'level': 'INFO',
+                'propagate': True,
+            },
+        },
+    }
