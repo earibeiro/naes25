@@ -176,23 +176,80 @@ MESSAGE_TAGS = {
 }
 
 
-# ✅ LOGGING PARA PRODUÇÃO
+# ✅ LOGGING CORRIGIDO - COMPATÍVEL COM WINDOWS E GOOGLE CLOUD
+import platform
+
+# Determinar diretório de logs baseado no sistema operacional
+if platform.system() == 'Windows':
+    # Windows - usar diretório temp do usuário
+    LOG_DIR = os.path.join(os.environ.get('TEMP', 'C:\\temp'), 'athena_logs')
+else:
+    # Linux/Unix/Google Cloud - usar /tmp
+    LOG_DIR = '/tmp'
+
+# Criar diretório de logs se não existir (apenas para Windows)
+if platform.system() == 'Windows' and not os.path.exists(LOG_DIR):
+    try:
+        os.makedirs(LOG_DIR, exist_ok=True)
+    except:
+        LOG_DIR = BASE_DIR / 'logs'  # Fallback para pasta do projeto
+        os.makedirs(LOG_DIR, exist_ok=True)
+
+# Configuração de logging apenas para produção
 if not DEBUG:
     LOGGING = {
         'version': 1,
         'disable_existing_loggers': False,
+        'formatters': {
+            'verbose': {
+                'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+                'style': '{',
+            },
+            'simple': {
+                'format': '{levelname} {message}',
+                'style': '{',
+            },
+        },
         'handlers': {
             'file': {
                 'level': 'INFO',
                 'class': 'logging.FileHandler',
-                'filename': '/tmp/django.log',
+                'filename': os.path.join(LOG_DIR, 'django.log'),
+                'formatter': 'verbose',
             },
+            'console': {
+                'level': 'INFO',
+                'class': 'logging.StreamHandler',
+                'formatter': 'simple',
+            },
+        },
+        'root': {
+            'handlers': ['console'],
         },
         'loggers': {
             'django': {
+                'handlers': ['file', 'console'],
+                'level': 'INFO',
+                'propagate': False,
+            },
+            'auditoria': {
                 'handlers': ['file'],
                 'level': 'INFO',
-                'propagate': True,
+                'propagate': False,
             },
+        },
+    }
+else:
+    # Desenvolvimento - logging simples
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+            },
+        },
+        'root': {
+            'handlers': ['console'],
         },
     }
