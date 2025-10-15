@@ -29,9 +29,7 @@ ALLOWED_HOSTS = [
     'athena-lgpd.appspot.com',  # Seu domínio específico
 ]
 
-
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -46,16 +44,31 @@ INSTALLED_APPS = [
     'crispy_bootstrap4',
 ]
 
+# ✅ DJANGO DEBUG TOOLBAR - APENAS EM DEBUG
+if DEBUG:
+    INSTALLED_APPS += ['debug_toolbar']
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+]
+
+# ✅ DEBUG TOOLBAR MIDDLEWARE - APÓS CommonMiddleware
+if DEBUG:
+    MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
+
+MIDDLEWARE += [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'auditoria.middleware.RequestStoreMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# ✅ INTERNAL IPS PARA DEBUG TOOLBAR
+if DEBUG:
+    INTERNAL_IPS = ["127.0.0.1", "localhost"]
 
 ROOT_URLCONF = 'Athena.Athena.urls'
 
@@ -76,10 +89,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Athena.Athena.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
 # ✅ DATABASE - Manter PostgreSQL Supabase
 DATABASES = {
     "default": {
@@ -92,10 +101,7 @@ DATABASES = {
     }
 }
 
-
 # Password validation
-# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -103,18 +109,11 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-
 # Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
-
 LANGUAGE_CODE = 'pt-br'
-
 TIME_ZONE = 'America/Sao_Paulo'
-
 USE_I18N = True
-
 USE_TZ = True
-
 USE_L10N = True
 
 DATE_FORMAT = 'd/m/Y'
@@ -122,7 +121,6 @@ DATETIME_FORMAT = 'd/m/Y H:i'
 USE_THOUSAND_SEPARATOR = True
 THOUSAND_SEPARATOR = '.'
 DECIMAL_SEPARATOR = ','
-
 
 # ✅ STATIC FILES - Configuração para produção
 STATIC_URL = '/static/'
@@ -136,7 +134,6 @@ else:
     # Produção - Google Cloud
     STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-
 # ✅ CONFIGURAÇÕES DE SEGURANÇA PARA PRODUÇÃO
 if not DEBUG:
     SECURE_SSL_REDIRECT = True
@@ -148,23 +145,17 @@ if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
     X_FRAME_OPTIONS = 'DENY'
 
-
 # Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
 
 # Crispy Forms
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
 CRISPY_TEMPLATE_PACK = "bootstrap4"
 
-
 # URLs de redirecionamento
 LOGIN_URL = "usuarios:login"
 LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "home"
-
 
 # Message Tags
 MESSAGE_TAGS = {
@@ -174,7 +165,6 @@ MESSAGE_TAGS = {
     messages.WARNING: 'warning',
     messages.ERROR: 'danger',
 }
-
 
 # ✅ LOGGING CORRIGIDO - COMPATÍVEL COM WINDOWS E GOOGLE CLOUD
 import platform
