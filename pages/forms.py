@@ -11,7 +11,7 @@ class PersonForm(forms.ModelForm):
     class Meta:
         model = Person
         fields = [
-            'full_name', 'birth_date', 'cpf', 'phone', 
+            'full_name', 'cpf', 'phone', 'birth_date',
             'address', 'city', 'data_processing_purpose'
         ]
         widgets = {
@@ -19,23 +19,23 @@ class PersonForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Nome completo da pessoa'
             }),
-            'birth_date': forms.DateInput(attrs={
-                'class': 'form-control',
-                'type': 'date'
-            }),
             'cpf': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'XXX.XXX.XXX-XX',
+                'placeholder': '000.000.000-00',
                 'data-mask': '000.000.000-00'
             }),
             'phone': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '(XX) XXXXX-XXXX',
+                'placeholder': '(00) 00000-0000',
                 'data-mask': '(00) 00000-0000'
+            }),
+            'birth_date': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date'
             }),
             'address': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Rua, número, bairro'
+                'placeholder': 'Endereço completo'
             }),
             'city': forms.Select(attrs={
                 'class': 'form-select'
@@ -43,14 +43,14 @@ class PersonForm(forms.ModelForm):
             'data_processing_purpose': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 3,
-                'placeholder': 'Descreva a finalidade do tratamento dos dados pessoais...'
+                'placeholder': 'Finalidade do tratamento dos dados...'
             }),
         }
         labels = {
             'full_name': 'Nome Completo',
-            'birth_date': 'Data de Nascimento',
             'cpf': 'CPF',
             'phone': 'Telefone',
+            'birth_date': 'Data de Nascimento',
             'address': 'Endereço',
             'city': 'Cidade',
             'data_processing_purpose': 'Finalidade do Tratamento (LGPD)',
@@ -60,11 +60,6 @@ class PersonForm(forms.ModelForm):
         # Remove o argumento 'user' se presente para evitar erro
         self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
-        
-        # Filtrar cidades por usuário se necessário
-        if self.user and not self.user.is_superuser:
-            # Lógica de filtro por usuário pode ser implementada aqui
-            pass
 
 
 class CompanyForm(forms.ModelForm):
@@ -72,9 +67,12 @@ class CompanyForm(forms.ModelForm):
     
     class Meta:
         model = Company
+        # ✅ CORRIGIDO: Usar apenas campos que existem em Company
         fields = [
-            'corporate_name', 'trade_name', 'cnpj', 'phone', 'email',
-            'address', 'city', 'data_processing_purpose'
+            'corporate_name', 'trade_name', 'cnpj', 'phone',
+            'address', 'city', 
+            'data_controller_name', 'data_controller_email',
+            'consent_text'
         ]
         widgets = {
             'corporate_name': forms.TextInput(attrs={
@@ -88,16 +86,12 @@ class CompanyForm(forms.ModelForm):
             'cnpj': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'XX.XXX.XXX/XXXX-XX',
-                'data-mask': '00.000.000/0000-00'
+                'data-mask': 'cnpj'
             }),
             'phone': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': '(XX) XXXXX-XXXX',
-                'data-mask': '(00) 00000-0000'
-            }),
-            'email': forms.EmailInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'contato@empresa.com'
+                'data-mask': 'telefone'
             }),
             'address': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -106,10 +100,18 @@ class CompanyForm(forms.ModelForm):
             'city': forms.Select(attrs={
                 'class': 'form-select'
             }),
-            'data_processing_purpose': forms.Textarea(attrs={
+            'data_controller_name': forms.TextInput(attrs={
                 'class': 'form-control',
-                'rows': 3,
-                'placeholder': 'Finalidade do tratamento dos dados da empresa...'
+                'placeholder': 'Nome do Encarregado de Dados (DPO)'
+            }),
+            'data_controller_email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'dpo@empresa.com'
+            }),
+            'consent_text': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 4,
+                'placeholder': 'Texto do consentimento LGPD...'
             }),
         }
         labels = {
@@ -117,10 +119,11 @@ class CompanyForm(forms.ModelForm):
             'trade_name': 'Nome Fantasia',
             'cnpj': 'CNPJ',
             'phone': 'Telefone',
-            'email': 'E-mail',
             'address': 'Endereço',
             'city': 'Cidade',
-            'data_processing_purpose': 'Finalidade do Tratamento (LGPD)',
+            'data_controller_name': 'Encarregado de Dados (DPO)',
+            'data_controller_email': 'E-mail do Encarregado',
+            'consent_text': 'Texto do Consentimento LGPD',
         }
     
     def __init__(self, *args, **kwargs):
@@ -136,7 +139,7 @@ class ContractForm(forms.ModelForm):
         model = Contract
         fields = [
             'title', 'description', 'contract_type', 'person', 'company', 
-            'data_processing_purpose', 'start_date', 'end_date'
+            'data_processing_purpose', 'start_date', 'end_date', 'value', 'is_active'
         ]
         widgets = {
             'title': forms.TextInput(attrs={
@@ -157,12 +160,12 @@ class ContractForm(forms.ModelForm):
             }),
             'company': forms.Select(attrs={
                 'class': 'form-select',
-                'data-placeholder': 'Selecione a empresa (opcional)...'
+                'data-placeholder': 'Selecione a empresa...'
             }),
             'data_processing_purpose': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 3,
-                'placeholder': 'Ex: Tratamento de dados para execução do contrato de serviços...'
+                'placeholder': 'Descreva a finalidade do tratamento dos dados neste contrato...'
             }),
             'start_date': forms.DateInput(attrs={
                 'class': 'form-control',
@@ -172,6 +175,26 @@ class ContractForm(forms.ModelForm):
                 'class': 'form-control',
                 'type': 'date'
             }),
+            'value': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': '0.00',
+                'step': '0.01'
+            }),
+            'is_active': forms.CheckboxInput(attrs={
+                'class': 'form-check-input'
+            }),
+        }
+        labels = {
+            'title': 'Título do Contrato',
+            'description': 'Descrição',
+            'contract_type': 'Tipo de Contrato',
+            'person': 'Pessoa Física',
+            'company': 'Empresa',
+            'data_processing_purpose': 'Finalidade do Tratamento de Dados (LGPD)',
+            'start_date': 'Data de Início',
+            'end_date': 'Data de Fim',
+            'value': 'Valor do Contrato (R$)',
+            'is_active': 'Contrato Ativo',
         }
     
     def __init__(self, *args, **kwargs):
@@ -183,8 +206,8 @@ class ContractForm(forms.ModelForm):
             self.fields['company'].queryset = Company.objects.filter(usuario=user)
             
             self.fields['person'].empty_label = "Selecione a pessoa física..."
-            self.fields['company'].empty_label = "Selecione a empresa (opcional)..."
-        
+            self.fields['company'].empty_label = "Selecione a empresa..."
+
 
 class StateForm(forms.ModelForm):
     """Formulário para State (apenas admin)"""
@@ -199,8 +222,8 @@ class StateForm(forms.ModelForm):
             }),
             'abbreviation': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'SP',
-                'maxlength': 2
+                'placeholder': 'UF',
+                'maxlength': '2'
             }),
         }
         labels = {
