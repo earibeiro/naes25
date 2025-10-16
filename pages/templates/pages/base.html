@@ -5,208 +5,130 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <meta name="description" content="" />
-    <meta name="author" content="" />
+    <meta name="description" content="Sistema de gestão de contratos e dados LGPD" />
+    <meta name="author" content="Athena LGPD" />
     <title>{% block title %}Athena - Sistema LGPD{% endblock %}</title>
-    <!-- Favicon-->
     <link rel="icon" type="image/x-icon" href="{% static 'assets/favicon.ico' %}" />
+    
     <!-- Font Awesome icons (free version)-->
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    
     <!-- Google fonts-->
     <link href="https://fonts.googleapis.com/css?family=Varela+Round" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet" />
+    
     <!-- Core theme CSS (includes Bootstrap)-->
     <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
-    <!-- ✅ CUSTOM CSS OVERRIDES - DEVE VIR DEPOIS DO TEMA -->
-    <link href="{% static 'css/custom.css' %}" rel="stylesheet" />
     
-    <!-- CSS customizado para mensagens -->
-    <style>
-        .messages-container {
-            position: fixed;
-            top: 80px;
-            right: 20px;
-            z-index: 9999;
-            max-width: 400px;
-        }
-        .alert {
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-    </style>
+    <!-- ✅ DATATABLES CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.7/css/dataTables.bootstrap5.min.css">
+    
+    <!-- ✅ FLATPICKR CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    
+    {% block extra_css %}{% endblock %}
 </head>
 <body id="page-top">
     <!-- Navigation-->
     <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
         <div class="container px-4 px-lg-5">
-            <a class="navbar-brand" href="{% url 'index' %}">Athena</a>
+            <a class="navbar-brand" href="{% url 'index' %}">
+                <i class="fas fa-shield-alt me-2"></i>Athena LGPD
+            </a>
             <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                 Menu
                 <i class="fas fa-bars"></i>
             </button>
             <div class="collapse navbar-collapse" id="navbarResponsive">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">Início</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">Sobre</a></li>
-                    
                     {% if user.is_authenticated %}
-                        <!-- Menu para usuários autenticados -->
                         <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Dashboard</a></li>
-                        
-                        <!-- Dropdown de dados -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDataDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Dados
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDataDropdown">
-                                <li><a class="dropdown-item" href="{% url 'person-list' %}">
-                                    <i class="fas fa-users me-1"></i>Pessoas
-                                </a></li>
-                                <li><a class="dropdown-item" href="{% url 'company-list' %}">
-                                    <i class="fas fa-building me-1"></i>Empresas
-                                </a></li>
-                                <li><a class="dropdown-item" href="{% url 'contract-list' %}">
-                                    <i class="fas fa-file-contract me-1"></i>Contratos
-                                </a></li>
-                                {% if user.is_superuser or user.groups.all %}
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="{% url 'state-list' %}">
-                                        <i class="fas fa-map me-1"></i>Estados
-                                    </a></li>
-                                    <li><a class="dropdown-item" href="{% url 'city-list' %}">
-                                        <i class="fas fa-city me-1"></i>Cidades
-                                    </a></li>
-                                {% endif %}
-                            </ul>
-                        </li>
-                        
-                        <!-- Dropdown do usuário -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarUserDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-user me-1"></i>{{ user.username }}
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarUserDropdown">
-                                <li><hr class="dropdown-divider"></li>
-                                
-                                <!-- Link para alterar senha -->
-                                <li><a class="dropdown-item" href="{% url 'usuarios:change-password' %}">
-                                    <i class="fas fa-key me-1"></i>Alterar Senha
-                                </a></li>
-                                
-                                <!-- Link para logs (apenas para usuários com grupos) -->
-                                {% if user.is_superuser or user.groups.exists %}
-                                    <li><a class="dropdown-item" href="{% url 'auditoria:activity-logs' %}">
-                                        <i class="fas fa-history me-1"></i>Logs de Atividade
-                                    </a></li>
-                                {% endif %}
-                                
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <form method="post" action="{% url 'usuarios:logout' %}" style="margin: 0;">
-                                        {% csrf_token %}
-                                        <button type="submit" class="dropdown-item" style="border: none; background: none; width: 100%; text-align: left; padding: 0.25rem 1.5rem; color: inherit; cursor: pointer;">
-                                            <i class="fas fa-sign-out-alt me-1"></i>Sair
-                                        </button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'person-list' %}">Pessoas</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'company-list' %}">Empresas</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'contract-list' %}">Contratos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'usuarios:logout' %}">Sair</a></li>
                     {% else %}
-                        <!-- Menu para usuários não autenticados -->
-                        <li class="nav-item"><a class="nav-link" href="{% url 'usuarios:login' %}">Entrar</a></li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'usuarios:cadastro-escolha' %}{% if request.GET.next %}?next={{ request.GET.next|urlencode }}{% endif %}">
-                                Criar Conta
-                            </a>
-                        </li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">Sobre</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'usuarios:login' %}">Login</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'usuarios:escolha_tipo_cadastro' %}">Cadastrar</a></li>
                     {% endif %}
                 </ul>
             </div>
         </div>
     </nav>
 
-    <!-- Masthead/Header -->
+    <!-- Masthead-->
     <header class="masthead{% block masthead_class %}{% endblock %}">
         <div class="container px-4 px-lg-5 d-flex h-100 align-items-center justify-content-center">
             <div class="d-flex justify-content-center">
                 <div class="text-center">
                     {% block hero_content %}
                     <h1 class="mx-auto my-0 text-uppercase">Athena</h1>
-                    <h2 class="text-white-50 mx-auto mt-2 mb-5">Sistema de Gestão LGPD - Contratos e Conformidade</h2>
+                    <h2 class="text-white-50 mx-auto mt-2 mb-5">Sistema de Gestão de Dados LGPD</h2>
                     <a class="btn btn-primary" href="#about">Começar</a>
                     {% endblock %}
                 </div>
             </div>
         </div>
     </header>
-    
-    <!-- ✅ SISTEMA DE MENSAGENS -->
-    {% if messages %}
-        <div class="messages-container">
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show shadow-lg mb-2" role="alert">
-                    {% if message.tags == 'error' %}
-                        <i class="fas fa-exclamation-triangle me-2"></i>
-                    {% elif message.tags == 'warning' %}
-                        <i class="fas fa-exclamation-circle me-2"></i>
-                    {% elif message.tags == 'success' %}
-                        <i class="fas fa-check-circle me-2"></i>
-                    {% elif message.tags == 'info' %}
-                        <i class="fas fa-info-circle me-2"></i>
-                    {% else %}
-                        <i class="fas fa-bell me-2"></i>
-                    {% endif %}
-                    
-                    <strong>{{ message }}</strong>
-                    
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
 
-    <!-- CONTEÚDO PRINCIPAL -->
-    {% block content %}
-        {% block about_content %}{% endblock %}
-        {% block about_image %}{% endblock %}
-        {% block projects_content %}{% endblock %}
-        {% block signup_content %}{% endblock %}
-        {% block contact_content %}{% endblock %}
+    <!-- About-->
+    <section class="about-section text-center" id="about">
+        <div class="container px-4 px-lg-5">
+            {% block about_content %}{% endblock %}
+        </div>
+    </section>
+
+    <!-- About Image -->
+    {% block about_image %}
+    <section class="about-section bg-light" id="about-image">
+        <div class="container px-4 px-lg-5">
+            <div class="row gx-4 gx-lg-5 justify-content-center">
+                <div class="col-lg-8">
+                    <img class="img-fluid" src="{% static 'assets/img/ipad.png' %}" alt="..." />
+                </div>
+            </div>
+        </div>
+    </section>
     {% endblock %}
+
+    <!-- Projects-->
+    {% block projects_content %}{% endblock %}
+
+    <!-- Signup-->
+    {% block signup_content %}{% endblock %}
+
+    <!-- Contact-->
+    {% block contact_content %}{% endblock %}
 
     <!-- Footer-->
     <footer class="footer bg-black small text-center text-white-50">
-        <div class="container px-4 px-lg-5">
-            {% block copyright %}Copyright &copy; {% now "Y" %} - Athena LGPD{% endblock %}
-        </div>
+        <div class="container px-4 px-lg-5">{% block copyright %}Copyright &copy; Athena 2025{% endblock %}</div>
     </footer>
+
+    <!-- ✅ JQUERY (ANTES DE TUDO) -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" 
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" 
+            crossorigin="anonymous"></script>
     
     <!-- Bootstrap core JS-->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- ✅ DATATABLES JS -->
+    <script src="https://cdn.datatables.net/2.0.7/js/dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/2.0.7/js/dataTables.bootstrap5.min.js"></script>
+    
+    <!-- ✅ INPUTMASK (MÁSCARAS) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/inputmask/5.0.9/jquery.inputmask.min.js"></script>
+    
+    <!-- ✅ FLATPICKR (CALENDÁRIO) -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
+    
     <!-- Core theme JS-->
     <script src="{% static 'js/scripts.js' %}"></script>
     
-    <!-- JAVASCRIPT PARA AUTO-HIDE DAS MENSAGENS -->
-    <script>
-        // Auto-hide messages after 5 seconds (success/info only)
-        document.addEventListener('DOMContentLoaded', function() {
-            const messages = document.querySelectorAll('.alert');
-            
-            messages.forEach(function(message) {
-                // Auto-hide apenas success e info
-                if (message.classList.contains('alert-success') || message.classList.contains('alert-info')) {
-                    setTimeout(function() {
-                        if (message && message.parentNode) {
-                            message.classList.remove('show');
-                            setTimeout(function() {
-                                if (message.parentNode) {
-                                    message.parentNode.removeChild(message);
-                                }
-                            }, 150);
-                        }
-                    }, 5000); // 5 segundos
-                }
-            });
-        });
-    </script>
+    <!-- ✅ BLOCO PARA JS CUSTOMIZADO -->
+    {% block extra_js %}{% endblock %}
 </body>
 </html>
