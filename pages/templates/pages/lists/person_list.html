@@ -1,20 +1,19 @@
 {% extends "pages/base.html" %}
 {% load static %}
 
-{% block title %}Pessoas Cadastradas - Athena{% endblock %}
+{% block title %}Pessoas - Athena{% endblock %}
 
-<!-- ✅ MASTHEAD COMPACTO PARA PÁGINAS INTERNAS -->
+<!-- ✅ MASTHEAD COMPACTO -->
 {% block masthead_class %} masthead--compact{% endblock %}
 
 {% block hero_content %}
 <div class="container px-4 px-lg-5 text-center">
-    <h1 class="text-white">👥 Pessoas Físicas</h1>
-    <p class="text-white-50">Gestão completa de pessoas cadastradas no sistema</p>
+    <h1 class="text-white">👥 Pessoas</h1>
+    <p class="text-white-50">Gestão de pessoas físicas cadastradas</p>
 </div>
 {% endblock %}
 
 {% block about_content %}
-<!-- ✅ HEADER COM BOTÃO DE AÇÃO NO TOPO -->
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3 m-0 text-white">
@@ -24,38 +23,79 @@
             <i class="fas fa-user-plus me-2"></i>Nova Pessoa
         </a>
     </div>
+
+    <!-- ✅ FILTROS -->
+    <div class="card bg-dark text-white mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-filter me-2"></i>Filtros de Busca
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">{{ filter.form.nome.label }}</label>
+                    {{ filter.form.nome }}
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">{{ filter.form.cpf.label }}</label>
+                    {{ filter.form.cpf }}
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">{{ filter.form.cidade.label }}</label>
+                    {{ filter.form.cidade }}
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">{{ filter.form.criada_de.label }}</label>
+                    {{ filter.form.criada_de }}
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">{{ filter.form.criada_ate.label }}</label>
+                    {{ filter.form.criada_ate }}
+                </div>
+                <div class="col-md-6 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="fas fa-search me-1"></i>Filtrar
+                    </button>
+                    <a href="{% url 'person-list' %}" class="btn btn-secondary">
+                        <i class="fas fa-times me-1"></i>Limpar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
     
-    <!-- Estatísticas em Cards -->
+    <!-- ✅ ESTATÍSTICAS -->
     <div class="row g-4 kpi-grid mb-4">
         <div class="col-12 col-md-3">
             <div class="card kpi-card bg-primary text-white h-100 shadow rounded-4">
                 <div class="card-body text-center">
                     <i class="fas fa-users fa-2x mb-2"></i>
-                    <div class="kpi-value">{{ persons|length }}</div>
-                    <div class="kpi-label">Total</div>
+                    <div class="kpi-value">{{ page_obj.paginator.count|default:persons|length }}</div>
+                    <div class="kpi-label">Total de Pessoas</div>
                 </div>
             </div>
         </div>
         <div class="col-12 col-md-3">
-            <div class="card kpi-card bg-success text-white h-100 shadow rounded-4">
+            <div class="card kpi-card bg-info text-white h-100 shadow rounded-4">
                 <div class="card-body text-center">
-                    <i class="fas fa-user-plus fa-2x mb-2"></i>
+                    <i class="fas fa-calendar-week fa-2x mb-2"></i>
                     <div class="kpi-value">0</div>
                     <div class="kpi-label">Esta Semana</div>
                 </div>
             </div>
         </div>
         <div class="col-12 col-md-3">
-            <div class="card kpi-card bg-warning text-white h-100 shadow rounded-4">
+            <div class="card kpi-card bg-success text-white h-100 shadow rounded-4">
                 <div class="card-body text-center">
-                    <i class="fas fa-clock fa-2x mb-2"></i>
-                    <div class="kpi-value">0</div>
-                    <div class="kpi-label">Pendentes</div>
+                    <i class="fas fa-check-circle fa-2x mb-2"></i>
+                    <div class="kpi-value">{{ page_obj.paginator.count|default:persons|length }}</div>
+                    <div class="kpi-label">Ativas</div>
                 </div>
             </div>
         </div>
         <div class="col-12 col-md-3">
-            <div class="card kpi-card bg-teal text-white h-100 shadow rounded-4">
+            <div class="card kpi-card bg-warning text-dark h-100 shadow rounded-4">
                 <div class="card-body text-center">
                     <i class="fas fa-file-contract fa-2x mb-2"></i>
                     <div class="kpi-value">0</div>
@@ -94,12 +134,7 @@
                                             <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
                                                 <i class="fas fa-user text-white"></i>
                                             </div>
-                                            <div>
-                                                <strong>{{ person.full_name }}</strong>
-                                                {% if person.birth_date %}
-                                                    <br><small class="text-muted">{{ person.birth_date|date:"d/m/Y" }}</small>
-                                                {% endif %}
-                                            </div>
+                                            <strong>{{ person.full_name }}</strong>
                                         </div>
                                     </td>
                                     <td>
@@ -160,15 +195,51 @@
                 </div>
             </div>
         </div>
+
+        <!-- Paginação -->
+        {% if is_paginated %}
+            <nav aria-label="Navegação de página" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page=1">Primeira</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page={{ page_obj.previous_page_number }}">Anterior</a>
+                        </li>
+                    {% endif %}
+
+                    <li class="page-item active">
+                        <span class="page-link">
+                            Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                        </span>
+                    </li>
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page={{ page_obj.next_page_number }}">Próxima</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page={{ page_obj.paginator.num_pages }}">Última</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
         
     {% else %}
-        <!-- Estado vazio com melhor design -->
+        <!-- Estado vazio -->
         <div class="card bg-dark text-white shadow rounded-4">
             <div class="card-body text-center py-5">
-                <i class="fas fa-user-friends fa-5x text-muted mb-4"></i>
-                <h4 class="text-white mb-3">Nenhuma pessoa cadastrada</h4>
+                <i class="fas fa-users fa-5x text-muted mb-4"></i>
+                <h4 class="text-white mb-3">Nenhuma pessoa encontrada</h4>
                 <p class="text-white-50 mb-4">
-                    Comece cadastrando sua primeira pessoa no sistema.
+                    {% if request.GET %}
+                        Nenhuma pessoa corresponde aos filtros aplicados.
+                        <a href="{% url 'person-list' %}" class="alert-link">Limpar filtros</a>
+                    {% else %}
+                        Comece cadastrando sua primeira pessoa no sistema.
+                    {% endif %}
                 </p>
                 <a href="{% url 'person-create' %}" class="btn btn-primary btn-lg">
                     <i class="fas fa-user-plus me-2"></i>Cadastrar Primeira Pessoa
