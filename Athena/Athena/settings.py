@@ -13,23 +13,41 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 from django.contrib.messages import constants as messages
+import platform
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# ✅ CONFIGURAÇÕES DE AMBIENTE
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
+
+# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-)&($w&%4f*50780q86o_55c-9e_3ij7#+_6s7)0rsnv!ur%ekw')
 
-# ✅ HOSTS PERMITIDOS
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+
+# ✅ MUDANÇA 1: ALLOWED_HOSTS
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    '*.appspot.com',  # Google Cloud App Engine
-    'athena-lgpd.appspot.com',  # Seu domínio específico
+    '.appspot.com',  # ← NOVO
+    'project-athena-0316.rj.r.appspot.com',  # ← NOVO
 ]
 
+# ✅ MUDANÇA 2: CSRF_TRUSTED_ORIGINS (NOVO BLOCO)
+CSRF_TRUSTED_ORIGINS = [
+    'https://project-athena-0316.rj.r.appspot.com',
+    'https://*.appspot.com',
+]
+
+# ✅ MUDANÇA 3: SECURE_PROXY_SSL_HEADER (NOVO BLOCO)
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+
 # Application definition
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -44,9 +62,10 @@ INSTALLED_APPS = [
     'crispy_bootstrap4',
 ]
 
-# ✅ DJANGO DEBUG TOOLBAR - APENAS EM DEBUG
+# ✅ MUDANÇA 4: DEBUG TOOLBAR (NOVO BLOCO)
 if DEBUG:
     INSTALLED_APPS += ['debug_toolbar']
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -54,7 +73,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
 ]
 
-# ✅ DEBUG TOOLBAR MIDDLEWARE - APÓS CommonMiddleware
+# ✅ MUDANÇA 5: DEBUG TOOLBAR MIDDLEWARE (NOVO BLOCO)
 if DEBUG:
     MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
 
@@ -66,9 +85,10 @@ MIDDLEWARE += [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# ✅ INTERNAL IPS PARA DEBUG TOOLBAR
+# ✅ MUDANÇA 6: INTERNAL_IPS (NOVO BLOCO)
 if DEBUG:
     INTERNAL_IPS = ["127.0.0.1", "localhost"]
+
 
 ROOT_URLCONF = 'Athena.Athena.urls'
 
@@ -89,7 +109,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Athena.Athena.wsgi.application'
 
-# ✅ DATABASE - Manter PostgreSQL Supabase
+
+# Database
+# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -101,28 +124,52 @@ DATABASES = {
     }
 }
 
+
 # Password validation
+# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
+
 AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
 ]
 
+
 # Internationalization
+# https://docs.djangoproject.com/en/5.2/topics/i18n/
+
 LANGUAGE_CODE = 'pt-br'
+
 TIME_ZONE = 'America/Sao_Paulo'
+
 USE_I18N = True
+
 USE_TZ = True
+
 USE_L10N = True
 
+# Formatos de data
 DATE_FORMAT = 'd/m/Y'
 DATETIME_FORMAT = 'd/m/Y H:i'
+
+# Formatação de números
 USE_THOUSAND_SEPARATOR = True
 THOUSAND_SEPARATOR = '.'
 DECIMAL_SEPARATOR = ','
 
-# ✅ STATIC FILES - Configuração para produção
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/5.2/howto/static-files/
+
 STATIC_URL = '/static/'
 
 if DEBUG:
@@ -134,7 +181,8 @@ else:
     # Produção - Google Cloud
     STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# ✅ CONFIGURAÇÕES DE SEGURANÇA PARA PRODUÇÃO
+
+# ✅ CONFIGURAÇÕES DE SEGURANÇA PARA PRODUÇÃO (JÁ EXISTE, MANTER)
 if not DEBUG:
     SECURE_SSL_REDIRECT = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -145,7 +193,10 @@ if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
     X_FRAME_OPTIONS = 'DENY'
 
+
 # Default primary key field type
+# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Crispy Forms
@@ -166,15 +217,11 @@ MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
 
-# ✅ LOGGING CORRIGIDO - COMPATÍVEL COM WINDOWS E GOOGLE CLOUD
-import platform
-
+# ✅ LOGGING (JÁ EXISTE, MANTER)
 # Determinar diretório de logs baseado no sistema operacional
 if platform.system() == 'Windows':
-    # Windows - usar diretório temp do usuário
     LOG_DIR = os.path.join(os.environ.get('TEMP', 'C:\\temp'), 'athena_logs')
 else:
-    # Linux/Unix/Google Cloud - usar /tmp
     LOG_DIR = '/tmp'
 
 # Criar diretório de logs se não existir (apenas para Windows)
@@ -182,7 +229,7 @@ if platform.system() == 'Windows' and not os.path.exists(LOG_DIR):
     try:
         os.makedirs(LOG_DIR, exist_ok=True)
     except:
-        LOG_DIR = BASE_DIR / 'logs'  # Fallback para pasta do projeto
+        LOG_DIR = BASE_DIR / 'logs'
         os.makedirs(LOG_DIR, exist_ok=True)
 
 # Configuração de logging apenas para produção
