@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'auditoria.apps.AuditoriaConfig',
     'crispy_forms',
     'crispy_bootstrap4',
+    'django_filters',
 ]
 
 # ✅ MUDANÇA 4: DEBUG TOOLBAR (NOVO BLOCO)

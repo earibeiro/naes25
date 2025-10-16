@@ -46,3 +46,4 @@ virtualenv-clone==0.5.7
 virtualenvwrapper==6.1.1
 virtualenvwrapper-win==1.2.7
 django-debug-toolbar>=4.4
+django-filter>=24.2

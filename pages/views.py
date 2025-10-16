@@ -8,9 +8,9 @@ from django.contrib import messages
 from django.utils import timezone
 from django.core.exceptions import PermissionDenied
 from datetime import timedelta
-from .models import Person, Company, Contract, State, City
+from django_filters.views import FilterView  # ✅ NOVO IMPORT
 
-# IMPORTAR MIXINS DO PRÓPRIO APP (LOCAL)
+from .models import Person, Company, Contract, State, City
 from .mixins import (
     OwnerQuerysetMixin, 
     OwnerObjectPermissionMixin, 
@@ -21,9 +21,8 @@ from .mixins import (
     AdminRequiredMixin,
     StaffRequiredMixin
 )
-
-# ✅ IMPORTAR FORMS CUSTOMIZADOS
 from .forms import PersonForm, CompanyForm, ContractForm, StateForm, CityForm
+from .filters import ContractFilter, CompanyFilter, PersonFilter  # ✅ NOVO IMPORT
 
 # ===========================================
 # VIEWS BÁSICAS (INDEX, ABOUT, HOME)
@@ -78,12 +77,13 @@ class HomeView(LoginRequiredMixin, TemplateView):
 # VIEWS PARA PERSON (PESSOA) - COM PROTEÇÃO
 # ===========================================
 
-class PersonListView(FuncionarioRequiredMixin, OwnerQuerysetMixin, ListView):
+class PersonListView(FuncionarioRequiredMixin, OwnerQuerysetMixin, FilterView):
     """ListView para pessoas - requer grupo funcionario + escopo por usuário"""
     model = Person
     template_name = 'pages/lists/person_list.html'
     context_object_name = 'persons'
     paginate_by = 10
+    filterset_class = PersonFilter  # ✅ NOVO
     
     # ✅ OTIMIZAÇÃO N+1: select_related para FK city e city.state
     def get_queryset(self):
@@ -164,12 +164,13 @@ class PersonDeleteView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, Funcionar
 # VIEWS PARA COMPANY (EMPRESA) - COM PROTEÇÃO
 # ===========================================
 
-class CompanyListView(FuncionarioRequiredMixin, OwnerQuerysetMixin, ListView):
+class CompanyListView(FuncionarioRequiredMixin, OwnerQuerysetMixin, FilterView):
     """ListView para empresas - requer grupo funcionario + escopo por usuário"""
     model = Company
     template_name = 'pages/lists/company_list.html'
     context_object_name = 'companies'
     paginate_by = 10
+    filterset_class = CompanyFilter  # ✅ NOVO
     
     # ✅ OTIMIZAÇÃO N+1: select_related para FK
     def get_queryset(self):
@@ -250,12 +251,13 @@ class CompanyDeleteView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, Funciona
 # VIEWS PARA CONTRACT (CONTRATO) - COM PROTEÇÃO
 # ===========================================
 
-class ContractListView(FuncionarioRequiredMixin, OwnerQuerysetMixin, ListView):
+class ContractListView(FuncionarioRequiredMixin, OwnerQuerysetMixin, FilterView):
     """ListView para contratos - requer grupo funcionario + escopo por usuário"""
     model = Contract
     template_name = 'pages/lists/contract_list.html'
     context_object_name = 'contracts'
     paginate_by = 10
+    filterset_class = ContractFilter  # ✅ NOVO
     
     # ✅ OTIMIZAÇÃO N+1: select_related para todas as FKs
     def get_queryset(self):
