@@ -35,7 +35,6 @@ db.sqlite3
 db.sqlite3-journal
 *.log
 logs/
-staticfiles/
 media/
 
 # Development
@@ -65,12 +64,9 @@ temp/
 tmp/
 
 # Scripts temporários
-fix_all_indexes.py
-create_contract_table.py
-create_contract_table_manual.py
-check_schema.py
-remove_index.py
-
-# Backup files
+fix_*.py
+create_*.py
+check_*.py
+remove_*.py
 backup*.sql
 backup*.json
