@@ -10,29 +10,67 @@
 # If you would like to upload your .git directory, .gitignore file or files
 # from your .gitignore file, remove the corresponding line
 # below:
+# Git files
 .git
 .gitignore
-README.md
-.env
-.venv/
-venv/
+.github/
+
+# Python
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*$py.class
+*.so
 .Python
-pip-log.txt
-pip-delete-this-directory.txt
-.tox
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
+venv/
+env/
+ENV/
+*.egg-info/
+dist/
+build/
+
+# Django
+*.sqlite3
+*.sqlite3-journal
+db.sqlite3
+db.sqlite3-journal
 *.log
-.DS_Store
+logs/
+staticfiles/
+media/
+
+# Development
+.env
 .vscode/
 .idea/
-*.sqlite3
-db.sqlite3
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Documentation
+README.md
+CHANGELOG.md
+docs/
+
+# Temporary files
+*.bak
+*.tmp
+temp/
+tmp/
+
+# Scripts temporários
+fix_all_indexes.py
+create_contract_table.py
+create_contract_table_manual.py
+check_schema.py
+remove_index.py
+
+# Backup files
+backup*.sql
+backup*.json
