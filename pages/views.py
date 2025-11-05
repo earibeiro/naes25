@@ -429,115 +429,58 @@ class ContractDeleteView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, Funcion
         return response
 
 
-# ===========================================
-# VIEWS PARA STATE (ESTADO) - APENAS ADMIN
-# ===========================================
+# =====================================================
+# STATE VIEWS
+# =====================================================
 
-class StateListView(LoginRequiredMixin, ListView):
+class StateListView(AdminRequiredMixin, FilterView):
+    """Lista de estados - APENAS ADMIN"""
     model = State
     template_name = 'pages/lists/state_list.html'
     context_object_name = 'states'
-    paginate_by = 10
-
-    def get_queryset(self):
-        queryset = State.objects.annotate(
-            total_cities=Count('city')
-        ).order_by('name')
-        
-        # Apply filters
-        self.filterset = StateFilter(self.request.GET, queryset=queryset)
-        return self.filterset.qs
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['filter'] = self.filterset
-        context['total_states'] = self.filterset.qs.count()
-        return context
+    filterset_class = StateFilter
+    paginate_by = 25
 
 
-# ✅ ADICIONAR ESTA VIEW (ESTAVA FALTANDO)
-class StateDetailView(LoginRequiredMixin, DetailView):
-    """
-    View para exibir detalhes de um Estado específico
-    """
+class StateCreateView(AdminRequiredMixin, CreateView):
+    """Criar estado - APENAS ADMIN"""
     model = State
-    template_name = 'pages/detail/state_detail.html'
+    form_class = StateForm
+    template_name = 'pages/forms/state_form.html'
+    success_url = reverse_lazy('state-list')
+    
+    def form_valid(self, form):
+        messages.success(self.request, '✅ Estado criado com sucesso!')
+        return super().form_valid(form)
+
+
+class StateDetailView(AdminRequiredMixin, DetailView):
+    """Detalhes do estado - APENAS ADMIN"""
+    model = State
+    template_name = 'pages/details/state_detail.html'
     context_object_name = 'state'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        state = self.get_object()
-        
-        # Cities in this state
-        context['cities'] = state.city_set.all().order_by('name')
-        context['total_cities'] = state.city_set.count()
-        
-        # Breadcrumbs
-        context['breadcrumbs'] = [
-            {'title': 'Home', 'url': 'home'},
-            {'title': 'Estados', 'url': 'state-list'},
-            {'title': state.name, 'url': None}
-        ]
-        
-        return context
 
-
-class StateCreateView(LoginRequiredMixin, CreateView):
+class StateUpdateView(AdminRequiredMixin, UpdateView):
+    """Editar estado - APENAS ADMIN"""
     model = State
     form_class = StateForm
     template_name = 'pages/forms/state_form.html'
     success_url = reverse_lazy('state-list')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['breadcrumbs'] = [
-            {'title': 'Home', 'url': 'home'},
-            {'title': 'Estados', 'url': 'state-list'},
-            {'title': 'Novo Estado', 'url': None}
-        ]
-        return context
-
+    
     def form_valid(self, form):
-        messages.success(self.request, 'Estado cadastrado com sucesso!')
+        messages.success(self.request, '✅ Estado atualizado com sucesso!')
         return super().form_valid(form)
 
 
-class StateUpdateView(LoginRequiredMixin, UpdateView):
+class StateDeleteView(AdminRequiredMixin, DeleteView):
+    """Deletar estado - APENAS ADMIN"""
     model = State
-    form_class = StateForm
-    template_name = 'pages/forms/state_form.html'
+    template_name = 'pages/confirms/state_confirm_delete.html'
     success_url = reverse_lazy('state-list')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['breadcrumbs'] = [
-            {'title': 'Home', 'url': 'home'},
-            {'title': 'Estados', 'url': 'state-list'},
-            {'title': f'Editar {self.object.name}', 'url': None}
-        ]
-        return context
-
-    def form_valid(self, form):
-        messages.success(self.request, 'Estado atualizado com sucesso!')
-        return super().form_valid(form)
-
-
-class StateDeleteView(LoginRequiredMixin, DeleteView):
-    model = State
-    template_name = 'pages/confirm/state_confirm_delete.html'
-    success_url = reverse_lazy('state-list')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['breadcrumbs'] = [
-            {'title': 'Home', 'url': 'home'},
-            {'title': 'Estados', 'url': 'state-list'},
-            {'title': f'Deletar {self.object.name}', 'url': None}
-        ]
-        return context
-
+    
     def delete(self, request, *args, **kwargs):
-        messages.success(self.request, 'Estado deletado com sucesso!')
+        messages.success(request, '✅ Estado excluído com sucesso!')
         return super().delete(request, *args, **kwargs)
 
 

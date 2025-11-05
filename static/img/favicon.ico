@@ -1,9 +1,8 @@
 """
-Comando para criar um favicon básico
+Comando para criar um favicon.ico básico
 """
 from django.core.management.base import BaseCommand
 from pathlib import Path
-import os
 
 
 class Command(BaseCommand):
@@ -11,7 +10,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         # Caminho para o favicon
-        static_dir = Path('static/images')
+        static_dir = Path('static/img')
         static_dir.mkdir(parents=True, exist_ok=True)
         
         favicon_path = static_dir / 'favicon.ico'
