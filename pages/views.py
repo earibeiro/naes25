@@ -22,7 +22,7 @@ from .mixins import (
     StaffRequiredMixin
 )
 from .forms import PersonForm, CompanyForm, ContractForm, StateForm, CityForm
-from .filters import ContractFilter, CompanyFilter, PersonFilter  # ✅ NOVO IMPORT
+from .filters import PersonFilter, CompanyFilter, ContractFilter, StateFilter, CityFilter  # ✅ NOVO IMPORT
 
 # ===========================================
 # VIEWS BÁSICAS (INDEX, ABOUT, HOME)
@@ -433,80 +433,155 @@ class ContractDeleteView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, Funcion
 # VIEWS PARA STATE (ESTADO) - APENAS ADMIN
 # ===========================================
 
-class StateListView(AdminRequiredMixin, ListView):
-    """ListView para estados - APENAS empresa_admin"""
+class StateListView(LoginRequiredMixin, ListView):
     model = State
     template_name = 'pages/lists/state_list.html'
     context_object_name = 'states'
-    paginate_by = 20
+    paginate_by = 10
 
+    def get_queryset(self):
+        queryset = State.objects.annotate(
+            total_cities=Count('city')
+        ).order_by('name')
+        
+        # Apply filters
+        self.filterset = StateFilter(self.request.GET, queryset=queryset)
+        return self.filterset.qs
 
-class StateCreateView(AdminRequiredMixin, CreateView):
-    """CreateView para estados - APENAS empresa_admin"""
-    model = State
-    form_class = StateForm
-    template_name = 'pages/forms/state_form.html'
-    success_url = reverse_lazy('state-list')
-    
-    def form_valid(self, form):
-        messages.success(self.request, f'✅ Estado "{form.instance.name}" criado com sucesso!')
-        return super().form_valid(form)
-
-
-class StateUpdateView(AdminRequiredMixin, UpdateView):
-    """UpdateView para estados - APENAS empresa_admin"""
-    model = State
-    form_class = StateForm
-    template_name = 'pages/forms/state_form.html'
-    success_url = reverse_lazy('state-list')
-    
-    def form_valid(self, form):
-        messages.success(self.request, f'✅ Estado "{form.instance.name}" atualizado com sucesso!')
-        return super().form_valid(form)
-
-
-class StateDeleteView(AdminRequiredMixin, DeleteView):
-    """DeleteView para estados - APENAS empresa_admin"""
-    model = State
-    template_name = 'pages/confirm/state_confirm_delete.html'
-    success_url = reverse_lazy('state-list')
-    
-    def delete(self, request, *args, **kwargs):
-        obj = self.get_object()
-        messages.success(self.request, f'✅ Estado "{obj.name}" excluído com sucesso!')
-        return super().delete(request, *args, **kwargs)
-
-
-# ✅ ADICIONAR ESTA VIEW
-class StateDetailView(AdminRequiredMixin, DetailView):
-    """DetailView para estados - APENAS empresa_admin"""
-    model = State
-    template_name = 'pages/detail/state_detail.html'
-    context_object_name = 'state'
-    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Cidades do estado
-        context['cities'] = self.object.city_set.all().order_by('name')
+        context['filter'] = self.filterset
+        context['total_states'] = self.filterset.qs.count()
         return context
 
 
-# ===========================================
-# VIEWS PARA CITY (CIDADE) - APENAS ADMIN
-# ===========================================
+# ✅ ADICIONAR ESTA VIEW (ESTAVA FALTANDO)
+class StateDetailView(LoginRequiredMixin, DetailView):
+    """
+    View para exibir detalhes de um Estado específico
+    """
+    model = State
+    template_name = 'pages/detail/state_detail.html'
+    context_object_name = 'state'
 
-class CityListView(AdminRequiredMixin, ListView):
-    """ListView para cidades - APENAS empresa_admin"""
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        state = self.get_object()
+        
+        # Cities in this state
+        context['cities'] = state.city_set.all().order_by('name')
+        context['total_cities'] = state.city_set.count()
+        
+        # Breadcrumbs
+        context['breadcrumbs'] = [
+            {'title': 'Home', 'url': 'home'},
+            {'title': 'Estados', 'url': 'state-list'},
+            {'title': state.name, 'url': None}
+        ]
+        
+        return context
+
+
+class StateCreateView(LoginRequiredMixin, CreateView):
+    model = State
+    form_class = StateForm
+    template_name = 'pages/forms/state_form.html'
+    success_url = reverse_lazy('state-list')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['breadcrumbs'] = [
+            {'title': 'Home', 'url': 'home'},
+            {'title': 'Estados', 'url': 'state-list'},
+            {'title': 'Novo Estado', 'url': None}
+        ]
+        return context
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Estado cadastrado com sucesso!')
+        return super().form_valid(form)
+
+
+class StateUpdateView(LoginRequiredMixin, UpdateView):
+    model = State
+    form_class = StateForm
+    template_name = 'pages/forms/state_form.html'
+    success_url = reverse_lazy('state-list')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['breadcrumbs'] = [
+            {'title': 'Home', 'url': 'home'},
+            {'title': 'Estados', 'url': 'state-list'},
+            {'title': f'Editar {self.object.name}', 'url': None}
+        ]
+        return context
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Estado atualizado com sucesso!')
+        return super().form_valid(form)
+
+
+class StateDeleteView(LoginRequiredMixin, DeleteView):
+    model = State
+    template_name = 'pages/confirm/state_confirm_delete.html'
+    success_url = reverse_lazy('state-list')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['breadcrumbs'] = [
+            {'title': 'Home', 'url': 'home'},
+            {'title': 'Estados', 'url': 'state-list'},
+            {'title': f'Deletar {self.object.name}', 'url': None}
+        ]
+        return context
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, 'Estado deletado com sucesso!')
+        return super().delete(request, *args, **kwargs)
+
+
+# ====================================
+# CITY VIEWS
+# ====================================
+
+class CityListView(LoginRequiredMixin, ListView):
     model = City
     template_name = 'pages/lists/city_list.html'
     context_object_name = 'cities'
-    paginate_by = 20
-    
-    # ✅ OTIMIZAÇÃO N+1: select_related para FK state
+    paginate_by = 10
+
     def get_queryset(self):
-        qs = super().get_queryset()
-        qs = qs.select_related('state')
-        return qs
+        queryset = City.objects.select_related('state').order_by('name')
+        
+        # Apply filters
+        self.filterset = CityFilter(self.request.GET, queryset=queryset)
+        return self.filterset.qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['filter'] = self.filterset
+        context['total_cities'] = self.filterset.qs.count()
+        return context
+
+
+class CityDetailView(LoginRequiredMixin, DetailView):
+    model = City
+    template_name = 'pages/detail/city_detail.html'
+    context_object_name = 'city'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        city = self.get_object()
+        
+        # Breadcrumbs
+        context['breadcrumbs'] = [
+            {'title': 'Home', 'url': 'home'},
+            {'title': 'Cidades', 'url': 'city-list'},
+            {'title': city.name, 'url': None}
+        ]
+        
+        return context
 
 
 class CityCreateView(AdminRequiredMixin, CreateView):
@@ -519,19 +594,6 @@ class CityCreateView(AdminRequiredMixin, CreateView):
     def form_valid(self, form):
         messages.success(self.request, f'✅ Cidade "{form.instance.name}" criada com sucesso!')
         return super().form_valid(form)
-
-
-class CityDetailView(AdminRequiredMixin, DetailView):
-    """DetailView para cidades - APENAS empresa_admin"""
-    model = City
-    template_name = 'pages/detail/city_detail.html'
-    context_object_name = 'city'
-    
-    # ✅ OTIMIZAÇÃO N+1
-    def get_queryset(self):
-        qs = super().get_queryset()
-        qs = qs.select_related('state')
-        return qs
 
 
 class CityUpdateView(AdminRequiredMixin, UpdateView):

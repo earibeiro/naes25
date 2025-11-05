@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # ✅ CORRIGIDO: Usar HomeView.as_view() em vez de views.home
+    # ✅ HOME (SEMPRE USAR .as_view() PARA CLASS-BASED VIEWS)
     path('', views.HomeView.as_view(), name='home'),
     
     # Person URLs
@@ -29,7 +29,7 @@ urlpatterns = [
     # State URLs
     path('estados/', views.StateListView.as_view(), name='state-list'),
     path('estados/criar/', views.StateCreateView.as_view(), name='state-create'),
-    # ❌ REMOVIDO: path('estados/<int:pk>/', views.StateDetailView.as_view(), name='state-detail'),
+    path('estados/<int:pk>/', views.StateDetailView.as_view(), name='state-detail'),  # ✅ AGORA FUNCIONA
     path('estados/<int:pk>/editar/', views.StateUpdateView.as_view(), name='state-update'),
     path('estados/<int:pk>/deletar/', views.StateDeleteView.as_view(), name='state-delete'),
     
@@ -40,7 +40,7 @@ urlpatterns = [
     path('cidades/<int:pk>/editar/', views.CityUpdateView.as_view(), name='city-update'),
     path('cidades/<int:pk>/deletar/', views.CityDeleteView.as_view(), name='city-delete'),
     
-    # URLs para rascunhos de contratos (permite anônimo)
+    # Contract Draft URLs (anonymous access)
     path('rascunho/contrato/', views.ContractDraftStartView.as_view(), name='contrato-draft-start'),
     path('rascunho/revisar/', views.ContratoDraftReviewView.as_view(), name='contrato-draft-review'),
     path('rascunho/finalizar/', views.ContratoDraftFinalizeView.as_view(), name='contrato-draft-finalize'),
