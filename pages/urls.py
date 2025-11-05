@@ -52,3 +52,5 @@ urlpatterns = [
     # Index
     path('index/', views.IndexView.as_view(), name='index'),
 ]
+
+# Deploy 2025-11-04 23:39:16
