@@ -1,0 +1,41 @@
+"""
+Comando para criar um favicon básico
+"""
+from django.core.management.base import BaseCommand
+from pathlib import Path
+import os
+
+
+class Command(BaseCommand):
+    help = 'Cria um favicon.ico básico se não existir'
+
+    def handle(self, *args, **options):
+        # Caminho para o favicon
+        static_dir = Path('static/images')
+        static_dir.mkdir(parents=True, exist_ok=True)
+        
+        favicon_path = static_dir / 'favicon.ico'
+        
+        if favicon_path.exists():
+            self.stdout.write(self.style.WARNING('⚠️ Favicon já existe'))
+            return
+        
+        # Criar um arquivo ICO vazio (16x16 transparente)
+        # Em produção, substitua por um ícone real
+        with open(favicon_path, 'wb') as f:
+            # Escreve um ICO válido mas vazio (1x1 pixel transparente)
+            ico_data = bytes([
+                0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x01,
+                0x00, 0x00, 0x01, 0x00, 0x18, 0x00, 0x30, 0x00,
+                0x00, 0x00, 0x16, 0x00, 0x00, 0x00, 0x28, 0x00,
+                0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00,
+                0x00, 0x00, 0x01, 0x00, 0x18, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF,
+                0xFF, 0x00, 0x00, 0x00, 0x00, 0x00
+            ])
+            f.write(ico_data)
+        
+        self.stdout.write(self.style.SUCCESS(f'✅ Favicon criado em: {favicon_path}'))
+        self.stdout.write(self.style.WARNING('⚠️ Em produção, substitua por um ícone personalizado'))

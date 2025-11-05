@@ -26,10 +26,10 @@ urlpatterns = [
     path('contratos/<int:pk>/editar/', views.ContractUpdateView.as_view(), name='contract-update'),
     path('contratos/<int:pk>/deletar/', views.ContractDeleteView.as_view(), name='contract-delete'),
     
-    # State URLs
+    # ✅ STATE URLs (VERIFICAR SE StateDetailView EXISTE)
     path('estados/', views.StateListView.as_view(), name='state-list'),
     path('estados/criar/', views.StateCreateView.as_view(), name='state-create'),
-    path('estados/<int:pk>/', views.StateDetailView.as_view(), name='state-detail'),  # ✅ AGORA FUNCIONA
+    path('estados/<int:pk>/', views.StateDetailView.as_view(), name='state-detail'),  # ✅ VERIFICAR
     path('estados/<int:pk>/editar/', views.StateUpdateView.as_view(), name='state-update'),
     path('estados/<int:pk>/deletar/', views.StateDeleteView.as_view(), name='state-delete'),
     
@@ -44,4 +44,11 @@ urlpatterns = [
     path('rascunho/contrato/', views.ContractDraftStartView.as_view(), name='contrato-draft-start'),
     path('rascunho/revisar/', views.ContratoDraftReviewView.as_view(), name='contrato-draft-review'),
     path('rascunho/finalizar/', views.ContratoDraftFinalizeView.as_view(), name='contrato-draft-finalize'),
+    
+    # About URLs
+    path('sobre/', views.AboutView.as_view(), name='about'),
+    path('about/', views.AboutRedirectView.as_view()),  # Redirect /about/ → /sobre/
+    
+    # Index
+    path('index/', views.IndexView.as_view(), name='index'),
 ]
