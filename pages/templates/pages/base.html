@@ -59,6 +59,14 @@
                         
                         {% if user.is_staff %}
                         <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">Admin</a></li>
+                        <!-- ✅ ADICIONAR LOGS (APENAS SE A URL EXISTIR) -->
+                        {% comment %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'auditoria:activity-log-list' %}">
+                                <i class="fas fa-history me-1"></i>Logs
+                            </a>
+                        </li>
+                        {% endcomment %}
                         {% endif %}
                         
                         <li class="nav-item dropdown">
@@ -81,14 +89,26 @@
         </div>
     </nav>
 
-    <!-- ✅ MENSAGENS DJANGO -->
+    <!-- ✅ BREADCRUMBS -->
+    {% if user.is_authenticated %}
+    <div class="container-fluid px-4 px-lg-5" style="padding-top: 80px;">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb bg-dark text-white rounded-3 px-3 py-2">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-warning"><i class="fas fa-home me-1"></i>Início</a></li>
+                {% block breadcrumb_items %}{% endblock %}
+            </ol>
+        </nav>
+    </div>
+    {% endif %}
+    
+    <!-- Messages -->
     {% if messages %}
-    <div class="container mt-5 pt-5">
+    <div class="container-fluid px-4 px-lg-5">
         {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
+            <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show rounded-3 shadow-sm" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
         {% endfor %}
     </div>
     {% endif %}

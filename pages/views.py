@@ -10,7 +10,7 @@ from django.core.exceptions import PermissionDenied
 from datetime import timedelta
 from django_filters.views import FilterView  # ✅ NOVO IMPORT
 
-from .models import Person, Company, Contract, State, City
+from .models import Person, Company, Contract, State, City, ContractMovement  # ✅ ADICIONAR ContractMovement
 from .mixins import (
     OwnerQuerysetMixin, 
     OwnerObjectPermissionMixin, 
@@ -248,25 +248,24 @@ class CompanyDeleteView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, Funciona
 
 
 # ===========================================
-# VIEWS PARA CONTRACT (CONTRATO) - COM PROTEÇÃO
+# CONTRACT VIEWS
 # ===========================================
 
-class ContractListView(FuncionarioRequiredMixin, OwnerQuerysetMixin, FilterView):
-    """ListView para contratos - requer grupo funcionario + escopo por usuário"""
+class ContractListView(OwnerQuerysetMixin, FuncionarioRequiredMixin, FilterView):
+    """ListView com filtros para contratos"""
     model = Contract
     template_name = 'pages/lists/contract_list.html'
     context_object_name = 'contracts'
+    filterset_class = ContractFilter
     paginate_by = 10
-    filterset_class = ContractFilter  # ✅ NOVO
     
-    # ✅ OTIMIZAÇÃO N+1: select_related para todas as FKs
     def get_queryset(self):
-        qs = super().get_queryset()
-        # FK: usuario (owner), company, person
-        qs = qs.select_related('usuario', 'company', 'person')
-        # Nested FK: company.city, person.city
-        qs = qs.select_related('company__city', 'person__city')
-        return qs
+        return super().get_queryset().select_related('company', 'person', 'usuario').order_by('-created_at')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['total_contracts'] = self.get_queryset().count()
+        return context
 
 
 class ContractCreateView(LoginRequiredMixin, OwnerCreateMixin, CreateView):
@@ -282,36 +281,61 @@ class ContractCreateView(LoginRequiredMixin, OwnerCreateMixin, CreateView):
         return kwargs
     
     def form_valid(self, form):
-        form.instance.usuario = self.request.user
-        messages.success(self.request, f'✅ Contrato "{form.instance.title}" criado com sucesso!')
-        return super().form_valid(form)
+        contract = form.save(commit=False)
+        contract.usuario = self.request.user
+        contract.save()
+        form.save_m2m()
+        
+        # ✅ REGISTRAR MOVIMENTO
+        ContractMovement.objects.create(
+            contract=contract,
+            movement_type='created',
+            description=f'Contrato criado por {self.request.user.username}',
+            performed_by=self.request.user,
+            metadata={
+                'title': contract.title,
+                'company_id': contract.company.id if contract.company else None,
+                'person_id': contract.person.id if contract.person else None,
+            }
+        )
+        
+        # ✅ ATUALIZAR CONTADOR NA EMPRESA
+        if contract.company:
+            contract.company.total_contracts = contract.company.contracts.filter(is_active=True).count()
+            contract.company.save(update_fields=['total_contracts'])
+        
+        messages.success(
+            self.request, 
+            f'✅ Contrato "{contract.title}" criado com sucesso!'
+        )
+        return redirect(self.get_success_url())
     
     def form_invalid(self, form):
-        messages.error(self.request, '❌ Erro ao criar contrato. Verifique os dados.')
+        messages.error(
+            self.request, 
+            '❌ Erro ao criar contrato. Verifique os dados informados.'
+        )
         return super().form_invalid(form)
 
 
 class ContractDetailView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, FuncionarioRequiredMixin, DetailView):
-    """DetailView para contratos - requer grupo funcionario + ownership"""
+    """DetailView para contratos"""
     model = Contract
     template_name = 'pages/detail/contract_detail.html'
     context_object_name = 'contract'
     
-    # ✅ OTIMIZAÇÃO N+1: select_related para todas as relações
     def get_queryset(self):
-        qs = super().get_queryset()
-        # FK: usuario, company, person
-        qs = qs.select_related('usuario', 'company', 'person')
-        # Nested FK: company.city, person.city, city.state
-        qs = qs.select_related(
-            'company__city', 'company__city__state',
-            'person__city', 'person__city__state'
-        )
-        return qs
+        return super().get_queryset().select_related('company', 'person', 'usuario')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # ✅ ADICIONAR MOVIMENTOS AO CONTEXTO
+        context['movements'] = self.object.movements.select_related('performed_by').order_by('-created_at')[:10]
+        return context
 
 
 class ContractUpdateView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, FuncionarioRequiredMixin, UpdateView):
-    """UpdateView para contratos - requer grupo funcionario + ownership"""
+    """UpdateView para contratos"""
     model = Contract
     form_class = ContractForm
     template_name = 'pages/forms/contract_form.html'
@@ -323,20 +347,86 @@ class ContractUpdateView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, Funcion
         return kwargs
     
     def form_valid(self, form):
-        messages.success(self.request, f'✅ Contrato "{form.instance.title}" atualizado com sucesso!')
-        return super().form_valid(form)
+        contract = form.save(commit=False)
+        
+        # ✅ DETECTAR MUDANÇAS
+        changed_fields = []
+        if form.changed_data:
+            changed_fields = list(form.changed_data)
+        
+        contract.save()
+        form.save_m2m()
+        
+        # ✅ REGISTRAR MOVIMENTO
+        ContractMovement.objects.create(
+            contract=contract,
+            movement_type='updated',
+            description=f'Contrato atualizado por {self.request.user.username}',
+            performed_by=self.request.user,
+            metadata={
+                'changed_fields': changed_fields,
+                'title': contract.title,
+            }
+        )
+        
+        # ✅ ATUALIZAR CONTADOR NA EMPRESA
+        if contract.company:
+            contract.company.total_contracts = contract.company.contracts.filter(is_active=True).count()
+            contract.company.save(update_fields=['total_contracts'])
+        
+        messages.success(
+            self.request, 
+            f'✅ Contrato "{contract.title}" atualizado com sucesso!'
+        )
+        return redirect(self.get_success_url())
+    
+    def form_invalid(self, form):
+        messages.error(
+            self.request, 
+            '❌ Erro ao atualizar contrato. Verifique os dados informados.'
+        )
+        return super().form_invalid(form)
 
 
 class ContractDeleteView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, FuncionarioRequiredMixin, DeleteView):
-    """DeleteView para contratos - requer grupo funcionario + ownership"""
+    """DeleteView para contratos"""
     model = Contract
     template_name = 'pages/confirm/contract_confirm_delete.html'
     success_url = reverse_lazy('contract-list')
     
     def delete(self, request, *args, **kwargs):
         obj = self.get_object()
-        messages.success(self.request, f'✅ Contrato "{obj.title}" excluído com sucesso!')
-        return super().delete(request, *args, **kwargs)
+        contract_title = obj.title
+        company = obj.company
+        
+        # ✅ REGISTRAR MOVIMENTO ANTES DE DELETAR
+        ContractMovement.objects.create(
+            contract=obj,
+            movement_type='deleted',
+            description=f'Contrato excluído por {request.user.username}',
+            performed_by=request.user,
+            metadata={
+                'title': contract_title,
+                'company_id': company.id if company else None,
+                'deleted_at': timezone.now().isoformat(),
+            }
+        )
+        
+        # ✅ MENSAGEM DE SUCESSO
+        messages.success(
+            request, 
+            f'✅ Contrato "{contract_title}" excluído com sucesso!'
+        )
+        
+        # ✅ DELETAR OBJETO
+        response = super().delete(request, *args, **kwargs)
+        
+        # ✅ ATUALIZAR CONTADOR NA EMPRESA (DEPOIS DA EXCLUSÃO)
+        if company:
+            company.total_contracts = company.contracts.filter(is_active=True).count()
+            company.save(update_fields=['total_contracts'])
+        
+        return response
 
 
 # ===========================================
@@ -385,6 +475,20 @@ class StateDeleteView(AdminRequiredMixin, DeleteView):
         obj = self.get_object()
         messages.success(self.request, f'✅ Estado "{obj.name}" excluído com sucesso!')
         return super().delete(request, *args, **kwargs)
+
+
+# ✅ ADICIONAR ESTA VIEW
+class StateDetailView(AdminRequiredMixin, DetailView):
+    """DetailView para estados - APENAS empresa_admin"""
+    model = State
+    template_name = 'pages/detail/state_detail.html'
+    context_object_name = 'state'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Cidades do estado
+        context['cities'] = self.object.city_set.all().order_by('name')
+        return context
 
 
 # ===========================================

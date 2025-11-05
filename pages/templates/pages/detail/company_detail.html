@@ -1,0 +1,270 @@
+<!-- LOCALIZAÇÃO: Logo após {% extends "pages/base.html" %} -->
+{% extends "pages/base.html" %}
+{% load static %}
+
+{% block title %}{{ company.corporate_name }} - Athena{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item">
+    <a href="{% url 'company-list' %}" class="text-warning">
+        <i class="fas fa-building me-1"></i>Empresas
+    </a>
+</li>
+<li class="breadcrumb-item active">{{ company.corporate_name|truncatechars:30 }}</li>
+{% endblock %}
+
+{% block masthead_class %} masthead--compact{% endblock %}
+
+{% block hero_content %}
+<div class="container px-4 px-lg-5 text-center" style="padding: 60px 0;">
+    <h1 class="text-white">
+        <i class="fas fa-building me-2"></i>{{ company.corporate_name }}
+    </h1>
+    <p class="text-white-50">Detalhes da empresa</p>
+</div>
+{% endblock %}
+
+{% block about_content %}
+<div class="container px-4 px-lg-5">
+    <div class="row g-4">
+        <!-- Coluna Principal -->
+        <div class="col-lg-8">
+            <!-- Card: Dados da Empresa -->
+            <div class="card bg-dark text-white shadow-lg rounded-4 mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-building me-2"></i>Dados da Empresa
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <strong class="text-warning">Razão Social:</strong>
+                            <p class="mb-0">{{ company.corporate_name }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong class="text-warning">Nome Fantasia:</strong>
+                            <p class="mb-0">
+                                {% if company.trade_name %}
+                                    {{ company.trade_name }}
+                                {% else %}
+                                    <span class="text-muted">Não informado</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong class="text-warning">CNPJ:</strong>
+                            <p class="mb-0">
+                                {% if company.cnpj %}
+                                    <code class="text-info">{{ company.cnpj }}</code>
+                                {% else %}
+                                    <span class="text-muted">Não informado</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong class="text-warning">Email:</strong>
+                            <p class="mb-0">
+                                {% if company.email %}
+                                    <a href="mailto:{{ company.email }}" class="text-info">{{ company.email }}</a>
+                                {% else %}
+                                    <span class="text-muted">Não informado</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong class="text-warning">Telefone:</strong>
+                            <p class="mb-0">
+                                {% if company.phone %}
+                                    {{ company.phone }}
+                                {% else %}
+                                    <span class="text-muted">Não informado</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong class="text-warning">Total de Contratos:</strong>
+                            <p class="mb-0">
+                                <span class="badge bg-success">{{ company.total_contracts }}</span>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong class="text-warning">Cadastrado em:</strong>
+                            <p class="mb-0">{{ company.created_at|date:"d/m/Y H:i" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card: Endereço -->
+            <div class="card bg-dark text-white shadow-lg rounded-4 mb-4">
+                <div class="card-header bg-primary">
+                    <h5 class="mb-0">
+                        <i class="fas fa-map-marker-alt me-2"></i>Endereço
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <strong class="text-warning">Logradouro:</strong>
+                            <p class="mb-0">
+                                {% if company.street %}
+                                    {{ company.street }}
+                                {% else %}
+                                    <span class="text-muted">Não informado</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-4">
+                            <strong class="text-warning">Número:</strong>
+                            <p class="mb-0">
+                                {% if company.number %}
+                                    {{ company.number }}
+                                {% else %}
+                                    <span class="text-muted">S/N</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong class="text-warning">Complemento:</strong>
+                            <p class="mb-0">
+                                {% if company.complement %}
+                                    {{ company.complement }}
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong class="text-warning">Bairro:</strong>
+                            <p class="mb-0">
+                                {% if company.neighborhood %}
+                                    {{ company.neighborhood }}
+                                {% else %}
+                                    <span class="text-muted">Não informado</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong class="text-warning">Cidade:</strong>
+                            <p class="mb-0">
+                                {% if company.city %}
+                                    {{ company.city.name }}
+                                {% else %}
+                                    <span class="text-muted">Não informada</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong class="text-warning">Estado:</strong>
+                            <p class="mb-0">
+                                {% if company.city.state %}
+                                    {{ company.city.state.name }} ({{ company.city.state.abbreviation }})
+                                {% else %}
+                                    <span class="text-muted">Não informado</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong class="text-warning">CEP:</strong>
+                            <p class="mb-0">
+                                {% if company.zip_code %}
+                                    {{ company.zip_code }}
+                                {% else %}
+                                    <span class="text-muted">Não informado</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card: Contratos Vinculados -->
+            <div class="card bg-dark text-white shadow-lg rounded-4">
+                <div class="card-header bg-success">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-contract me-2"></i>Contratos Vinculados
+                        <span class="badge bg-light text-dark ms-2">{{ company.contracts.count }}</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if company.contracts.all %}
+                        <div class="list-group list-group-flush">
+                            {% for contract in company.contracts.all %}
+                                <div class="list-group-item bg-secondary text-white d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>{{ contract.title }}</strong>
+                                        <br>
+                                        <small class="text-white-50">
+                                            {% if contract.person %}
+                                                <i class="fas fa-user me-1"></i>{{ contract.person.full_name }}
+                                            {% endif %}
+                                        </small>
+                                    </div>
+                                    <a href="{% url 'contract-detail' contract.pk %}" class="btn btn-sm btn-outline-light">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info text-center">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Nenhum contrato vinculado a esta empresa.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Coluna Lateral -->
+        <div class="col-lg-4">
+            <!-- Card: Ações Rápidas -->
+            <div class="card bg-secondary text-white shadow-lg rounded-4 mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-cogs me-2"></i>Ações
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'company-update' company.pk %}" class="btn btn-warning">
+                            <i class="fas fa-edit me-2"></i>Editar Empresa
+                        </a>
+                        <a href="{% url 'company-delete' company.pk %}" class="btn btn-danger">
+                            <i class="fas fa-trash me-2"></i>Excluir Empresa
+                        </a>
+                        <a href="{% url 'company-list' %}" class="btn btn-outline-light">
+                            <i class="fas fa-arrow-left me-2"></i>Voltar à Lista
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card: Informações do Sistema -->
+            <div class="card bg-dark text-white shadow-lg rounded-4">
+                <div class="card-header bg-info">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Sistema
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <small class="text-white-50">
+                        <strong>Criado por:</strong><br>
+                        {{ company.usuario.username }}<br><br>
+                        <strong>Data de Criação:</strong><br>
+                        {{ company.created_at|date:"d/m/Y H:i" }}<br><br>
+                        <strong>Última Atualização:</strong><br>
+                        {{ company.updated_at|date:"d/m/Y H:i" }}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block about_image %}{% endblock %}
+{% block projects_content %}{% endblock %}
+{% block signup_content %}{% endblock %}
+{% block contact_content %}{% endblock %}

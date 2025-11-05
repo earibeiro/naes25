@@ -3,6 +3,10 @@
 
 {% block title %}Pessoas - Athena{% endblock %}
 
+{% block breadcrumb_items %}
+<li class="breadcrumb-item active"><i class="fas fa-users me-1"></i>Pessoas</li>
+{% endblock %}
+
 <!-- ✅ MASTHEAD COMPACTO -->
 {% block masthead_class %} masthead--compact{% endblock %}
 
@@ -229,17 +233,17 @@
         {% endif %}
         
     {% else %}
-        <!-- Estado vazio -->
+        <!-- ✅ EMPTY STATE MELHORADO -->
         <div class="card bg-dark text-white shadow rounded-4">
             <div class="card-body text-center py-5">
-                <i class="fas fa-users fa-5x text-muted mb-4"></i>
+                <i class="fas fa-user-slash fa-5x text-muted mb-4"></i>
                 <h4 class="text-white mb-3">Nenhuma pessoa encontrada</h4>
                 <p class="text-white-50 mb-4">
                     {% if request.GET %}
                         Nenhuma pessoa corresponde aos filtros aplicados.
-                        <a href="{% url 'person-list' %}" class="alert-link">Limpar filtros</a>
+                        <a href="{% url 'person-list' %}" class="alert-link text-warning">Limpar filtros</a>
                     {% else %}
-                        Comece cadastrando sua primeira pessoa no sistema.
+                        Comece cadastrando sua primeira pessoa física no sistema.
                     {% endif %}
                 </p>
                 <a href="{% url 'person-create' %}" class="btn btn-primary btn-lg">

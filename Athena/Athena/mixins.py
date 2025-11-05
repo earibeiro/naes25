@@ -2,6 +2,10 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.contrib import messages
 from django.shortcuts import redirect
+from django.views.generic import CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
+from .models import Contract, ContractMovement
+from .forms import ContractForm
 
 
 class OwnerQuerysetMixin(LoginRequiredMixin):
@@ -131,3 +135,107 @@ class GroupRequiredMixin(UserPassesTestMixin):
             f"❌ Acesso restrito ao grupo '{self.group_required}'."
         )
         return redirect('home')
+
+
+class ContractCreateView(LoginRequiredMixin, OwnerCreateMixin, CreateView):
+    """CreateView para contratos"""
+    model = Contract
+    form_class = ContractForm
+    template_name = 'pages/forms/contract_form.html'
+    success_url = reverse_lazy('contract-list')
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+    
+    def form_valid(self, form):
+        contract = form.save(commit=False)
+        contract.usuario = self.request.user
+        contract.save()
+        form.save_m2m()
+        
+        # ✅ REGISTRAR MOVIMENTO
+        ContractMovement.objects.create(
+            contract=contract,
+            movement_type='created',
+            description=f'Contrato criado por {self.request.user.username}',
+            performed_by=self.request.user
+        )
+        
+        # ✅ ATUALIZAR CONTADOR NA EMPRESA
+        if contract.company:
+            contract.company.total_contracts = contract.company.contracts.filter(is_active=True).count()
+            contract.company.save(update_fields=['total_contracts'])
+        
+        messages.success(self.request, f'✅ Contrato "{contract.title}" criado com sucesso!')
+        return redirect(self.get_success_url())
+    
+    def form_invalid(self, form):
+        messages.error(self.request, '❌ Erro ao criar contrato. Verifique os dados.')
+        return super().form_invalid(form)
+
+
+class ContractUpdateView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, FuncionarioRequiredMixin, UpdateView):
+    """UpdateView para contratos"""
+    model = Contract
+    form_class = ContractForm
+    template_name = 'pages/forms/contract_form.html'
+    success_url = reverse_lazy('contract-list')
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+    
+    def form_valid(self, form):
+        contract = form.save(commit=False)
+        contract.save()
+        form.save_m2m()
+        
+        # ✅ REGISTRAR MOVIMENTO
+        ContractMovement.objects.create(
+            contract=contract,
+            movement_type='updated',
+            description=f'Contrato atualizado por {self.request.user.username}',
+            performed_by=self.request.user
+        )
+        
+        # ✅ ATUALIZAR CONTADOR NA EMPRESA
+        if contract.company:
+            contract.company.total_contracts = contract.company.contracts.filter(is_active=True).count()
+            contract.company.save(update_fields=['total_contracts'])
+        
+        messages.success(self.request, f'✅ Contrato "{contract.title}" atualizado com sucesso!')
+        return redirect(self.get_success_url())
+
+
+class ContractDeleteView(OwnerQuerysetMixin, OwnerObjectPermissionMixin, FuncionarioRequiredMixin, DeleteView):
+    """DeleteView para contratos"""
+    model = Contract
+    template_name = 'pages/confirm/contract_confirm_delete.html'
+    success_url = reverse_lazy('contract-list')
+    
+    def delete(self, request, *args, **kwargs):
+        obj = self.get_object()
+        
+        # ✅ REGISTRAR MOVIMENTO ANTES DE DELETAR
+        ContractMovement.objects.create(
+            contract=obj,
+            movement_type='deleted',
+            description=f'Contrato excluído por {request.user.username}',
+            performed_by=request.user
+        )
+        
+        # ✅ ATUALIZAR CONTADOR NA EMPRESA
+        company = obj.company
+        
+        messages.success(request, f'✅ Contrato "{obj.title}" excluído com sucesso!')
+        response = super().delete(request, *args, **kwargs)
+        
+        # Atualizar depois da exclusão
+        if company:
+            company.total_contracts = company.contracts.filter(is_active=True).count()
+            company.save(update_fields=['total_contracts'])
+        
+        return response

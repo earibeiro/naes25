@@ -6,6 +6,20 @@ from django.conf import settings
 from django.db import migrations, models
 
 
+def check_column_exists(apps, schema_editor):
+    """Verifica se as colunas já existem antes de adicionar"""
+    from django.db import connection
+    with connection.cursor() as cursor:
+        # Verificar se consent_date existe
+        cursor.execute("""
+            SELECT column_name 
+            FROM information_schema.columns 
+            WHERE table_name='pages_company' 
+            AND column_name='consent_date';
+        """)
+        return cursor.fetchone() is not None
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -14,6 +28,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # ✅ CRIAR MODELO ContractMovement PRIMEIRO
         migrations.CreateModel(
             name='ContractMovement',
             fields=[
@@ -29,6 +44,8 @@ class Migration(migrations.Migration):
                 'ordering': ['-created_at'],
             },
         ),
+        
+        # ✅ REMOVER CAMPOS ANTIGOS
         migrations.RemoveField(
             model_name='company',
             name='data_processing_purpose',
@@ -37,11 +54,15 @@ class Migration(migrations.Migration):
             model_name='company',
             name='email',
         ),
-        migrations.AddField(
-            model_name='company',
-            name='consent_date',
-            field=models.DateTimeField(default=django.utils.timezone.now, help_text='Data em que o consentimento LGPD foi registrado', verbose_name='Data do Consentimento'),
-        ),
+        
+        # ✅ ADICIONAR CAMPOS NOVOS (APENAS SE NÃO EXISTIREM)
+        # Comentar temporariamente estas linhas:
+        # migrations.AddField(
+        #     model_name='company',
+        #     name='consent_date',
+        #     field=models.DateTimeField(default=django.utils.timezone.now, help_text='Data em que o consentimento LGPD foi registrado', verbose_name='Data do Consentimento'),
+        # ),
+        
         migrations.AddField(
             model_name='company',
             name='consent_text',
@@ -62,6 +83,7 @@ class Migration(migrations.Migration):
             name='total_contracts',
             field=models.IntegerField(default=0, help_text='Número total de contratos ativos vinculados a esta empresa', verbose_name='Total de Contratos'),
         ),
+        
         migrations.AlterField(
             model_name='city',
             name='state',

@@ -5,6 +5,15 @@
     {% if object %}Editar Contrato{% else %}Novo Contrato{% endif %} - Athena
 {% endblock %}
 
+{% block breadcrumb_items %}
+<li class="breadcrumb-item">
+    <a href="{% url 'contract-list' %}" class="text-warning">
+        <i class="fas fa-file-contract me-1"></i>Contratos
+    </a>
+</li>
+<li class="breadcrumb-item active">{% if object %}Editar{% else %}Novo{% endif %}</li>
+{% endblock %}
+
 {% block hero_content %}
 <div class="container px-4 px-lg-5 text-center" style="padding: 60px 0;">
     <h1 class="text-white">

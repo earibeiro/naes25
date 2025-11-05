@@ -3,6 +3,13 @@
 
 {% block title %}Dashboard - Athena{% endblock %}
 
+<!-- ✅ BREADCRUMB PARA HOME (SÓ APARECE SE AUTENTICADO) -->
+{% block breadcrumb_items %}
+{% if user.is_authenticated %}
+<li class="breadcrumb-item active"><i class="fas fa-tachometer-alt me-1"></i>Dashboard</li>
+{% endif %}
+{% endblock %}
+
 <!-- ✅ HERO REDUZIDO COM MASTHEAD--MINIMAL -->
 {% block masthead_class %} masthead--minimal{% endblock %}
 

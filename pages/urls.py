@@ -29,7 +29,7 @@ urlpatterns = [
     # State URLs
     path('estados/', views.StateListView.as_view(), name='state-list'),
     path('estados/criar/', views.StateCreateView.as_view(), name='state-create'),
-    path('estados/<int:pk>/', views.StateDetailView.as_view(), name='state-detail'),
+    # ❌ REMOVIDO: path('estados/<int:pk>/', views.StateDetailView.as_view(), name='state-detail'),
     path('estados/<int:pk>/editar/', views.StateUpdateView.as_view(), name='state-update'),
     path('estados/<int:pk>/deletar/', views.StateDeleteView.as_view(), name='state-delete'),
     
@@ -37,9 +37,8 @@ urlpatterns = [
     path('cidades/', views.CityListView.as_view(), name='city-list'),
     path('cidades/criar/', views.CityCreateView.as_view(), name='city-create'),
     path('cidades/<int:pk>/', views.CityDetailView.as_view(), name='city-detail'),
-    path('cidades/<int:pk>/editar/', views.CityUpdateView.as_view(), name='update-city'),
-    path('cidades/<int:pk>/excluir/', views.CityDeleteView.as_view(), name='city-delete'),
-    path('cidades/<int:pk>/excluir/', views.CityDeleteView.as_view(), name='delete-city'),
+    path('cidades/<int:pk>/editar/', views.CityUpdateView.as_view(), name='city-update'),
+    path('cidades/<int:pk>/deletar/', views.CityDeleteView.as_view(), name='city-delete'),
     
     # URLs para rascunhos de contratos (permite anônimo)
     path('rascunho/contrato/', views.ContractDraftStartView.as_view(), name='contrato-draft-start'),

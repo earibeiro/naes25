@@ -3,6 +3,15 @@
 
 {% block title %}Novo Contrato - Athena{% endblock %}
 
+{% block breadcrumb_items %}
+<li class="breadcrumb-item">
+    <a href="{% url 'contract-list' %}" class="text-warning">
+        <i class="fas fa-file-contract me-1"></i>Contratos
+    </a>
+</li>
+<li class="breadcrumb-item active">Rascunho</li>
+{% endblock %}
+
 {% block masthead_class %} masthead--minimal{% endblock %}
 
 {% block hero_content %}

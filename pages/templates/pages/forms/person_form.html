@@ -2,7 +2,16 @@
 {% load static %}
 
 {% block title %}
-    {% if object %}Editar Pessoa - {{ object.full_name }}{% else %}Nova Pessoa{% endif %} - Athena
+    {% if object %}Editar Pessoa{% else %}Nova Pessoa{% endif %} - Athena
+{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item">
+    <a href="{% url 'person-list' %}" class="text-warning">
+        <i class="fas fa-users me-1"></i>Pessoas
+    </a>
+</li>
+<li class="breadcrumb-item active">{% if object %}Editar{% else %}Nova{% endif %}</li>
 {% endblock %}
 
 <!-- ✅ MASTHEAD COMPACTO -->

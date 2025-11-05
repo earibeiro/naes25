@@ -5,51 +5,70 @@
 
 {% block breadcrumb_items %}
 <li class="breadcrumb-item">
-    <a href="{% url 'person-list' %}">
+    <a href="{% url 'person-list' %}" class="text-warning">
         <i class="fas fa-users me-1"></i>Pessoas
     </a>
 </li>
-<li class="breadcrumb-item active">Excluir</li>
+<li class="breadcrumb-item">
+    <a href="{% url 'person-detail' object.pk %}" class="text-warning">
+        {{ object.full_name|truncatechars:20 }}
+    </a>
+</li>
+<li class="breadcrumb-item active text-danger">Excluir</li>
 {% endblock %}
 
-{% block content %}
-<div class="container-fluid px-4 px-lg-5 mt-3">
+{% block masthead_class %} masthead--minimal{% endblock %}
+
+{% block hero_content %}
+<div class="container px-4 px-lg-5 text-center" style="padding: 40px 0;">
+    <h1 class="text-white">
+        <i class="fas fa-exclamation-triangle me-2 text-danger"></i>Confirmar Exclusão
+    </h1>
+</div>
+{% endblock %}
+
+{% block about_content %}
+<div class="container px-4 px-lg-5">
     <div class="row justify-content-center">
         <div class="col-lg-6">
-            
-            <!-- Card de confirmação -->
-            <div class="card bg-dark border-danger shadow-lg">
+            <div class="card bg-dark border-danger shadow-lg rounded-4">
                 <div class="card-header bg-danger text-white text-center">
                     <h3 class="mb-0">
-                        <i class="fas fa-exclamation-triangle me-2"></i>Confirmar Exclusão
+                        <i class="fas fa-user-times me-2"></i>Excluir Pessoa
                     </h3>
                 </div>
                 <div class="card-body p-4 text-center">
-                    
-                    <div class="mb-4">
-                        <i class="fas fa-user fa-4x text-danger mb-3"></i>
-                        <h4 class="text-white">Excluir Pessoa</h4>
-                        <p class="text-white-50">
-                            Tem certeza que deseja excluir permanentemente:
-                        </p>
-                        <div class="alert alert-warning">
-                            <strong>{{ object.full_name }}</strong><br>
-                            <small>CPF: {{ object.cpf }}</small>
-                        </div>
-                        <p class="text-danger">
-                            <i class="fas fa-exclamation-circle me-1"></i>
-                            Esta ação não pode ser desfeita!
-                        </p>
+                    <i class="fas fa-user fa-4x text-danger mb-3"></i>
+                    <h4 class="text-white">Atenção!</h4>
+                    <p class="text-white-50">
+                        Tem certeza que deseja excluir permanentemente:
+                    </p>
+                    <div class="alert alert-warning my-3">
+                        <strong class="text-dark">{{ object.full_name }}</strong><br>
+                        <small class="text-muted">CPF: {{ object.cpf|default:"Não informado" }}</small>
                     </div>
-                    
+                    <p class="text-danger">
+                        <i class="fas fa-exclamation-circle me-1"></i>
+                        Esta ação não pode ser desfeita!
+                    </p>
+
+                    <!-- Avisos sobre contratos vinculados -->
+                    {% if object.contracts.count > 0 %}
+                        <div class="alert alert-danger">
+                            <i class="fas fa-file-contract me-2"></i>
+                            <strong>Esta pessoa possui {{ object.contracts.count }} contrato(s) vinculado(s)!</strong>
+                            <br><small>Os contratos também serão afetados.</small>
+                        </div>
+                    {% endif %}
+
                     <!-- Formulário de confirmação -->
-                    <form method="post">
+                    <form method="post" class="mt-4">
                         {% csrf_token %}
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-danger btn-lg">
-                                <i class="fas fa-trash me-2"></i>Sim, Excluir
+                                <i class="fas fa-trash me-2"></i>Sim, Excluir Permanentemente
                             </button>
-                            <a href="{% url 'person-list' %}" class="btn btn-secondary btn-lg">
+                            <a href="{% url 'person-detail' object.pk %}" class="btn btn-secondary btn-lg">
                                 <i class="fas fa-times me-2"></i>Cancelar
                             </a>
                         </div>
@@ -60,3 +79,8 @@
     </div>
 </div>
 {% endblock %}
+
+{% block about_image %}{% endblock %}
+{% block projects_content %}{% endblock %}
+{% block signup_content %}{% endblock %}
+{% block contact_content %}{% endblock %}
