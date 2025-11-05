@@ -13,6 +13,9 @@ class Command(BaseCommand):
 
         # Mapeamento de URLs quebradas → URLs corretas
         url_fixes = {
+            # ✅ ADICIONAR ESTA LINHA
+            r"{% url 'cadastro' %}": "{% url 'usuarios:cadastro-escolha' %}",
+            
             # URLs do sistema de usuários
             r"{% url 'escolha_tipo_cadastro' %}": "{% url 'usuarios:cadastro-escolha' %}",
             r"{% url 'escolha-tipo-cadastro' %}": "{% url 'usuarios:cadastro-escolha' %}",
