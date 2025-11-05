@@ -1,9 +1,8 @@
-runtime: python312
+﻿runtime: python312
 
-instance_class: F1
+env: standard
 
-env_variables:
-  DJANGO_SETTINGS_MODULE: "Athena.settings"
+entrypoint: gunicorn -b :$PORT Athena.Athena.wsgi:application --workers 2 --threads 4 --timeout 120
 
 handlers:
 - url: /static
@@ -14,6 +13,29 @@ handlers:
   script: auto
   secure: always
 
+env_variables:
+  DJANGO_SETTINGS_MODULE: "Athena.Athena.settings"
+  SECRET_KEY: "django-insecure-7r)4^w97@%9j&!1m8z@n^f8z7&_p)g0v&$q6ej5q!^4@+_(nq0"
+  DEBUG: "False"
+  ALLOWED_HOSTS: "athena-project-naes.ew.r.appspot.com,*.appspot.com"
+  DATABASE_URL: "postgresql://postgres.vcmafdafcmtlrvcxpxlz:wN5vJ&A6Aq3E6he@aws-0-us-east-1.pooler.supabase.com:6543/postgres"
+
+liveness_check:
+  path: "/health/"
+  check_interval_sec: 30
+  timeout_sec: 4
+  failure_threshold: 2
+  success_threshold: 2
+
+readiness_check:
+  path: "/health/"
+  check_interval_sec: 5
+  timeout_sec: 4
+  failure_threshold: 2
+  success_threshold: 2
+  app_start_timeout_sec: 300
+
 automatic_scaling:
   min_instances: 0
-  max_instances: 1
+  max_instances: 2
+  target_cpu_utilization: 0.65

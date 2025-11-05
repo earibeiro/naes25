@@ -11,3 +11,5 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                 'recent_consents': Person.objects.filter(usuario=self.request.user).order_by('-consent_date')[:5],
             })
         return context
+
+<!-- Deploy: 2025-11-05 17:51:03 -->
