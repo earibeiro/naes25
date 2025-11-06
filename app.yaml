@@ -18,6 +18,7 @@ env_variables:
   DEBUG: "False"
   ALLOWED_HOSTS: "project-athena-0316.rj.r.appspot.com,*.appspot.com"
   DATABASE_URL: "postgresql://postgres.vcmafdafcmtlrvcxpxlz:wN5vJ&A6Aq3E6he@aws-0-us-east-1.pooler.supabase.com:6543/postgres"
+  RUN_MIGRATIONS: "true"
 
 automatic_scaling:
   min_instances: 0
