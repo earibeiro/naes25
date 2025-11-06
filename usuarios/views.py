@@ -9,6 +9,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_POST
 from django.contrib.auth import get_user_model
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .forms import (
     CadastroPessoaFisicaForm, 
@@ -109,6 +110,16 @@ class CustomLogoutView(LogoutView):
         """Bloquear GET e mostrar aviso"""
         messages.warning(request, '⚠️ Logout deve ser feito via POST por segurança.')
         return redirect('home')
+
+
+class PerfilView(LoginRequiredMixin, TemplateView):
+    """View de perfil do usuário"""
+    template_name = 'usuarios/perfil.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['user'] = self.request.user
+        return context
 
 
 # View simples para teste (pode remover depois)
