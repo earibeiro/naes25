@@ -1,5 +1,4 @@
 ﻿runtime: python312
-
 env: standard
 
 entrypoint: gunicorn -b :$PORT Athena.Athena.wsgi:application --workers 2 --threads 4 --timeout 120
@@ -19,21 +18,6 @@ env_variables:
   DEBUG: "False"
   ALLOWED_HOSTS: "athena-project-naes.ew.r.appspot.com,*.appspot.com"
   DATABASE_URL: "postgresql://postgres.vcmafdafcmtlrvcxpxlz:wN5vJ&A6Aq3E6he@aws-0-us-east-1.pooler.supabase.com:6543/postgres"
-
-liveness_check:
-  path: "/health/"
-  check_interval_sec: 30
-  timeout_sec: 4
-  failure_threshold: 2
-  success_threshold: 2
-
-readiness_check:
-  path: "/health/"
-  check_interval_sec: 5
-  timeout_sec: 4
-  failure_threshold: 2
-  success_threshold: 2
-  app_start_timeout_sec: 300
 
 automatic_scaling:
   min_instances: 0

@@ -388,3 +388,5 @@ class ContractMovement(models.Model):
         }
         return icons.get(self.movement_type, 'fas fa-question-circle')
 
+
+# Deploy: 2025-11-06 00:04:16

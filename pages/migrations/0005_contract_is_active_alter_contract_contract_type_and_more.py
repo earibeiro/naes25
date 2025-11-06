@@ -26,3 +26,5 @@ class Migration(migrations.Migration):
             field=models.TextField(blank=True, help_text='Descrição detalhada do contrato', verbose_name='Descrição'),
         ),
     ]
+
+# Deploy: 2025-11-06 00:04:16

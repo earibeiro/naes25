@@ -261,3 +261,4 @@ class CityForm(forms.ModelForm):
         # Remove o argumento 'user' se presente
         self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
+# Deploy: 2025-11-06 00:04:16

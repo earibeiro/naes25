@@ -94,3 +94,4 @@ class CustomPasswordChangeForm(PasswordChangeForm):
                 'class': 'form-control',
                 'placeholder': f'Digite sua {field.label.lower()}'
             })
+# Deploy: 2025-11-06 00:04:16

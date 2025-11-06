@@ -126,3 +126,4 @@ class UserProfile(models.Model):
                 raise ValidationError("CNPJ é obrigatório para Pessoa Jurídica")
             if not self.razao_social:
                 raise ValidationError("Razão social é obrigatória para Pessoa Jurídica")
+# Deploy: 2025-11-06 00:04:16

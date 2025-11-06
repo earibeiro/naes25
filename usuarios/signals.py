@@ -95,3 +95,4 @@ def is_staff_user(user):
         user.is_superuser or 
         user.groups.filter(name__in=['empresa_admin', 'funcionario']).exists()
     )
+# Deploy: 2025-11-06 00:04:16

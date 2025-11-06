@@ -117,3 +117,5 @@ def teste_view(request):
         'titulo': 'Teste de Usuários',
         'user': request.user
     })
+
+# Deploy: 2025-11-06 00:04:16

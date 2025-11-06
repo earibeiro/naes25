@@ -87,3 +87,5 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='pages.state', verbose_name='Estado'),
         ),
     ]
+
+# Deploy: 2025-11-06 00:04:16

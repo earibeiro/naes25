@@ -601,3 +601,5 @@ class ContratoDraftFinalizeView(FuncionarioRequiredMixin, TemplateView):
     """Finalização de rascunho - requer autenticação"""
     template_name = 'pages/contracts/contract_draft_finalize.html'
 # Deploy 2025-11-04 23:39:16
+
+# Deploy: 2025-11-06 00:04:16

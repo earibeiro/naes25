@@ -119,3 +119,4 @@ class Command(BaseCommand):
         self.stdout.write('')
         self.stdout.write('💡 Use: python manage.py manage_groups --add-user <username> <group>')
         self.stdout.write('   Exemplo: python manage.py manage_groups --add-user admin empresa_admin')
+# Deploy: 2025-11-06 00:04:16

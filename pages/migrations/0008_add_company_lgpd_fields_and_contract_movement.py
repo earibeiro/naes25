@@ -185,3 +185,5 @@ class Migration(migrations.Migration):
             index=models.Index(fields=['movement_type', '-created_at'], name='pages_contr_movemen_73aa14_idx'),
         ),
     ]
+
+# Deploy: 2025-11-06 00:04:16

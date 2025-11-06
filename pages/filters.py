@@ -325,3 +325,4 @@ class CityFilter(df.FilterSet):
     class Meta:
         model = City
         fields = ["nome", "estado", "estado_sigla"]
+# Deploy: 2025-11-06 00:04:16

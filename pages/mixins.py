@@ -197,3 +197,4 @@ class AdminOnlyMixin(UserPassesTestMixin):
     def handle_no_permission(self):
         messages.error(self.request, "❌ Acesso restrito a administradores.")
         return redirect('home')
+# Deploy: 2025-11-06 00:04:16

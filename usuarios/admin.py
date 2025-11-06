@@ -24,3 +24,5 @@ class UserProfileAdmin(admin.ModelAdmin):
             'fields': ('email_contato', 'endereco', 'data_cadastro')
         }),
     )
+
+# Deploy: 2025-11-06 00:04:16

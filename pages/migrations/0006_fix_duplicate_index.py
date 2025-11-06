@@ -39,3 +39,5 @@ class Migration(migrations.Migration):
 
 # Criar nova migration para resolver o conflito:
 # python manage.py makemigrations pages --empty --name fix_duplicate_index
+
+# Deploy: 2025-11-06 00:04:16

@@ -8,3 +8,5 @@ class PagesConfig(AppConfig):
     # Importar sinais para criar grupos automaticamente.
     def ready(self):
         import pages.signals
+
+# Deploy: 2025-11-06 00:04:16

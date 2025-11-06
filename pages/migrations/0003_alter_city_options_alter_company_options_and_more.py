@@ -92,3 +92,5 @@ class Migration(migrations.Migration):
             field=models.CharField(max_length=100, verbose_name='Nome'),
         ),
     ]
+
+# Deploy: 2025-11-06 00:04:16

@@ -20,3 +20,4 @@ def create_default_groups(sender, **kwargs):
             print("Grupo 'funcionario' criado automaticamente")
         
         print("Grupos padrão criados/atualizados com sucesso!")
+# Deploy: 2025-11-06 00:04:16

@@ -91,3 +91,4 @@ class Command(BaseCommand):
                                         
                     except Exception as e:
                         self.stdout.write(self.style.ERROR(f'Erro ao ler {filepath}: {e}'))
+# Deploy: 2025-11-06 00:04:16

@@ -17,3 +17,5 @@ class Migration(migrations.Migration):
             field=models.CharField(max_length=14, unique=True, validators=[django.core.validators.RegexValidator('^\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}$', 'Formato inválido. Use: XXX.XXX.XXX-XX')], verbose_name='CPF'),
         ),
     ]
+
+# Deploy: 2025-11-06 00:04:16
