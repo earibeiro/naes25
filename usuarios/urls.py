@@ -20,15 +20,21 @@ except ImportError:
 app_name = "usuarios"
 
 urlpatterns = [
-    # Novas rotas de cadastro
-    path("cadastro/", EscolhaTipoCadastroView.as_view(), name="cadastro-escolha"),
-    path("cadastro/admin/", SignUpEmpresaAdminView.as_view(), name="cadastro-admin"),
-    path("cadastro/funcionario/", SignUpFuncionarioView.as_view(), name="cadastro-funcionario"),
+    path('login/', views.CustomLoginView.as_view(), name='login'),
+    path('logout/', views.CustomLogoutView.as_view(), name='logout'),
+    path('cadastro/', views.EscolhaTipoCadastroView.as_view(), name='cadastro-escolha'),
+    path('cadastro/admin/', views.AdminSignupView.as_view(), name='cadastro-admin'),
+    path('cadastro/funcionario/', views.FuncionarioSignupView.as_view(), name='cadastro-funcionario'),
+    path('cadastro/pessoa-fisica/', views.CadastroPessoaFisicaView.as_view(), name='cadastro-pessoa-fisica'),
+    path('cadastro/pessoa-juridica/', views.CadastroPessoaJuridicaView.as_view(), name='cadastro-pessoa-juridica'),
     
-    # Rotas existentes para compatibilidade
-    path('escolha-tipo-cadastro/', EscolhaTipoCadastroView.as_view(), name='escolha-tipo-cadastro'),
-    path('cadastro-pessoa-fisica/', CadastroPessoaFisicaView.as_view(), name='cadastro-pessoa-fisica'),
-    path('cadastro-pessoa-juridica/', CadastroPessoaJuridicaView.as_view(), name='cadastro-pessoa-juridica'),
+    # ❌ COMENTAR/REMOVER ESTA LINHA
+    # path('perfil/', views.PerfilView.as_view(), name='perfil'),
+    
+    # Password reset URLs
+    path('password_reset/', auth_views.PasswordResetView.as_view(
+        template_name='usuarios/password_reset.html'
+    ), name='password_reset'),
     
     # Adicionar rota que pode estar sendo referenciada em templates antigos
     path('cadastro-pj/', CadastroPessoaJuridicaView.as_view(), name='cadastro-pj'),
@@ -53,6 +59,6 @@ urlpatterns = [
     path('teste/', teste_view, name='teste'),
     
     # ✅ ADICIONAR ROTA DE PERFIL
-    path('perfil/', views.PerfilView.as_view(), name='perfil'),
+    # path('perfil/', views.PerfilView.as_view(), name='perfil'),
 ]
 # Deploy: 2025-11-06 00:04:16
