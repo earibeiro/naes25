@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.views.generic import CreateView, TemplateView
 from django.urls import reverse_lazy
-from django.contrib.auth.views import LogoutView
+from django.contrib.auth.views import LogoutView, LoginView  # ✅ ADICIONAR LoginView
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_POST
@@ -122,6 +122,36 @@ class PerfilView(LoginRequiredMixin, TemplateView):
         return context
 
 
+# ✅ ADICIONAR CustomLoginView
+class CustomLoginView(LoginView):
+    """Login customizado"""
+    template_name = 'usuarios/login.html'
+    redirect_authenticated_user = True
+    
+    def get_success_url(self):
+        return self.get_redirect_url() or reverse_lazy('home')
+    
+    def form_valid(self, form):
+        messages.success(self.request, f'✅ Login realizado com sucesso! Bem-vindo, {form.get_user().username}!')
+        return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        messages.error(self.request, '❌ Usuário ou senha inválidos.')
+        return super().form_invalid(form)
+
+
+# ✅ ADICIONAR AdminSignupView
+class AdminSignupView(SignUpEmpresaAdminView):
+    """Alias para cadastro de admin"""
+    pass
+
+
+# ✅ ADICIONAR FuncionarioSignupView
+class FuncionarioSignupView(SignUpFuncionarioView):
+    """Alias para cadastro de funcionário"""
+    pass
+
+
 # View simples para teste (pode remover depois)
 def teste_view(request):
     return render(request, 'usuarios/teste.html', {
@@ -129,4 +159,25 @@ def teste_view(request):
         'user': request.user
     })
 
-# Deploy: 2025-11-06 00:04:16
+# Deploy: 2025-11-06 14:00:00
+
+from django.urls import path
+from django.contrib.auth import views as auth_views
+from .views import (
+    CustomLoginView,
+    CustomLogoutView,
+    EscolhaTipoCadastroView,
+    AdminSignupView,
+    FuncionarioSignupView,
+    CadastroPessoaFisicaView,
+    CadastroPessoaJuridicaView,
+    PerfilView,  # ✅ ADICIONAR AQUI
+)
+
+app_name = 'usuarios'
+
+urlpatterns = [
+    # ...existing code...
+    path('perfil/', PerfilView.as_view(), name='perfil'),  # ✅ AGORA FUNCIONA
+    # ...existing code...
+]

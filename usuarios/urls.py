@@ -1,5 +1,6 @@
 from django.urls import path, reverse_lazy
 from django.contrib.auth import views as auth_views
+from . import views  # ✅ USAR IMPORT SIMPLES
 from .views import (
     EscolhaTipoCadastroView,
     SignUpEmpresaAdminView,
@@ -7,6 +8,10 @@ from .views import (
     CadastroPessoaFisicaView,
     CadastroPessoaJuridicaView,
     CustomLogoutView,
+    CustomLoginView,  # ✅ ADICIONAR
+    AdminSignupView,   # ✅ ADICIONAR
+    FuncionarioSignupView,  # ✅ ADICIONAR
+    PerfilView,        # ✅ ADICIONAR
     teste_view
 )
 
@@ -14,37 +19,35 @@ from .views import (
 try:
     from .forms import CustomPasswordChangeForm
 except ImportError:
-    # Fallback se form não existir
     CustomPasswordChangeForm = None
 
 app_name = "usuarios"
 
 urlpatterns = [
-    path('login/', views.CustomLoginView.as_view(), name='login'),
-    path('logout/', views.CustomLogoutView.as_view(), name='logout'),
-    path('cadastro/', views.EscolhaTipoCadastroView.as_view(), name='cadastro-escolha'),
-    path('cadastro/admin/', views.AdminSignupView.as_view(), name='cadastro-admin'),
-    path('cadastro/funcionario/', views.FuncionarioSignupView.as_view(), name='cadastro-funcionario'),
-    path('cadastro/pessoa-fisica/', views.CadastroPessoaFisicaView.as_view(), name='cadastro-pessoa-fisica'),
-    path('cadastro/pessoa-juridica/', views.CadastroPessoaJuridicaView.as_view(), name='cadastro-pessoa-juridica'),
+    # Login/Logout
+    path('login/', CustomLoginView.as_view(), name='login'),
+    path('logout/', CustomLogoutView.as_view(), name='logout'),
     
-    # ❌ COMENTAR/REMOVER ESTA LINHA
-    # path('perfil/', views.PerfilView.as_view(), name='perfil'),
+    # Cadastro
+    path('cadastro/', EscolhaTipoCadastroView.as_view(), name='cadastro-escolha'),
+    path('cadastro/admin/', AdminSignupView.as_view(), name='cadastro-admin'),
+    path('cadastro/funcionario/', FuncionarioSignupView.as_view(), name='cadastro-funcionario'),
+    path('cadastro/pessoa-fisica/', CadastroPessoaFisicaView.as_view(), name='cadastro-pessoa-fisica'),
+    path('cadastro/pessoa-juridica/', CadastroPessoaJuridicaView.as_view(), name='cadastro-pessoa-juridica'),
     
-    # Password reset URLs
+    # Perfil
+    path('perfil/', PerfilView.as_view(), name='perfil'),
+    
+    # Password reset
     path('password_reset/', auth_views.PasswordResetView.as_view(
         template_name='usuarios/password_reset.html'
     ), name='password_reset'),
     
-    # Adicionar rota que pode estar sendo referenciada em templates antigos
+    # Rotas antigas (compatibilidade)
     path('cadastro-pj/', CadastroPessoaJuridicaView.as_view(), name='cadastro-pj'),
     path('cadastro-pf/', CadastroPessoaFisicaView.as_view(), name='cadastro-pf'),
     
-    # Login/Logout específicos
-    path('login/', auth_views.LoginView.as_view(template_name='usuarios/login.html'), name='login'),
-    path('logout/', CustomLogoutView.as_view(), name='logout'),
-    
-    # ✅ ALTERAÇÃO DE SENHA COM FORM OPCIONAL
+    # Alteração de senha
     path('alterar-senha/', auth_views.PasswordChangeView.as_view(
         template_name='usuarios/change_password.html',
         form_class=CustomPasswordChangeForm if CustomPasswordChangeForm else None,
@@ -57,8 +60,6 @@ urlpatterns = [
     
     # Teste
     path('teste/', teste_view, name='teste'),
-    
-    # ✅ ADICIONAR ROTA DE PERFIL
-    # path('perfil/', views.PerfilView.as_view(), name='perfil'),
 ]
-# Deploy: 2025-11-06 00:04:16
+
+# Deploy: 2025-11-06 14:00:00
