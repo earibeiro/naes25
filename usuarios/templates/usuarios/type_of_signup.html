@@ -39,9 +39,9 @@
                                 <li>Usuários individuais</li>
                             </ul>
                             <div class="mt-4">
-                                <a href="{% url 'cadastro-pf' %}" class="btn btn-primary btn-lg">
-                                    <i class="fas fa-user-plus me-2"></i>
-                                    Cadastrar como PF
+                                <!-- ✅ CORRIGIDO -->
+                                <a href="{% url 'usuarios:cadastro-pessoa-fisica' %}" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-user-plus me-2"></i>Cadastrar como Pessoa Física
                                 </a>
                             </div>
                         </div>
@@ -73,9 +73,9 @@
                                 <li>Pessoas jurídicas em geral</li>
                             </ul>
                             <div class="mt-4">
-                                <a href="{% url 'cadastro-pj' %}" class="btn btn-warning btn-lg text-dark">
-                                    <i class="fas fa-building me-2"></i>
-                                    Cadastrar como PJ
+                                <!-- ✅ CORRIGIDO -->
+                                <a href="{% url 'usuarios:cadastro-pessoa-juridica' %}" class="btn btn-warning btn-lg text-dark">
+                                    <i class="fas fa-building me-2"></i>Cadastrar como Pessoa Jurídica
                                 </a>
                             </div>
                         </div>
