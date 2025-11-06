@@ -1,3 +1,123 @@
+{% extends "pages/base.html" %}
+{% load static %}
+
+{% block title %}Dashboard - Athena{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item active"><i class="fas fa-tachometer-alt me-1"></i>Dashboard</li>
+{% endblock %}
+
+{% block masthead_class %} masthead--minimal{% endblock %}
+
+{% block hero_content %}
+<div class="container px-4 px-lg-5 text-center">
+    <h1 class="text-white">Bem-vindo, {{ user.username }}!</h1>
+    <p class="text-white-50">Dashboard de Gestão LGPD - Controle total dos seus dados</p>
+</div>
+{% endblock %}
+
+{% block about_content %}
+<div class="container px-4 px-lg-5">
+    <!-- ESTATÍSTICAS -->
+    <div class="row text-center mb-5">
+        <div class="col-md-4">
+            <div class="card bg-dark border-primary">
+                <div class="card-body">
+                    <h3 class="text-primary">{{ total_persons|default:0 }}</h3>
+                    <p class="text-white mb-0">Pessoas Cadastradas</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-dark border-warning">
+                <div class="card-body">
+                    <h3 class="text-warning">{{ total_companies|default:0 }}</h3>
+                    <p class="text-white mb-0">Empresas Cadastradas</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-dark border-success">
+                <div class="card-body">
+                    <h3 class="text-success">{{ total_contracts|default:0 }}</h3>
+                    <p class="text-white mb-0">Contratos Ativos</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AÇÕES RÁPIDAS -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-lg-8 text-center">
+            <h2 class="text-white mb-4">Ações Rápidas</h2>
+            <div class="d-flex flex-wrap justify-content-center gap-3">
+                <a href="{% url 'person-create' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-user-plus me-2"></i>Nova Pessoa
+                </a>
+                <a href="{% url 'company-create' %}" class="btn btn-warning btn-lg">
+                    <i class="fas fa-building me-2"></i>Nova Empresa
+                </a>
+                <a href="{% url 'contrato-draft-start' %}" class="btn btn-success btn-lg">
+                    <i class="fas fa-file-contract me-2"></i>Novo Contrato
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- LISTAGENS RECENTES -->
+    <div class="row">
+        <!-- Pessoas Recentes -->
+        <div class="col-md-6 mb-4">
+            <div class="card bg-dark border-light">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-users me-2"></i>Pessoas Recentes</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_persons %}
+                        <ul class="list-group list-group-flush">
+                            {% for person in recent_persons %}
+                            <li class="list-group-item bg-dark text-white border-secondary">
+                                <a href="{% url 'person-detail' person.pk %}" class="text-decoration-none text-white">
+                                    {{ person.full_name }}
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        <a href="{% url 'person-list' %}" class="btn btn-sm btn-outline-primary mt-3">Ver Todas</a>
+                    {% else %}
+                        <p class="text-white-50">Nenhuma pessoa cadastrada ainda.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Empresas Recentes -->
+        <div class="col-md-6 mb-4">
+            <div class="card bg-dark border-light">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="fas fa-building me-2"></i>Empresas Recentes</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_companies %}
+                        <ul class="list-group list-group-flush">
+                            {% for company in recent_companies %}
+                            <li class="list-group-item bg-dark text-white border-secondary">
+                                <a href="{% url 'company-detail' company.pk %}" class="text-decoration-none text-white">
+                                    {{ company.name }}
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        <a href="{% url 'company-list' %}" class="btn btn-sm btn-outline-warning mt-3">Ver Todas</a>
+                    {% else %}
+                        <p class="text-white-50">Nenhuma empresa cadastrada ainda.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
 
 class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'pages/dashboard.html'
