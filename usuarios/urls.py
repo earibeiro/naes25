@@ -51,5 +51,8 @@ urlpatterns = [
     
     # Teste
     path('teste/', teste_view, name='teste'),
+    
+    # ✅ ADICIONAR ROTA DE PERFIL
+    path('perfil/', views.PerfilView.as_view(), name='perfil'),
 ]
 # Deploy: 2025-11-06 00:04:16

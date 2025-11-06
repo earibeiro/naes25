@@ -1,19 +1,19 @@
 ﻿runtime: python312
 env: standard
 
-entrypoint: gunicorn -b :$PORT Athena.wsgi:application --workers 2 --threads 4 --timeout 120
+entrypoint: gunicorn -b :$PORT Athena.Athena.wsgi:application --workers 2 --threads 4 --timeout 120
 
 handlers:
 - url: /static
   static_dir: staticfiles/
   secure: always
 
-- url: /.*
+- url: /.*"
   script: auto
   secure: always
 
 env_variables:
-  DJANGO_SETTINGS_MODULE: "Athena.settings"
+  DJANGO_SETTINGS_MODULE: "Athena.Athena.settings"
   SECRET_KEY: "django-insecure-7r)4^w97@%9j&!1m8z@n^f8z7&_p)g0v&$q6ej5q!^4@+_(nq0"
   DEBUG: "False"
   ALLOWED_HOSTS: "project-athena-0316.rj.r.appspot.com,*.appspot.com"
