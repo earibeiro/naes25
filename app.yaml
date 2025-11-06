@@ -1,7 +1,7 @@
 ﻿runtime: python312
 env: standard
 
-entrypoint: gunicorn -b :$PORT Athena.Athena.wsgi:application --workers 2 --threads 4 --timeout 120
+entrypoint: gunicorn -b :$PORT Athena.wsgi:application --workers 2 --threads 4 --timeout 120
 
 handlers:
 - url: /static
@@ -13,10 +13,10 @@ handlers:
   secure: always
 
 env_variables:
-  DJANGO_SETTINGS_MODULE: "Athena.Athena.settings"
+  DJANGO_SETTINGS_MODULE: "Athena.settings"
   SECRET_KEY: "django-insecure-7r)4^w97@%9j&!1m8z@n^f8z7&_p)g0v&$q6ej5q!^4@+_(nq0"
   DEBUG: "False"
-  ALLOWED_HOSTS: "athena-project-naes.ew.r.appspot.com,*.appspot.com"
+  ALLOWED_HOSTS: "project-athena-0316.rj.r.appspot.com,*.appspot.com"
   DATABASE_URL: "postgresql://postgres.vcmafdafcmtlrvcxpxlz:wN5vJ&A6Aq3E6he@aws-0-us-east-1.pooler.supabase.com:6543/postgres"
 
 automatic_scaling:
